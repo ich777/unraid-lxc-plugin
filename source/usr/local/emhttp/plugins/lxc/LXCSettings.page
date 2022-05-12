@@ -1,0 +1,104 @@
+Menu="Utilities"
+Title="LXC Settings"
+Icon="lxc.png"
+---
+<?
+$started = $var['fsState']=='Started';
+$status = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh status");
+$default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
+$avail_bridges = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh avail_bridges");
+$selected_bridge = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh selected_bridge");
+?>
+<link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.filetree.css')?>">
+<style>
+body{-webkit-overflow-scrolling:touch}
+.errortext{color:#EF3D47;display:none}
+.fileTree{background:<?=$bgcolor?>;width:300px;max-height:150px;overflow-y:scroll;overflow-x:hidden;position:absolute;z-index:100;display:none}
+.basic{display:block}
+.advanced{display:none}
+</style>
+
+<script>
+//Don't execute commands again if page is refreshed
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
+<script>
+//Don't execute commands again if page is refreshed
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
+<form markdown="1" id="changecfg" method="post" >
+_(Enable LXC)_:
+: <select id="SERVICE" name="SERVICE">
+  <?= mk_option($status, 'disabled', _('No'))?>
+  <?= mk_option($status, 'enabled', _('Yes'))?>
+  </select>
+
+_(Default LXC storage path)_:
+: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/user')?'/mnt/user':'/mnt'?>" value="<?=htmlspecialchars($default_path)?>/" placeholder="_(Click to Select)_" pattern="^[^\\]*/$">
+  <?if (!$started):?><span><i class="fa fa-warning icon warning"></i> _(Modify with caution: unable to validate path until Array is Started)_</span>
+  <?elseif (!is_dir($default_path)):?><span><i class="fa fa-warning icon warning"></i> _(Path does not exist)_</span><?endif;?>
+
+_(Default network bridge)_:
+:  <select name="BRNAME" >
+      <?php
+      $output = $avail_bridges;
+      $data = explode("\n", $output);
+      var_dump($data);
+      foreach($data as $item){
+      if ( $item == $selected_bridge ) {
+        echo "<option selected=\"selected\" value=\"$item\"> $item</option>";
+      } else {
+        echo "<option value=\"$item\"> $item</option>";
+        }
+}
+?>
+  </select>
+
+_(Update configuration file)_:
+:  <input type="submit" name="changeCFG" value="_(Update)_">
+</form>
+
+<table>
+<tr>
+<th>
+<div id="title"><span class="left"><i class="title fa fa-list"></i>lxc.conf</span></div>
+</th>
+<th>
+<div id="title"><span class="left"><i class="title fa fa-list"></i>default.conf</span></div>
+</th>
+</tr>
+
+<tr>
+<td><?="<pre id='btrfs-scrub'>".shell_exec("cat /boot/config/plugins/lxc/lxc.conf")."</pre>"?></td>
+<td><?="<pre id='btrfs-scrub'>".shell_exec("cat /boot/config/plugins/lxc/default.conf")."</pre>"?></td>
+</tr>
+</table>
+
+<?php
+if(isset($_POST['changeCFG'])) {
+$SERVICE = $_POST["SERVICE"];
+$DEFAULTDIR = $_POST["DEFAULTDIR"];
+$BRNAME = $_POST["BRNAME"];
+if ($started) {
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh change_config ".escapeshellarg($SERVICE)." ".escapeshellarg($DEFAULTDIR)." ".escapeshellarg($BRNAME)." 1");
+} else {
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh change_config ".escapeshellarg($SERVICE)." ".escapeshellarg($DEFAULTDIR)." ".escapeshellarg($BRNAME)."");
+}
+echo '<script>parent.window.location.reload();</script>';
+}
+?>
+<script src="<?autov('/webGui/javascript/jquery.filetree.js')?>" charset="utf-8"></script>
+<script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
+
+<script>
+
+  $('#defaultdir').fileTreeAttach();
+
+
+</script>

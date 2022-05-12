@@ -1,0 +1,58 @@
+Menu="Tasks:71"
+Type="xmenu"
+Title="LXC"
+Tabs="true"
+Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/dev/null\")"
+---
+<?php
+$started = $var['fsState']=='Started';
+$avail_containers = shell_exec("lxc-ls");
+?>
+
+<script>
+//Don't execute commands again if page is refreshed
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
+<script>
+//Don't execute commands again if page is refreshed
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
+<h1 style="text-align: center;"><a href="https://forums.unraid.net/" target="_blank" rel="noopener"><span style="color: green;">LXC</span></a></h1>
+<? if (isset($started ) === true && trim($started ) !== ''): ?>
+<h4 style="text-align: center;">This plugin is currently in development and features will be added over time. Currently the plugin is command line only!</h4>
+<hr />
+<p>&nbsp;</p>
+<? if (isset($avail_containers ) === true && trim($avail_containers ) !== ''): ?>
+Installed LXC Container(s):
+<?php
+echo "<pre>$avail_containers</pre>";
+?>
+
+Details for currently installed LXC Container(s):
+<?php
+$data = explode("\n", $avail_containers);
+foreach($data as $item){
+  $details = shell_exec("lxc-info $item");
+  echo "<pre>$details</pre>";
+}
+?>
+
+<? else: ?>
+<h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
+<p>To install Alpine Edge container open up a Terminal and enter:<br /><code>lxc-create --name Alpine --template download -- --dist alpine --release edge --arch amd64</code></p>
+<p>To install Arch current container open up a Terminal and enter:<br /><code>lxc-create --name Arch --template download -- --dist archlinux --release current --arch amd64</code></p>
+<p>To install CentOS 7 container open up a Terminal and enter:<br /><code>lxc-create --name CentOS --template download -- --dist centos --release 7 --arch amd64</code></p>
+<p>To install a Debian Bullseye container open up a Terminal and enter:<br /><code>lxc-create --name Debian --template download -- --dist debian --release bullseye --arch amd64</code></p>
+<p>To install Fedora 36 container open up a Terminal and enter:<br /><code>lxc-create --name Fedora --template download -- --dist fedora --release 36 --arch amd64</code></p>
+<p>To install Ubuntu Xenial container open up a Terminal and enter:<br /><code>lxc-create --name Ubuntu --template download -- --dist ubuntu --release xenial --arch amd64</code></p>
+<p>You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></p>
+<? endif; ?>
+<? else: ?>
+<h3 style="text-align: center;">Please start the Array!</h3>
+<? endif; ?>
