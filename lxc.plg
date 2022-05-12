@@ -1,0 +1,165 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+  <!ENTITY name      "lxc">
+  <!ENTITY author    "ich777">
+  <!ENTITY version   "2022.05.12">
+  <!ENTITY launch    "Settings/LXC">
+  <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
+  <!ENTITY pluginURL "&gitURL;/&name;.plg">
+  <!ENTITY md5       "0347bb76e3dbd4eb11241db167f3600a">
+  <!ENTITY plugin    "/boot/config/plugins/&name;">
+  <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
+]>
+
+<PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0-rc8" support="https://forums.unraid.net/topic/83786-support-ich777-application-dockers/">
+
+<CHANGES>
+
+###2022.05.12
+- Initial release
+
+</CHANGES>
+
+<FILE Run="/bin/bash">
+<INLINE>
+rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version;')
+</INLINE>
+</FILE>
+
+<FILE Name="/boot/config/plugins/&name;/&name;-&version;.txz" Run="upgradepkg --install-new">
+<URL>&gitURL;/packages/&name;-&version;.txz</URL>
+<MD5>&md5;</MD5>
+</FILE>
+
+<FILE Name="&emhttp;/README.md">
+<INLINE>
+**LXC**
+
+LXC is a well-known Linux container runtime that consists of tools, templates, and library and language bindings. It's pretty low level, very flexible and covers just about every containment feature supported by the upstream kernel.
+
+**Please Note that this plugin is currently in development and GUI functionality will be added over time!**
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash">
+<INLINE>
+
+#Create setting files if not found
+if [ ! -f "&plugin;/plugin.cfg" ]; then
+  echo 'SERVICE=enabled
+TIMEOUT=30' > "&plugin;/plugin.cfg"
+fi
+
+if [ ! -f "&plugin;/lxc.conf" ]; then
+  echo 'lxc.lxcpath=/mnt/user/lxc' > "&plugin;/lxc.conf"
+fi
+
+if [ ! -f "&plugin;/default.conf" ]; then
+  echo 'lxc.net.0.type = veth
+lxc.net.0.flags = up
+lxc.net.0.link = br0
+lxc.net.0.name = eth0' > "&plugin;/default.conf"
+fi
+
+#Create packages directory
+if [ ! -d &plugin;/packages ]; then
+  mkdir -p &plugin;/packages
+fi
+
+#Wait for Network and timeout after 30 seconds
+HOST="8.8.8.8"
+for i in {1..10}; do
+  ping -c1 $HOST &amp;> /dev/null &amp;&amp; break;
+done
+
+#Set variables and get version numbers
+LXC_DATADIRECTORY="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
+DL_URL="https://github.com/ich777/unraid-lxc-plugin/releases/download/$LAT_V"
+LAT_V="$(wget -qO- https://api.github.com/repos/ich777/unraid-lxc-plugin/releases/latest | jq -r '.tag_name')"
+CUR_V="$(ls /boot/config/plugins/lxc/packages/LXC-*-1.txz | sort -V | tail -1 | cut -d '-' -f2)
+
+if [ -z "${LAT_V}" ]; then
+  if [ -z "$CUR_V" ]; then
+    echo "---Something went horribly wrong, can't get latest version from LXC and no local version found!---"
+    removepkg /boot/config/plugins/&name;/&name;-&version;.txz"
+    rm -rf &plugin;
+    exit 1
+  else
+    LAT_V=${CUR_V}
+  fi
+fi
+
+#Check for old packages
+rm -f $(ls &plugin;/packages/LXC-*-1.txz 2>/dev/null | grep -v "$LAT_V")
+
+download() {
+#Download LXC package
+if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packages/LXC-${LAT_V}-1.txz" "${DL_URL}/LXC-${LAT_V}-1.txz" ; then
+  if [ "$(md5sum "&plugin;/packages/LXC-${LAT_V}-1.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/LXC-${LAT_V}-1.txz.md5" | cut -d ' ' -f1)" ]; then
+    echo
+    echo "---CHECKSUM ERROR!---"
+    removepkg /boot/config/plugins/&name;/&name;-&version;.txz"
+    rm -rf &plugin;
+    exit 1
+  fi
+  echo
+  echo "----------Successfully downloaded LXC Package-----------"
+else
+  echo
+  echo "--------------Can't download LXC Package----------------"
+  exit 1
+fi
+}
+
+check() {
+if [ ! -f "&plugin;/packages/LXC-${LAT_V}-1.txz" ]; then
+  echo
+  echo "---------------Downloading LXC Package!-----------------"
+  echo "------------Please don't close this window!-------------"
+  download
+else
+  echo
+  echo "---------------LXC Package found locally----------------"
+fi
+}
+
+install() {
+#Install LXC Package
+/sbin/installpkg "&plugin;/packages/LXC-${LAT_V}-1.txz"
+if [ ! -d ${LXC_DATADIRECTORY}/cache ]; then
+  mkdir -p ${LXC_DATADIRECTORY}/cache
+fi
+rm -rf /var/cache/lxc 
+ln -s /${LXC_DATADIRECTORY}/cache /var/cache/lxc
+ln -s /boot/config/plugins/lxc/default.conf /etc/lxc/default.conf
+ln -s /boot/config/plugins/lxc/lxc.conf /etc/lxc/lxc.conf
+}
+
+#Check if Coral Accelerator Module Drivers are already downloaded
+check
+if [ "$(lxc-start --version)" != "${LAT_V}" ]; then
+  install > /dev/null
+fi
+
+echo "---------------LXC installation complete!---------------"
+
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+
+echo "------------------------------"
+echo "---Uninstalling LXC Package---"
+echo "------------------------------"
+# Remove plugin related files
+removepkg &name;-&version;
+echo
+echo "------------------------------------------------------------------------------"
+echo "-------------LXC Package uninstalled, please reboot your server!--------------"
+echo "------------------------------------------------------------------------------"
+echo
+
+</INLINE>
+</FILE>
+</PLUGIN>
