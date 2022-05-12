@@ -45,7 +45,7 @@ LXC is a well-known Linux container runtime that consists of tools, templates, a
 
 #Create setting files if not found
 if [ ! -f "&plugin;/plugin.cfg" ]; then
-  echo 'SERVICE=enabled
+  echo 'SERVICE=disabled
 TIMEOUT=30' > "&plugin;/plugin.cfg"
 fi
 
