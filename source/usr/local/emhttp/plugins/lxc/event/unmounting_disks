@@ -1,0 +1,13 @@
+#!/bin/bash
+CONTAINERS="$(lxc-ls --active)"
+TIMEOUT="$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "TIMEOUT" | cut -d '=' -f2 | sed 's/\"//g')"
+if [ -z "${TIMEOUT}" ]; then
+  TIMEOUT=15
+fi
+for container in $CONTAINERS; do
+  logger "LXC: Stopping Container: $container..."
+  lxc-stop --timeout=${TIMEOUT} $container 2>/dev/null
+  logger "LXC: Container $container successful stopped!"
+done
+sleep 5
+rm -rf /var/cache/lxc
