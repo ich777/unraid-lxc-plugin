@@ -36,7 +36,6 @@ rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version
 **LXC**
 
 LXC is a well-known Linux container runtime that consists of tools, templates, and library and language bindings. It's pretty low level, very flexible and covers just about every containment feature supported by the upstream kernel.
-
 **Please Note that this plugin is currently in development and GUI functionality will be added over time!**
 </INLINE>
 </FILE>
@@ -74,14 +73,14 @@ done
 
 #Set variables and get version numbers
 LXC_DATADIRECTORY="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
-DL_URL="https://github.com/ich777/unraid-lxc-plugin/releases/download/$LAT_V"
 LAT_V="$(wget -qO- https://api.github.com/repos/ich777/unraid-lxc-plugin/releases/latest | jq -r '.tag_name')"
-CUR_V="$(ls /boot/config/plugins/lxc/packages/LXC-*-1.txz | sort -V | tail -1 | cut -d '-' -f2)
+CUR_V="$(ls /boot/config/plugins/lxc/packages/LXC-*-1.txz | sort -V | tail -1 | cut -d '-' -f2)"
+DL_URL="https://github.com/ich777/unraid-lxc-plugin/releases/download/$LAT_V"
 
 if [ -z "${LAT_V}" ]; then
-  if [ -z "$CUR_V" ]; then
+  if [ -z "${CUR_V}" ]; then
     echo "---Something went horribly wrong, can't get latest version from LXC and no local version found!---"
-    removepkg /boot/config/plugins/&name;/&name;-&version;.txz"
+    removepkg &name;-&version;.txz
     rm -rf &plugin;
     exit 1
   else
@@ -98,7 +97,7 @@ if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packag
   if [ "$(md5sum "&plugin;/packages/LXC-${LAT_V}-1.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/LXC-${LAT_V}-1.txz.md5" | cut -d ' ' -f1)" ]; then
     echo
     echo "---CHECKSUM ERROR!---"
-    removepkg /boot/config/plugins/&name;/&name;-&version;.txz"
+    removepkg &name;-&version;.txz
     rm -rf &plugin;
     exit 1
   fi
@@ -135,7 +134,7 @@ ln -s /boot/config/plugins/lxc/default.conf /etc/lxc/default.conf
 ln -s /boot/config/plugins/lxc/lxc.conf /etc/lxc/lxc.conf
 }
 
-#Check if Coral Accelerator Module Drivers are already downloaded
+#Check if LXC Package is already downloaded
 check
 if [ "$(lxc-start --version)" != "${LAT_V}" ]; then
   install > /dev/null
@@ -154,6 +153,7 @@ echo "---Uninstalling LXC Package---"
 echo "------------------------------"
 # Remove plugin related files
 removepkg &name;-&version;
+rm -rf &plugin;
 echo
 echo "------------------------------------------------------------------------------"
 echo "-------------LXC Package uninstalled, please reboot your server!--------------"
