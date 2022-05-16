@@ -83,7 +83,7 @@ else
     $color="color:red;";
 }
 
-?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><?php echo $container_array['Name'];?><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $CPUs;?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $container_array['Memory use'];?></td><td><?php echo $container_array['KMem use'];?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $autostart_button;?></td><td><a href="LXCEditContainer" name="<?php echo $container_array['Name'];?>" class="button">Edit</a></td><td></td></tr></tbody> <?php
+?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><?php echo $container_array['Name'];?><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $CPUs;?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $container_array['Memory use'];?></td><td><?php echo $container_array['KMem use'];?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $autostart_button;?></td><td><a href="LXCEditContainer" name="<?php echo $container_array['Name'];?>" class="button">Edit</a></td></tr></tbody> <?php
 
 unset($container_array);
 }
