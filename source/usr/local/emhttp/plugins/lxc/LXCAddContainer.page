@@ -1,0 +1,28 @@
+Title="Add LXC Container"
+Markdown="false"
+---
+<?php
+$started = $var['fsState']=='Started';
+$avail_containers = shell_exec("lxc-ls");
+?>
+
+<script>
+//Don't execute commands again if page is refreshed
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
+<script>
+//Don't execute commands again if page is refreshed
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
+
+<?php 
+echo "<a href=\"#\" title='"._("Create")."' onclick=\"openBox('/usr/local/emhttp/plugins/lxc/include/create_container.sh','Create',300,800,false);return false\"><button type='button'>Create</button></a></a>";
+?>
+
+<a href="LXC" class="button">Back</a>

@@ -7,6 +7,7 @@ Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/d
 <?php
 $started = $var['fsState']=='Started';
 $avail_containers = shell_exec("lxc-ls");
+$default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
 ?>
 
 <script>
@@ -22,6 +23,8 @@ $avail_containers = shell_exec("lxc-ls");
         window.history.replaceState( null, null, window.location.href );
     }
 </script>
+
+
 
 <h1 style="text-align: center;"><a href="https://forums.unraid.net/" target="_blank" rel="noopener"><span style="color: green;">LXC</span></a></h1>
 <? if (isset($started ) === true && trim($started ) !== ''): ?>
@@ -29,19 +32,66 @@ $avail_containers = shell_exec("lxc-ls");
 <hr />
 <p>&nbsp;</p>
 <? if (isset($avail_containers ) === true && trim($avail_containers ) !== ''): ?>
-Installed LXC Container(s):
-<?php
-echo "<pre>$avail_containers</pre>";
-?>
 
-Details for currently installed LXC Container(s):
+
+<table id="lxc_table" class="tablesorter four shift">
+<thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>_(Name)_</th><th>_(CPUs)_</th><th>_(PID)_</th><th>_(Memory)_</th><th>_(Kernel Memory)_</th><th>_(Total RX/TX)_</th><th>_(Autostart)_</th><th>_(Edit)_</th></tr></thead>
+
+
 <?php
-$data = explode("\n", $avail_containers);
+$cont = trim($avail_containers, "\n");
+$data = explode("\n", $cont);
 foreach($data as $item){
   $details = shell_exec("lxc-info $item");
-  echo "<pre>$details</pre>";
+
+
+$replaced = explode("\n", $details);
+$raw_array = preg_replace('/\s\s+/', ' ', $replaced);
+foreach($raw_array as $line)
+{
+    $tmp = explode(": ", $line);
+    $container_array[$tmp[0]] = $tmp[1];
 }
+
+//Get CPUs and autostart
+$CPUs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_CPUs ".escapeshellarg($container_array['PID'])."");
+$autostart = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_autostart ".escapeshellarg($default_path)." ".escapeshellarg($container_array['Name'])."");
+
+if($autostart=="1")
+{
+    $autostart_button='<a class="button">Disable</a>';
+}
+else 
+{
+    $autostart_button='<a class="button">Enable</a>';
+}
+
+
+
+// Set color from status
+$status=$container_array['State'];
+if($status=="RUNNING")
+{
+    $color="color:green";
+}
+else if($status=="FROZEN")
+{
+    $color="color:orange";
+}
+else 
+{
+    $color="color:red;";
+}
+
+?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><?php echo $container_array['Name'];?><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $CPUs;?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $container_array['Memory use'];?></td><td><?php echo $container_array['KMem use'];?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $autostart_button;?></td><td><a href="LXCEditContainer" name="<?php echo $container_array['Name'];?>" class="button">Edit</a></td><td></td></tr></tbody> <?php
+
+unset($container_array);
+}
+
 ?>
+</table>
+
+<a href="LXCAddContainer" class="button">Add Container</a>
 
 <? else: ?>
 <h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
