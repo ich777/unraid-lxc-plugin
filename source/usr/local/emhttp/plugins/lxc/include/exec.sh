@@ -48,8 +48,54 @@ if [ ! -z "${4}" ]; then
 fi
 }
 
+function get_autostart(){
+echo -n "$(grep "lxc.start.auto" $1/$2/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')"
+}
+
 function enable_autostart(){
-echo -n "$(cat /boot/config/plugins/lxc/default.conf | grep -n "lxc.net.0.link" | cut -d '=' -f2 | sed 's/\"//g' | sed 's/ //g')"
+if [ ! "$(grep "lxc.start.auto" $1/$2/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
+echo "
+# Autostart Settings
+lxc.start.auto = 1
+lxc.start.delay = 0" > $1/$2/config
+else
+sed -i "/lxc.start.auto/c\lxc.start.auto = 1" $1/$2/config
+fi
+}
+
+function disable_autostart(){
+if [ ! "$(grep "lxc.start.auto" $1/$2/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
+echo "
+# Autostart Settings
+lxc.start.auto = 0
+lxc.start.delay = 0" > $1/$2/config
+else
+sed -i "/lxc.start.auto/c\lxc.start.auto = 0" $1/$2/config
+fi
+}
+
+function get_CPUs(){
+echo -n "$(cat /proc/$1/status | grep "Cpus_allowed_list" | awk '{print $2}')"
+}
+
+function start_Container(){
+echo -n "$(lxc-start $1)"
+}
+
+function stopp_Container(){
+echo -n "$(lxc-stop $1)"
+}
+
+function freeze_Container(){
+echo -n "$(lxc-freeze $1)"
+}
+
+function unfreeze_Container(){
+echo -n "$(lxc-unfreeze $1)"
+}
+
+function kill_Container(){
+echo -n "$(lxc-stopp -kill $1)"
 }
 
 $@
