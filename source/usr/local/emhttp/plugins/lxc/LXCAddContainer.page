@@ -23,7 +23,7 @@ $started = $var['fsState']=='Started';
 </script>
 
 <div id="canvas">
-<form method="POST" autocomplete="off" onsubmit="createContainer(this)">
+<form method="post" autocomplete="off">
 
 <div class="">
 <dl>
@@ -53,7 +53,7 @@ $started = $var['fsState']=='Started';
 </dl>
 </div>
 
-<input type="submit" value="Create"/> 
+<input type="button" value="_(Create)_" onclick="createContainer(this.form)">
 <a href="LXC" class="button">Back</a>
 
 </form>
