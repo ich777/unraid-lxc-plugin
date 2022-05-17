@@ -1,30 +1,35 @@
 #!/bin/bash
-cat << "EOF"
-_______________________________________________________________________________________
-_______________________________________________________________________________________
-TTTTTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEEEEEE___SSSSSSSSSSSSSSS_TTTTTTTTTTTTTTTTTTTTTTT
-T:::::::::::::::::::::TE::::::::::::::::::::E_SS:::::::::::::::ST:::::::::::::::::::::T
-T:::::::::::::::::::::TE::::::::::::::::::::ES:::::SSSSSS::::::ST:::::::::::::::::::::T
-T:::::TT:::::::TT:::::TEE::::::EEEEEEEEE::::ES:::::S_____SSSSSSST:::::TT:::::::TT:::::T
-TTTTTT__T:::::T__TTTTTT__E:::::E_______EEEEEES:::::S____________TTTTTT__T:::::T__TTTTTT
-________T:::::T__________E:::::E_____________S:::::S____________________T:::::T________
-________T:::::T__________E::::::EEEEEEEEEE____S::::SSSS_________________T:::::T________
-________T:::::T__________E:::::::::::::::E_____SS::::::SSSSS____________T:::::T________
-________T:::::T__________E:::::::::::::::E_______SSS::::::::SS__________T:::::T________
-________T:::::T__________E::::::EEEEEEEEEE__________SSSSSS::::S_________T:::::T________
-________T:::::T__________E:::::E_________________________S:::::S________T:::::T________
-________T:::::T__________E:::::E_______EEEEEE____________S:::::S________T:::::T________
-______TT:::::::TT______EE::::::EEEEEEEE:::::ESSSSSSS_____S:::::S______TT:::::::TT______
-______T:::::::::T______E::::::::::::::::::::ES::::::SSSSSS:::::S______T:::::::::T______
-______T:::::::::T______E::::::::::::::::::::ES:::::::::::::::SS_______T:::::::::T______
-______TTTTTTTTTTT______EEEEEEEEEEEEEEEEEEEEEE_SSSSSSSSSSSSSSS_________TTTTTTTTTTT______
-_______________________________________________________________________________________
-_______________________________________________________________________________________
-_______________________________________________________________________________________
-_______________________________________________________________________________________
-_______________________________________________________________________________________
-_______________________________________________________________________________________
 
-_____waiting 5 seconds to display DONE Button______
-EOF
-sleep 5
+
+echo $1 $2 $3 $4 $5 $6
+
+## Create the container, exit if failed
+#lxc-create --name $3 --template download -- --dist $4 --release $5 --arch amd64 || exit 1
+
+## Inject the random generated MAC address in the config file
+#if [ ! "$(grep "lxc.net.0.hwaddr" $1/$3/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
+#  echo "lxc.net.0.hwaddr = $2" >> $1/$3/config
+#else
+#  sed -i "/lxc.net.0.hwaddr/c\lxc.net.0.hwaddr = $2" $1/$3/config
+#fi
+
+## Inject the Autostart settings in the config file
+#if [ "$5" == "on" ]; then
+#  if [ ! "$(grep "lxc.start.auto" $1/$3/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
+#    echo "
+## Autostart Settings
+#lxc.start.auto = 1
+#lxc.start.delay = 0" >> $1/$3/config
+#  else
+#    sed -i "/lxc.start.auto/c\lxc.start.auto = 1" $1/$3/config
+#  fi
+#else
+#  if [ ! "$(grep "lxc.start.auto" $1/$3/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
+#    echo "
+## Autostart Settings
+#lxc.start.auto = 0
+#lxc.start.delay = 0" >> $1/$3/config
+#  else
+#    sed -i "/lxc.start.auto/c\lxc.start.auto = 0" $1/$3/config
+#  fi
+#fi
