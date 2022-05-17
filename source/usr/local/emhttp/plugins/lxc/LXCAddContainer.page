@@ -15,7 +15,7 @@ $started = $var['fsState']=='Started';
         var distribution = form.contDistribution.value;
         var release = form.contRelease.value;
         var name = form.contName.value;
-        var autostart = form.contAutostart.value;
+        var autostart = form.contAutostart.is(':checked');
         <?php $macaddress = "52:54:00:" .strtoupper(implode(':', str_split(substr(md5(mt_rand()), 0, 6), 2))); ?>
         openBox('/usr/local/emhttp/plugins/lxc/include/create_container.sh&arg1=<?php echo $macaddress; ?>&arg2='+distribution+'&arg3='+release+'&arg4='+name+'&arg5='+autostart,'Create',300,800,false);
         return false;
