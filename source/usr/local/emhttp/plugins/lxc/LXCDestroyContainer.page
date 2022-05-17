@@ -1,0 +1,22 @@
+Title="Destroy LXC Container"
+Markdown="false"
+---
+<?php
+$started = $var['fsState']=='Started';
+$avail_containers = shell_exec("lxc-ls");
+?>
+
+<script>
+//Don't execute commands again if page is refreshed
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
+
+<h1>Destroy Page</h1>
+
+Are you really sure that you want to destroy the container //placeholder//</br>
+This is IRREVERSIBLE and all your data from the container will be lost!
+</br></br></br>
+
+<a href="LXC" class="button">Back</a>

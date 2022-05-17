@@ -24,8 +24,6 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
     }
 </script>
 
-
-
 <h1 style="text-align: center;"><a href="https://forums.unraid.net/" target="_blank" rel="noopener"><span style="color: green;">LXC</span></a></h1>
 <? if (isset($started ) === true && trim($started ) !== ''): ?>
 <h4 style="text-align: center;">This plugin is currently in development and features will be added over time. Currently the plugin is command line only!</h4>
@@ -35,7 +33,7 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 
 
 <table id="lxc_table" class="tablesorter four shift">
-<thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>_(Name)_</th><th>_(CPUs)_</th><th>_(PID)_</th><th>_(Memory)_</th><th>_(Kernel Memory)_</th><th>_(Total RX/TX)_</th><th>_(Autostart)_</th><th>_(Edit)_</th></tr></thead>
+<thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>_(Name/Status)_</th><th></th><th>_(CPUs)_</th><th>_(Memory)_/</br>_(Kernel Memory)_</th><th>Address</th><th>_(Total RX/TX)_</th><th>_(PID)_</th><th>_(Autostart)_</th><th>_(Destroy)_</th></tr></thead>
 
 
 <?php
@@ -53,9 +51,10 @@ foreach($raw_array as $line)
     $container_array[$tmp[0]] = $tmp[1];
 }
 
-//Get CPUs and autostart
+//Get CPUs, autostart and IPs
 $CPUs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_CPUs ".escapeshellarg($container_array['PID'])."");
 $autostart = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_autostart ".escapeshellarg($default_path)." ".escapeshellarg($container_array['Name'])."");
+$IPs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_IPs ".escapeshellarg($container_array['Name'])."");
 
 if($autostart=="1")
 {
@@ -73,17 +72,20 @@ $status=$container_array['State'];
 if($status=="RUNNING")
 {
     $color="color:green";
+    $status_buttons='<a class="button">Stop</a><a class="button">Freeze</a><a class="button">Kill</a>';
 }
 else if($status=="FROZEN")
 {
     $color="color:orange";
+    $status_buttons='<a class="button">Stop</a><a class="button">Kill</a>';
 }
 else 
 {
     $color="color:red;";
+    $status_buttons='<a class="button">Start</a>';
 }
 
-?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><?php echo $container_array['Name'];?><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $CPUs;?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $container_array['Memory use'];?></td><td><?php echo $container_array['KMem use'];?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $autostart_button;?></td><td><a href="LXCEditContainer" name="<?php echo $container_array['Name'];?>" class="button">Edit</a></td></tr></tbody> <?php
+?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><?php echo $container_array['Name'];?><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><a href="LXCDestroyContainer" name="<?php echo $container_array['Name'];?>" class="button">Destroy</a></td></tr></tbody> <?php
 
 unset($container_array);
 }
