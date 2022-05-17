@@ -136,7 +136,7 @@ ln -s /boot/config/plugins/lxc/lxc.conf /etc/lxc/lxc.conf
 
 #Check if LXC Package is already downloaded
 check
-if [ "$(lxc-start --version)" != "${LAT_V}" ]; then
+if [ "$(lxc-start --version 2>/dev/null)" != "${LAT_V}" ]; then
   install > /dev/null
 fi
 
