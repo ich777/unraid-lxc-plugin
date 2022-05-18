@@ -84,9 +84,7 @@ echo -n "$(lxc-info $1 -iH | sed ':a;N;$!ba;s/\n/<\/br>/g')"
 }
 
 function start_Container(){
-logger 1
-echo -n "$(echo 1)"
-#lxc-start $1
+lxc-start $1
 }
 
 function stop_Container(){
