@@ -11,16 +11,13 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 ?>
 
 <script>
-//Don't execute commands again if page is refreshed
+    //Don't execute commands again if page is refreshed
     if ( window.history.replaceState ) {
         window.history.replaceState( null, null, window.location.href );
     }
-</script>
 
-<script>
-//Don't execute commands again if page is refreshed
-    if ( window.history.replaceState ) {
-        window.history.replaceState( null, null, window.location.href );
+    function commandContainer(command, name) {
+        openBox("/usr/local/emhttp/plugins/lxc/include/exec.sh&arg1="+command+"&arg2="+name,"Create",300,800,true);
     }
 </script>
 
@@ -69,20 +66,26 @@ else
 
 // Set color from status
 $status=$container_array['State'];
+$name="'".$container_array['Name']."'";
+$start="'start_Container'";
+$stop="'stop_Container'";
+$freeze="'freeze_Container'";
+$unfreeze="'unfreeze_Container'";
+$kill="'kill_Container'";
 if($status=="RUNNING")
 {
     $color="color:green";
-    $status_buttons='<a class="button">Stop</a><a class="button">Freeze</a><a class="button">Kill</a>';
+    $status_buttons='<button onclick="commandContainer('.$stop.', '.$name.')">Stop</button><button onclick="commandContainer('.$freeze.', '.$name.')">Freeze</button><button onclick="commandContainer('.$kill.', '.$name.')">Kill</button>';
 }
 else if($status=="FROZEN")
 {
     $color="color:orange";
-    $status_buttons='<a class="button">Stop</a><a class="button">Kill</a>';
+    $status_buttons='<button onclick="commandContainer('.$stop.', '.$name.')">Stop</button><button onclick="commandContainer('.$kill.', '.$name.')">Kill</button>';
 }
 else 
 {
     $color="color:red;";
-    $status_buttons='<a class="button">Start</a>';
+    $status_buttons='<button onclick="commandContainer('.$start.', '.$name.')">Start</button>';
 }
 
 ?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><?php echo $container_array['Name'];?><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><a href="LXCDestroyContainer" name="<?php echo $container_array['Name'];?>" class="button">Destroy</a></td></tr></tbody> <?php

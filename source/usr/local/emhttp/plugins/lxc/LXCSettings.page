@@ -40,8 +40,8 @@ _(Enable LXC)_:
   </select>
 
 _(Default LXC storage path)_:
-: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/user')?'/mnt/user':'/mnt'?>" value="<?=htmlspecialchars($default_path)?>/" placeholder="_(Click to Select)_" pattern="^[^\\]*/$">
-  <span style="color: #ff0000;">Don't share this directory via SMB or NFS or change the permissions from this directory!</span>
+: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($default_path)?>/" placeholder="_(Click to Select)_" pattern="^[^\\]*/$"></br>
+  <span style="color: #ff0000;">ATTENTION: It is strongly recommended to not use a FUSE path like /mnt/user/lxc/ instead use the real path to the share like /mnt/cache/lxc/ or /mnt/disk1/lxc/</br>Don't share this directory via SMB or NFS or change the permissions from this directory!</span>
   <?if (!$started):?><span><i class="fa fa-warning icon warning"></i> _(Modify with caution: unable to validate path until Array is Started)_</span>
   <?elseif (!is_dir($default_path)):?><span><i class="fa fa-warning icon warning"></i> _(Path does not exist)_</span><?endif;?>
 
