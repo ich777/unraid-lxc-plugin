@@ -64,7 +64,6 @@ fi
 }
 
 function disable_autostart(){
-logger disable
 if [ ! "$(grep "lxc.start.auto" $1/$2/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
 echo "
 # Autostart Settings
@@ -100,7 +99,7 @@ lxc-unfreeze $1
 }
 
 function kill_Container(){
-lxc-stop -kill $1
+lxc-stop --kill $1
 }
 
 function destroy_Container(){
