@@ -16,21 +16,26 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
         window.history.replaceState( null, null, window.location.href );
     }
 
-    function commandContainer(command, name) {
-        openBox("/usr/local/emhttp/plugins/lxc/include/exec.sh&arg1="+command+"&arg2="+name,"Create",300,800,true);
+    function destroyConfirm() {
+        if (confirm("ATTENTION: Do you really want to destroy this LXC Container? This is IRREVERSIBLE and will delete the container and all data in it!") == true) {
+            return true;
+        } else {
+            return false;
+        }
     }
+    
 </script>
 
 <h1 style="text-align: center;"><a href="https://forums.unraid.net/" target="_blank" rel="noopener"><span style="color: green;">LXC</span></a></h1>
 <? if (isset($started ) === true && trim($started ) !== ''): ?>
-<h4 style="text-align: center;">This plugin is currently in development and features will be added over time. Currently the plugin is command line only!</h4>
+<h4 style="text-align: center;">This plugin is currently in development and features will be added over time.</h4>
 <hr />
 <p>&nbsp;</p>
 <? if (isset($avail_containers ) === true && trim($avail_containers ) !== ''): ?>
 
 
 <table id="lxc_table" class="tablesorter four shift">
-<thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>_(Name/Status)_</th><th></th><th>_(CPUs)_</th><th>_(Memory)_/</br>_(Kernel Memory)_</th><th>Address</th><th>_(Total RX/TX)_</th><th>_(PID)_</th><th>_(Autostart)_</th><th>_(Destroy)_</th></tr></thead>
+<thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>Name/Status</th><th></th><th>CPUs</th><th>Memory/</br>Kernel Memory</th><th>Address</th><th>Total RX/TX</th><th>PID</th><th>Autostart</th><th>Destroy</th></tr></thead>
 
 
 <?php
@@ -53,60 +58,106 @@ $CPUs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_CPUs ".esc
 $autostart = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_autostart ".escapeshellarg($default_path)." ".escapeshellarg($container_array['Name'])."");
 $IPs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_IPs ".escapeshellarg($container_array['Name'])."");
 
-if($autostart=="1")
-{
-    $autostart_button='<a class="button">Disable</a>';
-}
-else 
-{
-    $autostart_button='<a class="button">Enable</a>';
-}
-
-
-
 // Set color from status
 $status=$container_array['State'];
-$name="'".$container_array['Name']."'";
-$start="'start_Container'";
-$stop="'stop_Container'";
-$freeze="'freeze_Container'";
-$unfreeze="'unfreeze_Container'";
-$kill="'kill_Container'";
 if($status=="RUNNING")
 {
     $color="color:green";
-    $status_buttons='<button onclick="commandContainer('.$stop.', '.$name.')">Stop</button><button onclick="commandContainer('.$freeze.', '.$name.')">Freeze</button><button onclick="commandContainer('.$kill.', '.$name.')">Kill</button>';
+    $status_buttons="<form id=\"stop\" method=\"post\" >
+    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+    <input type=\"submit\" name=\"stopCONT\" value=\"Stop\">
+    <input type=\"submit\" name=\"freezeCONT\" value=\"Freeze\">
+    <input type=\"submit\" name=\"killCONT\" value=\"Kill\">
+    </form>";
 }
 else if($status=="FROZEN")
 {
     $color="color:orange";
-    $status_buttons='<button onclick="commandContainer('.$stop.', '.$name.')">Stop</button><button onclick="commandContainer('.$kill.', '.$name.')">Kill</button>';
+    $status_buttons="<form id=\"unfreeze\" method=\"post\" >
+    <input type=\"submit\" name=\"unfreezeCONT\" value=\"Unfreeze\">
+    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+    <input type=\"submit\" name=\"killCONT\" value=\"Kill\">
+    </form>";
 }
 else 
 {
     $color="color:red;";
-    $status_buttons='<button onclick="commandContainer('.$start.', '.$name.')">Start</button>';
+    $status_buttons="<form id=\"start\" method=\"post\" >
+    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+    <input type=\"submit\" name=\"startCONT\" value=\"Start\">
+    </form>";
 }
 
-?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><?php echo $container_array['Name'];?><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><a href="LXCDestroyContainer" name="<?php echo $container_array['Name'];?>" class="button">Destroy</a></td></tr></tbody> <?php
+if($autostart=="1")
+{
+    $autostart_button="<form id=\"disable\" method=\"post\" >
+    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+    <input type=\"submit\" name=\"disableAUTOSTART\" value=\"Disable\">
+    </form>";
+}
+else 
+{
+    $autostart_button="<form id=\"enable\" method=\"post\" >
+    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+    <input type=\"submit\" name=\"enableAUTOSTART\" value=\"Enable\">
+    </form>";
+}
+
+$destroy_button="<form id=\"destroy\" method=\"post\" onsubmit=\"return destroyConfirm()\">
+<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+<input type=\"submit\" name=\"destroyCONT\" value=\"Destroy\">
+</form>";
+
+?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><font size="+1"><a href='#' title='"._("Download Driver")."' onclick="openBox('/usr/local/emhttp/plugins/lxc/include/show_config.sh&arg1=<?php echo $default_path; ?>&arg2=<?php echo $container_array['Name'];?>','Configuration - <?php echo $container_array['Name'];?>',700,800,false);return false"<input type='text'><?php echo $container_array['Name'];?></input></a></a></font><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><?php echo $destroy_button;?></td></tr></tbody> <?php
+
+
 
 unset($container_array);
+}
+
+if(isset($_POST['startCONT'])) {
+$CONTname = $_POST["CONTname"];
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh start_Container ".escapeshellarg($CONTname)."");
+echo '<script>parent.window.location.reload();</script>';
+} elseif(isset($_POST['stopCONT'])) {
+$CONTname = $_POST["CONTname"];
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh stop_Container ".escapeshellarg($CONTname)."");
+echo '<script>parent.window.location.reload();</script>';
+} elseif(isset($_POST['freezeCONT'])) {
+$CONTname = $_POST["CONTname"];
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh freeze_Container ".escapeshellarg($CONTname)."");
+echo '<script>parent.window.location.reload();</script>';
+} elseif(isset($_POST['killCONT'])) {
+$CONTname = $_POST["CONTname"];
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh kill_Container ".escapeshellarg($CONTname)."");
+echo '<script>parent.window.location.reload();</script>';
+} elseif(isset($_POST['unfreezeCONT'])) {
+$CONTname = $_POST["CONTname"];
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh unfreeze_Container ".escapeshellarg($CONTname)."");
+echo '<script>parent.window.location.reload();</script>';
+} elseif(isset($_POST['enableAUTOSTART'])) {
+$CONTname = $_POST["CONTname"];
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh enable_autostart ".escapeshellarg($default_path)." ".escapeshellarg($CONTname)."");
+echo '<script>parent.window.location.reload();</script>';
+} elseif(isset($_POST['disableAUTOSTART'])) {
+$CONTname = $_POST["CONTname"];
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh disable_autostart ".escapeshellarg($default_path)." ".escapeshellarg($CONTname)."");
+echo '<script>parent.window.location.reload();</script>';
+} elseif(isset($_POST['destroyCONT'])) {
+$CONTname = $_POST["CONTname"];
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh destroy_Container ".escapeshellarg($CONTname)."");
+echo '<script>parent.window.location.reload();</script>';
 }
 
 ?>
 </table>
 
 <a href="LXCAddContainer" class="button">Add Container</a>
-
 <? else: ?>
 <h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
-<p>To install Alpine Edge container open up a Terminal and enter:<br /><code>lxc-create --name Alpine --template download -- --dist alpine --release edge --arch amd64</code></p>
-<p>To install Arch current container open up a Terminal and enter:<br /><code>lxc-create --name Arch --template download -- --dist archlinux --release current --arch amd64</code></p>
-<p>To install CentOS 7 container open up a Terminal and enter:<br /><code>lxc-create --name CentOS --template download -- --dist centos --release 7 --arch amd64</code></p>
-<p>To install a Debian Bullseye container open up a Terminal and enter:<br /><code>lxc-create --name Debian --template download -- --dist debian --release bullseye --arch amd64</code></p>
-<p>To install Fedora 36 container open up a Terminal and enter:<br /><code>lxc-create --name Fedora --template download -- --dist fedora --release 36 --arch amd64</code></p>
-<p>To install Ubuntu Xenial container open up a Terminal and enter:<br /><code>lxc-create --name Ubuntu --template download -- --dist ubuntu --release xenial --arch amd64</code></p>
-<p>You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></p>
+<p>No containers installed! Click on Add Container to add one.</p>
+
+<a href="LXCAddContainer" class="button">Add Container</a>
 <? endif; ?>
 <? else: ?>
 <h3 style="text-align: center;">Please start the Array!</h3>

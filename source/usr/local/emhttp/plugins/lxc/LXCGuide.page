@@ -4,20 +4,18 @@ Title="Readme"
 <?php
 $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
 ?>
-<h3 style="text-align: center;">Please configure LXC first in the Settings tab in Unraid!</h3>
-<p>Please note that this container is in development and GUI features will be added over time like Autostart, Container Start/Stop,...</p>
-<p>To install Alpine Edge container open up a Terminal and enter:<br /><code>lxc-create --name Alpine --template download -- --dist alpine --release edge --arch amd64</code></p>
-<p>To install Arch current container open up a Terminal and enter:<br /><code>lxc-create --name Arch --template download -- --dist archlinux --release current --arch amd64</code></p>
-<p>To install CentOS 7 container open up a Terminal and enter:<br /><code>lxc-create --name CentOS --template download -- --dist centos --release 7 --arch amd64</code></p>
-<p>To install a Debian Bullseye container open up a Terminal and enter:<br /><code>lxc-create --name Debian --template download -- --dist debian --release bullseye --arch amd64</code></p>
-<p>To install Fedora 36 container open up a Terminal and enter:<br /><code>lxc-create --name Fedora --template download -- --dist fedora --release 36 --arch amd64</code></p>
-<p>To install Ubuntu Xenial container open up a Terminal and enter:<br /><code>lxc-create --name Ubuntu --template download -- --dist ubuntu --release xenial --arch amd64</code></p>
-<p style="text-align: right;">You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></p>
+<h3>These commands are used if you want to interact with LXC from the terminal:</h3>
+<p><b>To attach to a started container type in:</b></br><code>lxc-attach CONTAINERNAME /bin/bash</code><br /><em>(please replace /bin/bash with the corresponding shell)</em></p>
 <p>&nbsp;</p>
 <p>To start a container enter:<br /><code>lxc-start CONTAINERNAME</code></p>
 <p>To stop a container enter:<br /><code>lxc-stop CONTAINERNAME</code><code></code></p>
 <p>To kill a container enter:<br /><code>lxc-stop --kill CONTAINERNAME</code><code></code><code></code></p>
-<p>To attach to the container console enter:<br /><code>lxc-attach CONTAINERNAME /bin/bash</code><br /><em>(please replace /bin/bash with the corresponding shell)</em></p>
 <p>To delete a container enter:<br /><code>lxc-destroy CONTAINERNAME</code><br /><em>(the container must be stopped in the first place)</em></p>
 <p>&nbsp;</p>
-<p>If you want to enable autostart for a container please go to your main LXC directory and open up the corresponding name from the container for which you want to enable autostart (eg /CONTAINERNAME).<br />In this directory open up the <strong>config</strong> file and add this parameter at the end and save the file<br /><code>lxc.start.auto = 1</code><em><br /><br /></em>You can also add a delay for the autostart like in this example for 30 seconds by adding this:<br /><code>lxc.start.delay = 30</code><br /><br />(Please note that the autostart is triggered after the Array is started)</p>
+<p>To install Alpine Edge container manually open up a Terminal and enter:<br /><code>lxc-create --name Alpine --template download -- --dist alpine --release edge --arch amd64</code></p>
+<p>To install Arch current container manually open up a Terminal and enter:<br /><code>lxc-create --name Arch --template download -- --dist archlinux --release current --arch amd64</code></p>
+<p>To install CentOS 7 container manually open up a Terminal and enter:<br /><code>lxc-create --name CentOS --template download -- --dist centos --release 7 --arch amd64</code></p>
+<p>To install a Debian Bullseye container manually open up a Terminal and enter:<br /><code>lxc-create --name Debian --template download -- --dist debian --release bullseye --arch amd64</code></p>
+<p>To install Fedora 36 container manually open up a Terminal and enter:<br /><code>lxc-create --name Fedora --template download -- --dist fedora --release 36 --arch amd64</code></p>
+<p>To install Ubuntu Xenial container manually open up a Terminal and enter:<br /><code>lxc-create --name Ubuntu --template download -- --dist ubuntu --release xenial --arch amd64</code></p>
+<p style="text-align: right;">You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></p>
