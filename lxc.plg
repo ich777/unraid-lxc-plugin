@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.05.18">
+  <!ENTITY version   "2022.05.19">
   <!ENTITY launch    "Settings/LXC">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "572a724a93f0958d72d0942997d48c57">
+  <!ENTITY md5       "ab9e05976594b970abc16c6eb2975835">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,11 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0-rc8" support="https://forums.unraid.net/topic/83786-support-ich777-application-dockers/">
 
 <CHANGES>
+
+###2022.05.19
+- Added Start/Stop/Kill/Freeze/Unfreeze buttons
+- Added Autostart Enable/Disable button
+- Added Destroy container button
 
 ###2022.05.18
 - Added warning about the LXC path
@@ -42,7 +47,6 @@ rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version
 **LXC**
 
 LXC is a well-known Linux container runtime that consists of tools, templates, and library and language bindings. It's pretty low level, very flexible and covers just about every containment feature supported by the upstream kernel.
-**Please Note that this plugin is currently in development and GUI functionality will be added over time!**
 </INLINE>
 </FILE>
 
