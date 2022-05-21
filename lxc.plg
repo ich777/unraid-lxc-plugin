@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.05.20">
+  <!ENTITY version   "2022.05.21">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "2c495f02f49eaf7d63afcb58c0abb7f9">
+  <!ENTITY md5       "c8ad61af7800033e3dc68ae54f0c566b">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -15,10 +15,14 @@
 
 <CHANGES>
 
+###2022.05.21
+- Fixed destroy of running containers was not working
+- Forbid spaces in container, distirbuiton and release names
+
 ###2022.05.20
 - Added Timeout option to settings page
 - Lowered initial timeout from 30 to 15 seconds
-- Fixed stopped containers startin when clicking on Update on the Settings page
+- Fixed stopped containers starting when clicking on Update on the Settings page
 - Plugin now links to Settings page instead to LXC pge
 - Moved plugin icon from User Utilities to System Settings
 - Renamed LXC Settings to LXC on Settings page
