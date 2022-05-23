@@ -14,8 +14,14 @@ function selected_bridge(){
 echo -n "$(cat /boot/config/plugins/lxc/default.conf | grep -n "lxc.net.0.link" | cut -d '=' -f2 | sed 's/\"//g' | sed 's/ //g')"
 }
 
+function selected_timeout(){
+echo -n "$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "TIMEOUT" | cut -d '=' -f2 | sed 's/\"//g')"
+}
+
 function change_config(){
+SERVICE_STATUS="$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "SERVICE" | cut -d '=' -f2 | sed 's/\"//g')"
 sed -i "/SERVICE=/c\SERVICE=${1}" "/boot/config/plugins/lxc/plugin.cfg"
+sed -i "/TIMEOUT=/c\TIMEOUT=${4}" "/boot/config/plugins/lxc/plugin.cfg"
 sed -i "/lxc.lxcpath=/c\lxc.lxcpath=${2%/*}" "/boot/config/plugins/lxc/lxc.conf"
 sed -i "/lxc.net.0.link =/c\lxc.net.0.link = ${3}" "/boot/config/plugins/lxc/default.conf"
 if [ "${1}" == "disabled" ]; then
@@ -39,8 +45,10 @@ fi
 if [ ! -f /etc/lxc/lxc.conf ]; then
   ln -s /boot/config/plugins/lxc/lxc.conf /etc/lxc/lxc.conf
 fi
-if [ ! -z "${4}" ]; then
-  lxc-autostart
+if [ ! -z "${5}" ]; then
+  if [ "${SERVICE_STATUS}" != "enabled" ]; then
+    lxc-autostart
+  fi
   if [ ! -d ${2%/*} ]; then
     mkdir -p ${2%/*}/cache
   fi
@@ -87,7 +95,7 @@ lxc-start $1
 }
 
 function stop_Container(){
-lxc-stop $1
+lxc-stop --timeout=${2} $1
 }
 
 function freeze_Container(){
@@ -103,7 +111,8 @@ lxc-stop --kill $1
 }
 
 function destroy_Container(){
-lxc-stop -kill $1
+lxc-stop --kill $1
+sleep 0.5
 lxc-destroy $1
 }
 
