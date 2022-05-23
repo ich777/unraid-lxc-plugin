@@ -136,7 +136,7 @@ if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packag
     exit 1
   fi
   echo
-  echo "----------Successfully downloaded LXC Package-----------"
+  echo "---Successfully downloaded LXC Package, installing...---"
 else
   echo
   echo "--------------Can't download LXC Package----------------"
@@ -152,7 +152,7 @@ if [ ! -f "&plugin;/packages/LXC-${LAT_V}-1.txz" ]; then
   download
 else
   echo
-  echo "---------------LXC Package found locally----------------"
+  echo "--------LXC Package found locally, installing...--------"
 fi
 }
 
