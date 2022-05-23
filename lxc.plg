@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.05.21">
+  <!ENTITY version   "2022.05.23">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "9bdcd21319142d4f9df34cbfd48f71aa">
+  <!ENTITY md5       "fcba6cb4078838b0b5813693017eaeac">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0-rc8" support="https://forums.unraid.net/topic/83786-support-ich777-application-dockers/">
 
 <CHANGES>
+
+###2022.05.23
+- Made path for LXC on settings page required
 
 ###2022.05.21
 - Fixed destroy of running containers was not working
