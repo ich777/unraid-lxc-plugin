@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.05.23">
+  <!ENTITY version   "2022.05.23a">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0-rc8" support="https://forums.unraid.net/topic/83786-support-ich777-application-dockers/">
 
 <CHANGES>
+
+###2022.05.23a
+- Don't create default LXC directory on first plugin install
 
 ###2022.05.23
 - Made path for LXC on settings page required
@@ -53,11 +56,11 @@
 
 <FILE Run="/bin/bash">
 <INLINE>
-rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null|grep -v '&version;')
+rm -f $(ls &plugin;/&name;*.txz 2>/dev/null|grep -v '&version;')
 </INLINE>
 </FILE>
 
-<FILE Name="/boot/config/plugins/&name;/&name;-&version;.txz" Run="upgradepkg --install-new">
+<FILE Name="&plugin;/&name;-&version;.txz" Run="upgradepkg --install-new">
 <URL>&gitURL;/packages/&name;-&version;.txz</URL>
 <MD5>&md5;</MD5>
 </FILE>
@@ -102,9 +105,10 @@ for i in {1..10}; do
 done
 
 #Set variables and get version numbers
-LXC_DATADIRECTORY="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
+LXC_DATADIRECTORY="$(cat &plugin;/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
+LXC_SERVICE="$(cat &plugin;/plugin.cfg | grep -n "SERVICE" | cut -d '=' -f2 | sed 's/\"//g')"
 LAT_V="$(wget -qO- https://api.github.com/repos/ich777/unraid-lxc-plugin/releases/latest | jq -r '.tag_name')"
-CUR_V="$(ls /boot/config/plugins/lxc/packages/LXC-*-1.txz | sort -V | tail -1 | cut -d '-' -f2)"
+CUR_V="$(ls &plugin;/packages/LXC-*-1.txz | sort -V | tail -1 | cut -d '-' -f2)"
 DL_URL="https://github.com/ich777/unraid-lxc-plugin/releases/download/$LAT_V"
 
 if [ -z "${LAT_V}" ]; then
@@ -155,19 +159,25 @@ fi
 install() {
 #Install LXC Package
 /sbin/installpkg "&plugin;/packages/LXC-${LAT_V}-1.txz"
+ln -s &plugin;/default.conf /etc/lxc/default.conf
+ln -s &plugin;/lxc.conf /etc/lxc/lxc.conf
+}
+
+enable_lxc() {
 if [ ! -d ${LXC_DATADIRECTORY}/cache ]; then
   mkdir -p ${LXC_DATADIRECTORY}/cache
 fi
 rm -rf /var/cache/lxc 
-ln -s /${LXC_DATADIRECTORY}/cache /var/cache/lxc
-ln -s /boot/config/plugins/lxc/default.conf /etc/lxc/default.conf
-ln -s /boot/config/plugins/lxc/lxc.conf /etc/lxc/lxc.conf
+ln -s ${LXC_DATADIRECTORY}/cache /var/cache/lxc
 }
 
 #Check if LXC Package is already downloaded
 check
 if [ "$(lxc-start --version 2>/dev/null)" != "${LAT_V}" ]; then
   install > /dev/null
+  if [ "${LXC_SERVICE}" == "enabled" ]; then
+    enable_lxc
+  fi
 fi
 
 echo "---------------LXC installation complete!---------------"
