@@ -1,5 +1,5 @@
 Menu="Utilities"
-Title="LXC Settings"
+Title="LXC"
 Icon="lxc.png"
 ---
 <?
@@ -8,6 +8,7 @@ $status = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh status");
 $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
 $avail_bridges = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh avail_bridges");
 $selected_bridge = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh selected_bridge");
+$selected_timeout = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh selected_timeout");
 ?>
 <link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.filetree.css')?>">
 <style>
@@ -40,7 +41,7 @@ Enable LXC:
   </select>
 
 Default LXC storage path:
-: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$"></br>
+: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$" required></br>
   <span style="color: #ff0000;">ATTENTION: It is strongly recommended to not use a FUSE path like /mnt/user/lxc/ instead use the real path to the share like /mnt/cache/lxc/ or /mnt/diskX/lxc/</br>Don't share this directory via SMB or NFS or change the permissions from this directory!</br>(If this path doesn't exist it will be created when LXC is enabled for the first time)</span>
   <?if (!$started):?><span><i class="fa fa-warning icon warning"></i> Modify with caution: unable to validate path until Array is Started</span>
   <?elseif (!is_dir($default_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist</span><?endif;?>
@@ -61,6 +62,11 @@ Default network bridge:
 }
 ?>
   </select>
+
+LXC Stop Timeout:
+:  <input type="text" name="TIMEOUT" required="true" pattern="[0-9][0-9]+" value="<?php echo $selected_timeout;?>" required> seconds
+
+<p>&nbsp;</p>
 
 Update configuration file:
 :  <input type="submit" name="changeCFG" value="Update">
@@ -87,10 +93,11 @@ if(isset($_POST['changeCFG'])) {
 $SERVICE = $_POST["SERVICE"];
 $DEFAULTDIR = $_POST["DEFAULTDIR"];
 $BRNAME = $_POST["BRNAME"];
+$TIMEOUT = $_POST["TIMEOUT"];
 if ($started) {
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh change_config ".escapeshellarg($SERVICE)." ".escapeshellarg($DEFAULTDIR)." ".escapeshellarg($BRNAME)." 1");
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh change_config ".escapeshellarg($SERVICE)." ".escapeshellarg($DEFAULTDIR)." ".escapeshellarg($BRNAME)." ".escapeshellarg($TIMEOUT)." 1");
 } else {
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh change_config ".escapeshellarg($SERVICE)." ".escapeshellarg($DEFAULTDIR)." ".escapeshellarg($BRNAME)."");
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh change_config ".escapeshellarg($SERVICE)." ".escapeshellarg($DEFAULTDIR)." ".escapeshellarg($BRNAME)." ".escapeshellarg($TIMEOUT)."");
 }
 echo '<script>parent.window.location.reload();</script>';
 }

@@ -17,7 +17,7 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 
         var regex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
         if(!regex.test(form.contMac.value)) {
-            alert("invalid mac address");
+            alert("Invalid MAC address");
             return false;
         }
 
@@ -37,28 +37,28 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 <div class="">
 <dl>
 <dt>Container Name:</dt>
-<dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="true" value="DebianLXC"></dd>
+<dd><input type="text" name="contName" onkeypress="return event.charCode != 32" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="true" value="DebianLXC"></dd>
 </dl>
 </div>
 
 <div class="">
 <dl>
 <dt>Distribution:</dt>
-<dd><input type="text" name="contDistribution"  pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="debian"> You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></dd>
+<dd><input type="text" name="contDistribution" onkeypress="return event.charCode != 32" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="debian"> You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></dd>
 </dl>
 </div>
 
 <div class="">
 <dl>
 <dt>Release:</dt>
-<dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye"></dd>
+<dd><input type="text" name="contRelease" onkeypress="return event.charCode != 32" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye"></dd>
 </dl>
 </div>
 
 <div class="">
 <dl>
 <dt>Mac Address:</dt>
-<dd><input type="text" name="contMac" required="true" pattern="[a-z0-9][a-z0-9_.-]+" style="text-transform:uppercase" value="<?php echo $macaddress;?>"></dd>
+<dd><input type="text" name="contMac" required="true" onkeypress="return event.charCode != 32" pattern="[a-z0-9][a-z0-9_.-]+" style="text-transform:uppercase" value="<?php echo $macaddress;?>"></dd>
 </dl>
 </div>
 

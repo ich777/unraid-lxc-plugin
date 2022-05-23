@@ -8,6 +8,7 @@ Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/d
 $started = $var['fsState']=='Started';
 $avail_containers = shell_exec("lxc-ls");
 $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
+$selected_timeout = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh selected_timeout");
 ?>
 
 <script>
@@ -108,7 +109,7 @@ $destroy_button="<form id=\"destroy\" method=\"post\" onsubmit=\"return destroyC
 <input type=\"submit\" name=\"destroyCONT\" value=\"Destroy\">
 </form>";
 
-?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><font size="+1"><a href='#' title='"._("Download Driver")."' onclick="openBox('/usr/local/emhttp/plugins/lxc/include/show_config.sh&arg1=<?php echo $default_path; ?>&arg2=<?php echo $container_array['Name'];?>','Configuration - <?php echo $container_array['Name'];?>',700,800,false);return false"<input type='text'><?php echo $container_array['Name'];?></input></a></a></font><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><?php echo $destroy_button;?></td></tr></tbody> <?php
+?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><font size="+1"><a href='#' title='Show Config' onclick="openBox('/usr/local/emhttp/plugins/lxc/include/show_config.sh&arg1=<?php echo $default_path; ?>&arg2=<?php echo $container_array['Name'];?>','Configuration - <?php echo $container_array['Name'];?>',700,800,false);return false"<input type='text'><?php echo $container_array['Name'];?></input></a></a></font><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><?php echo $destroy_button;?></td></tr></tbody> <?php
 
 
 
@@ -121,7 +122,7 @@ shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh start_Container ".esca
 echo '<script>parent.window.location.reload();</script>';
 } elseif(isset($_POST['stopCONT'])) {
 $CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh stop_Container ".escapeshellarg($CONTname)."");
+shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh stop_Container ".escapeshellarg($CONTname)." ".escapeshellarg($selected_timeout)."");
 echo '<script>parent.window.location.reload();</script>';
 } elseif(isset($_POST['freezeCONT'])) {
 $CONTname = $_POST["CONTname"];
