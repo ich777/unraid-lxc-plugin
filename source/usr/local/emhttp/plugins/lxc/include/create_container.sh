@@ -39,4 +39,5 @@ echo
 echo "To connect to the container, start the container first, open up a Unraid terminal and type in:"
 echo "'lxc-attach $3' (without quotes)."
 echo
-echo "It is recommended to attach to the right shell by typing in for example 'lxc-attach $3 /bin/bash'"
+echo "It is recommended to attach to the corresponding shell by typing in for example:"
+echo "'lxc-attach $3 /bin/bash'"
