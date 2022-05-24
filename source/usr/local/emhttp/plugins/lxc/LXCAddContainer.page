@@ -8,26 +8,25 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 ?>
 
 <script>
-    //Don't execute commands again if page is refreshed
-    if ( window.history.replaceState ) {
-        window.history.replaceState( null, null, window.location.href );
+  //Don't execute commands again if page is refreshed
+  if ( window.history.replaceState ) {
+    window.history.replaceState( null, null, window.location.href );
+  }
+
+  //Create container box
+  function createContainer(form) {
+    var regex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
+    if(!regex.test(form.contMac.value)) {
+      alert("Invalid MAC address");
+      return false;
     }
-
-    function createContainer(form) {
-
-        var regex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
-        if(!regex.test(form.contMac.value)) {
-            alert("Invalid MAC address");
-            return false;
-        }
-
-        var distribution = form.contDistribution.value;
-        var release = form.contRelease.value;
-        var name = form.contName.value;
-        var autostart = form.contAutostart.checked;
-        var mac = form.contMac.value;
-        openBox("/usr/local/emhttp/plugins/lxc/include/create_container.sh&arg1=<?php echo $default_path; ?>&arg2="+mac+"&arg3="+name+"&arg4="+distribution+"&arg5="+release+"&arg6="+autostart,"Create Container",300,800,true);
-        return false;
+    var distribution = form.contDistribution.value;
+    var release = form.contRelease.value;
+    var name = form.contName.value;
+    var autostart = form.contAutostart.checked;
+    var mac = form.contMac.value;
+    openBox("/usr/local/emhttp/plugins/lxc/include/create_container.sh&arg1=<?php echo $default_path; ?>&arg2="+mac+"&arg3="+name+"&arg4="+distribution+"&arg5="+release+"&arg6="+autostart,"Create Container",600,800,true);
+    return false;
     }
 </script>
 

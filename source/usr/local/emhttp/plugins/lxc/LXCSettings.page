@@ -20,18 +20,12 @@ body{-webkit-overflow-scrolling:touch}
 </style>
 
 <script>
-//Don't execute commands again if page is refreshed
-    if ( window.history.replaceState ) {
-        window.history.replaceState( null, null, window.location.href );
-    }
+  //Don't execute commands again if page is refreshed
+  if ( window.history.replaceState ) {
+    window.history.replaceState( null, null, window.location.href );
+  }
 </script>
 
-<script>
-//Don't execute commands again if page is refreshed
-    if ( window.history.replaceState ) {
-        window.history.replaceState( null, null, window.location.href );
-    }
-</script>
 
 <form markdown="1" id="changecfg" method="post" >
 Enable LXC:
@@ -49,16 +43,16 @@ Default LXC storage path:
 
 Default network bridge:
 :  <select name="BRNAME" >
-      <?php
-      $output = $avail_bridges;
-      $data = explode("\n", $output);
-      var_dump($data);
-      foreach($data as $item){
-      if ( $item == $selected_bridge ) {
-        echo "<option selected=\"selected\" value=\"$item\"> $item</option>";
-      } else {
-        echo "<option value=\"$item\"> $item</option>";
-        }
+  <?php
+  $output = $avail_bridges;
+  $data = explode("\n", $output);
+  var_dump($data);
+  foreach($data as $item){
+  if ( $item == $selected_bridge ) {
+    echo "<option selected=\"selected\" value=\"$item\"> $item</option>";
+  } else {
+    echo "<option value=\"$item\"> $item</option>";
+  }
 }
 ?>
   </select>
@@ -106,8 +100,5 @@ echo '<script>parent.window.location.reload();</script>';
 <script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
 
 <script>
-
   $('#defaultdir').fileTreeAttach();
-
-
 </script>

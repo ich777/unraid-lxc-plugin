@@ -12,46 +12,39 @@ $selected_timeout = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh se
 ?>
 
 <script>
-    //Don't execute commands again if page is refreshed
-    if ( window.history.replaceState ) {
-        window.history.replaceState( null, null, window.location.href );
-    }
+  //Don't execute commands again if page is refreshed
+  if ( window.history.replaceState ) {
+    window.history.replaceState( null, null, window.location.href );
+  }
 
-    function destroyConfirm() {
-        if (confirm("ATTENTION: Do you really want to destroy this LXC Container? This is IRREVERSIBLE and will delete the container and all data in it!") == true) {
-            return true;
-        } else {
-            return false;
-        }
+  //Destroy container pop up
+  function destroyConfirm() {
+    if (confirm("ATTENTION: Do you really want to destroy this LXC Container? This is IRREVERSIBLE and will delete the container and all data in it!") == true) {
+      return true;
+    } else {
+      return false;
     }
-    
+  }  
 </script>
 
-<h1 style="text-align: center;"><a href="https://forums.unraid.net/" target="_blank" rel="noopener"><span style="color: green;">LXC</span></a></h1>
 <? if (isset($started ) === true && trim($started ) !== ''): ?>
-<h4 style="text-align: center;">This plugin is currently in development and features will be added over time.</h4>
-<hr />
-<p>&nbsp;</p>
 <? if (isset($avail_containers ) === true && trim($avail_containers ) !== ''): ?>
-
 
 <table id="lxc_table" class="tablesorter four shift">
 <thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>Name/Status</th><th></th><th>CPUs</th><th>Memory/</br>Kernel Memory</th><th>Address</th><th>Total RX/TX</th><th>PID</th><th>Autostart</th><th>Destroy</th></tr></thead>
 
-
 <?php
+//Read containers and information about them
 $cont = trim($avail_containers, "\n");
 $data = explode("\n", $cont);
 foreach($data as $item){
   $details = shell_exec("lxc-info $item");
-
-
-$replaced = explode("\n", $details);
-$raw_array = preg_replace('/\s\s+/', ' ', $replaced);
-foreach($raw_array as $line)
+  $replaced = explode("\n", $details);
+  $raw_array = preg_replace('/\s\s+/', ' ', $replaced);
+  foreach($raw_array as $line)
 {
-    $tmp = explode(": ", $line);
-    $container_array[$tmp[0]] = $tmp[1];
+  $tmp = explode(": ", $line);
+  $container_array[$tmp[0]] = $tmp[1];
 }
 
 //Get CPUs, autostart and IPs
@@ -59,49 +52,50 @@ $CPUs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_CPUs ".esc
 $autostart = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_autostart ".escapeshellarg($default_path)." ".escapeshellarg($container_array['Name'])."");
 $IPs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_IPs ".escapeshellarg($container_array['Name'])."");
 
-// Set color from status
+// Set color from container status and create status buttons
 $status=$container_array['State'];
 if($status=="RUNNING")
 {
-    $color="color:green";
-    $status_buttons="<form id=\"stop\" method=\"post\" >
-    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-    <input type=\"submit\" name=\"stopCONT\" value=\"Stop\">
-    <input type=\"submit\" name=\"freezeCONT\" value=\"Freeze\">
-    <input type=\"submit\" name=\"killCONT\" value=\"Kill\">
-    </form>";
+  $color="color:green";
+  $status_buttons="<form id=\"stop\" method=\"post\" >
+<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+<input type=\"submit\" name=\"stopCONT\" value=\"Stop\">
+<input type=\"submit\" name=\"freezeCONT\" value=\"Freeze\">
+<input type=\"submit\" name=\"killCONT\" value=\"Kill\">
+  </form>";
 }
 else if($status=="FROZEN")
 {
-    $color="color:orange";
-    $status_buttons="<form id=\"unfreeze\" method=\"post\" >
-    <input type=\"submit\" name=\"unfreezeCONT\" value=\"Unfreeze\">
-    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-    <input type=\"submit\" name=\"killCONT\" value=\"Kill\">
-    </form>";
+  $color="color:orange";
+  $status_buttons="<form id=\"unfreeze\" method=\"post\" >
+<input type=\"submit\" name=\"unfreezeCONT\" value=\"Unfreeze\">
+<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+<input type=\"submit\" name=\"killCONT\" value=\"Kill\">
+</form>";
 }
 else 
 {
-    $color="color:red;";
-    $status_buttons="<form id=\"start\" method=\"post\" >
-    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-    <input type=\"submit\" name=\"startCONT\" value=\"Start\">
-    </form>";
+  $color="color:red;";
+  $status_buttons="<form id=\"start\" method=\"post\" >
+<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+<input type=\"submit\" name=\"startCONT\" value=\"Start\">
+</form>";
 }
 
+//Create autostart buttons
 if($autostart=="1")
 {
-    $autostart_button="<form id=\"disable\" method=\"post\" >
-    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-    <input type=\"submit\" name=\"disableAUTOSTART\" value=\"Disable\">
-    </form>";
+  $autostart_button="<form id=\"disable\" method=\"post\" >
+<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+<input type=\"submit\" name=\"disableAUTOSTART\" value=\"Disable\">
+</form>";
 }
 else 
 {
-    $autostart_button="<form id=\"enable\" method=\"post\" >
-    <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-    <input type=\"submit\" name=\"enableAUTOSTART\" value=\"Enable\">
-    </form>";
+  $autostart_button="<form id=\"enable\" method=\"post\" >
+<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
+<input type=\"submit\" name=\"enableAUTOSTART\" value=\"Enable\">
+</form>";
 }
 
 $destroy_button="<form id=\"destroy\" method=\"post\" onsubmit=\"return destroyConfirm()\">
@@ -111,11 +105,11 @@ $destroy_button="<form id=\"destroy\" method=\"post\" onsubmit=\"return destroyC
 
 ?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><font size="+1"><a href='#' title='Show Config' onclick="openBox('/usr/local/emhttp/plugins/lxc/include/show_config.sh&arg1=<?php echo $default_path; ?>&arg2=<?php echo $container_array['Name'];?>','Configuration - <?php echo $container_array['Name'];?>',700,800,false);return false"<input type='text'><?php echo $container_array['Name'];?></input></a></a></font><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><?php echo $destroy_button;?></td></tr></tbody> <?php
 
-
-
+//Unset container_array
 unset($container_array);
 }
 
+//Post functions
 if(isset($_POST['startCONT'])) {
 $CONTname = $_POST["CONTname"];
 shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh start_Container ".escapeshellarg($CONTname)."");
@@ -149,7 +143,6 @@ $CONTname = $_POST["CONTname"];
 shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh destroy_Container ".escapeshellarg($CONTname)."");
 echo '<script>parent.window.location.reload();</script>';
 }
-
 ?>
 </table>
 

@@ -1,10 +1,10 @@
 Menu="LXC:1"
 Title="Readme"
 ---
-<?php
-$default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
-?>
-<h3>These commands are used if you want to interact with LXC from the terminal:</h3>
+<h3>If you experience any bugs please report them on the support thread <a href="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/" target="_blank" rel="noopener">here</a>!</h3>
+<p><b>You find the manual page for the container configuration file <a href="https://linuxcontainers.org/lxc/manpages/man5/lxc.container.conf.5.html" target="_blank" rel="noopener">here</a>!</p></b>
+<p>&nbsp;</p>
+<p><b>These commands are used if you want to interact with LXC from the terminal:</b></p>
 <p><b>To attach to a started container type in:</b></br><code>lxc-attach CONTAINERNAME /bin/bash</code><br /><em>(please replace /bin/bash with the corresponding shell)</em></p>
 <p>&nbsp;</p>
 <p>To start a container enter:<br /><code>lxc-start CONTAINERNAME</code></p>
@@ -18,4 +18,4 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 <p>To install a Debian Bullseye container manually open up a Terminal and enter:<br /><code>lxc-create --name Debian --template download -- --dist debian --release bullseye --arch amd64</code></p>
 <p>To install Fedora 36 container manually open up a Terminal and enter:<br /><code>lxc-create --name Fedora --template download -- --dist fedora --release 36 --arch amd64</code></p>
 <p>To install Ubuntu Xenial container manually open up a Terminal and enter:<br /><code>lxc-create --name Ubuntu --template download -- --dist ubuntu --release xenial --arch amd64</code></p>
-<p style="text-align: right;">You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></p>
+<p style="text-align: center;"><b>You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></b></p>
