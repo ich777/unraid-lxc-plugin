@@ -69,7 +69,7 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 </div>
 
 <input type="button" value="_(Create)_" onclick="createContainer(this.form)">
-<a href="LXC" class="button">Back</a>
+<a href="LXC" class="button">Done</a>
 
 </form>
 </div>
