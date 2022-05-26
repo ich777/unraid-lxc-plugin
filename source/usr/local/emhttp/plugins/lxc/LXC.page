@@ -25,13 +25,17 @@ $selected_timeout = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh se
       return false;
     }
   }  
+  
+  function startConsole(name) {
+    openTerminal('lxc',name);
+  }
 </script>
 
 <? if (isset($started ) === true && trim($started ) !== ''): ?>
 <? if (isset($avail_containers ) === true && trim($avail_containers ) !== ''): ?>
 
 <table id="lxc_table" class="tablesorter four shift">
-<thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>Name/Status</th><th></th><th>CPUs</th><th>Memory/</br>Kernel Memory</th><th>Address</th><th>Total RX/TX</th><th>PID</th><th>Autostart</th><th>Destroy</th></tr></thead>
+<thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>Name/Status</th><th>Terminal</th><th></th><th>CPUs</th><th>Memory/</br>Kernel Memory</th><th>Address</th><th>Total RX/TX</th><th>PID</th><th>Autostart</th><th>Destroy</th></tr></thead>
 
 <?php
 //Read containers and information about them
@@ -63,6 +67,7 @@ if($status=="RUNNING")
 <input type=\"submit\" name=\"freezeCONT\" value=\"Freeze\">
 <input type=\"submit\" name=\"killCONT\" value=\"Kill\">
   </form>";
+  $terminal_button="<font size=\"+1\"><a href='#' title='Terminal' onclick=\"startConsole('$container_array[Name]')\"><i class=\"icon-u-terminal system\"></i></a></font>";
 }
 else if($status=="FROZEN")
 {
@@ -103,10 +108,12 @@ $destroy_button="<form id=\"destroy\" method=\"post\" onsubmit=\"return destroyC
 <input type=\"submit\" name=\"destroyCONT\" value=\"Destroy\">
 </form>";
 
-?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><font size="+1"><a href='#' title='Show Config' onclick="openBox('/usr/local/emhttp/plugins/lxc/include/show_config.sh&arg1=<?php echo $default_path; ?>&arg2=<?php echo $container_array['Name'];?>','Configuration - <?php echo $container_array['Name'];?>',700,800,false);return false"<input type='text'><?php echo $container_array['Name'];?></input></a></a></font><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><?php echo $destroy_button;?></td></tr></tbody> <?php
+?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><font size="+1"><a href='#' title='Show Config' onclick="openBox('/usr/local/emhttp/plugins/lxc/include/show_config.sh&arg1=<?php echo $default_path; ?>&arg2=<?php echo $container_array['Name'];?>','Configuration - <?php echo $container_array['Name'];?>',700,800,false);return false"<input type='text'><?php echo $container_array['Name'];?></input></a></a></font><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $terminal_button;?></td><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><?php echo $destroy_button;?></td></tr></tbody>
 
+<?php
 //Unset container_array
 unset($container_array);
+unset($terminal_button);
 }
 
 //Post functions
