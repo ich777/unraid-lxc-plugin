@@ -6,7 +6,13 @@ echo
 lxc-create --name $2 --template download -- --dist debian --release bullseye --arch amd64 &> /dev/null || echo "Something went wrong!"
 
 # Inject the random generated MAC address in the config file
-sed -i "/lxc.net.0.hwaddr/c\lxc.net.0.hwaddr = $(printf '52:54:00:%02X:%02X:%02X\n' $[RANDOM%256] $[RANDOM%256] $[RANDOM%256])" $1/$2/config
+echo "lxc.net.0.hwaddr = $(printf '52:54:00:%02X:%02X:%02X\n' $[RANDOM%256] $[RANDOM%256] $[RANDOM%256])" >> $1/$2/config
+
+# Inject the Autostart settings in the config file
+echo "
+# Autostart Settings
+lxc.start.auto = 0
+lxc.start.delay = 0" >> $1/$2/config
 
 echo
 echo "+----------------------------------------------------------------------------"
