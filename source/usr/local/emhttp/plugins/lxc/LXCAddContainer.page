@@ -28,6 +28,13 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
     openBox("/usr/local/emhttp/plugins/lxc/include/create_container.sh&arg1=<?php echo $default_path; ?>&arg2="+mac+"&arg3="+name+"&arg4="+distribution+"&arg5="+release+"&arg6="+autostart,"Create Container",600,800,true);
     return false;
     }
+
+  //Create VNC container box
+  function createVNCContainer(form) {
+    var name = form.VNCcontName.value;
+    openBox("/usr/local/emhttp/plugins/lxc/include/create_vnc_container.sh&arg1=<?php echo $default_path; ?>&arg2="+name,"Create VNC Container",600,800,true);
+    return false;
+    }
 </script>
 
 <div id="canvas">
@@ -74,3 +81,20 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 </form>
 </div>
 
+
+<div id="title">
+    <span class="left"></span>
+</div>
+
+<form method="post" autocomplete="off">
+
+
+<div class="">
+<dl>
+<dt>VNC Container Name:</dt>
+<dd><input type="text" name="VNCcontName" onkeypress="return event.charCode != 32" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="true" value="DebianVNC">
+<input type="button" value="_(Create VNC Container)_" onclick="createVNCContainer(this.form)"></dd>
+</dl>
+
+</div>
+</form>
