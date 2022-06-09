@@ -205,7 +205,7 @@ echo '|'
 echo '| SSH is enabled for the user debian.'
 echo '|'
 echo '| The default root password is: Unraid'
-echo '| The default user password for the user debian is: Unraid'
+echo '| The default user password for the user debian is: debian'
 echo '|'
 echo '| WARNING: It is strongly Recommended to change these passwords!'
 echo '+-----------------------------------------------------------------'"
