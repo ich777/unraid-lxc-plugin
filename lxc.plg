@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.06.09">
+  <!ENTITY version   "2022.06.09a">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "6f33355c1da47c165100f196d5126df2">
+  <!ENTITY md5       "f751d60fbb6521a0260e1da2b90e72eb">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2022.06.09a
+- Added Distribution Logos
+- Moved link to show container configuration from container Name to the Distribution Logo
 
 ###2022.06.09
 - Bugfix in VNC automatic install script showing wrong default user password at the end
