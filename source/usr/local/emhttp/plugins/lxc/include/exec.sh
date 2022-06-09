@@ -90,6 +90,10 @@ function get_IPs(){
 echo -n "$(lxc-info $1 -iH | sed ':a;N;$!ba;s/\n/<\/br>/g')"
 }
 
+function get_distribution(){
+echo -n "$(grep -oP '(?<=dist )\w+' $1/$2/config | head -1 | sed 's/\"//g')"
+}
+
 function start_Container(){
 lxc-start $1
 }
