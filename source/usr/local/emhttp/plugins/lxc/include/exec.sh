@@ -117,7 +117,29 @@ lxc-stop --kill $1
 function destroy_Container(){
 lxc-stop --kill $1
 sleep 0.5
-lxc-destroy $1
+umount $2/$1/rootfs
+SNAPSHOTS="$(lxc-snapshot -L $1)"
+for snapshot in $SNAPSHOTS; do
+  umount $2/$1/snaps/$snapshot/rootfs
+done
+lxc-destroy -s $1
 }
 
+function create_snapshot(){
+lxc-stop --timeout=${2} $1
+lxc-snapshot $1
+lxc-start $1
+}
+
+function get_snapshot(){
+SNAPSHOTS="$(lxc-snapshot -L $1)"
+for snapshot in "$SNAPSHOTS"; do
+echo "$snapshot"
+done
+}
+
+function delete_snapshot(){
+umount $3/$2/snaps/$1/rootfs
+lxc-snapshot -d $1 $2
+}
 $@
