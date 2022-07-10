@@ -24,8 +24,17 @@ $selected_timeout = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh se
     } else {
       return false;
     }
-  }  
-  
+  }
+
+  //Snapshot container pop up
+  function snapshotConfirm() {
+    if (confirm("This action will stop the LXC Container and start it again if it was running. Continue?") == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   function startConsole(name) {
     openTerminal('lxc',name);
   }
@@ -109,7 +118,7 @@ $destroy_button="<form id=\"destroy\" method=\"post\" onsubmit=\"return destroyC
 <input type=\"submit\" name=\"destroyCONT\" value=\"Destroy\">
 </form>";
 
-$snapshot_button="<form id=\"snapshot\" method=\"post\">
+$snapshot_button="<form id=\"snapshot\" method=\"post\" onsubmit=\"return snapshotConfirm()\">
 <input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
 <input type=\"submit\" name=\"snapshotCONT\" value=\"Create\">
 </form>";
