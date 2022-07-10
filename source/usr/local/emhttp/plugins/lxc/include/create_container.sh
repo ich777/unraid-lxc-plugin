@@ -2,8 +2,15 @@
 echo "Creating container, please wait until the DONE button is displayed!"
 echo
 
-# Create the container, exit if failed
-lxc-create --name $3 --template download -- --dist $4 --release $5 --arch amd64 || echo "Something went wrong!"
+# Create container from snapshot or create container from template
+if [ "$7" == "true" ]; then
+  # Create container from snapshot, exit if failed
+  lxc-stop --name $3
+  lxc-snapshot -n $8 -r $9 $3 || echo "Something went wrong!"
+else
+  # Create the container, exit if failed
+  lxc-create --name $3 --template download -- --dist $4 --release $5 --arch amd64 || echo "Something went wrong!"
+fi
 
 # Inject the random generated MAC address in the config file
 if [ ! "$(grep "lxc.net.0.hwaddr" $1/$3/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
