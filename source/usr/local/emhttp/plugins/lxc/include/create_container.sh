@@ -1,12 +1,22 @@
 #!/bin/bash
-echo "Creating container, please wait until the DONE button is displayed!"
-echo
 
 # Create container from snapshot or create container from template
-if [ "$7" == "true" ]; then
+if [ "$7" == "snapshot" ]; then
+  echo "Creating container, please wait until the DONE button is displayed!"
+  echo
   # Create container from snapshot, exit if failed
   lxc-stop --name $3
   lxc-snapshot -n $8 -r $9 $3 || echo "Something went wrong!"
+elif [ "$7" == "copy" ]; then
+  echo "Copying container, please wait until the DONE button is displayed!"
+  echo
+  # Create container from existing, exit if failed
+  CONT_STATUS="$(lxc-info --name $8 | grep State: | cut -d ':' -f2 | sed -e 's/^[ \t]*//')"
+  lxc-stop --name $8
+  lxc-copy -n $8 -N $3
+  if [ "${CONT_STATUS}" == "RUNNING" ]; then
+    lxc-start --name $8
+  fi
 else
   # Create the container, exit if failed
   lxc-create --name $3 --template download -- --dist $4 --release $5 --arch amd64 || echo "Something went wrong!"
