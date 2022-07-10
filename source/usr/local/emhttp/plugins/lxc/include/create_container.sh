@@ -2,7 +2,9 @@
 echo "Creating container, please wait until the DONE button is displayed!"
 echo
 
+# Create container from snapshot or create container from template
 if [ "$7" == "true" ]; then
+  # Create container from snapshot, exit if failed
   lxc-stop --name $3
   lxc-snapshot -n $8 -r $9 $3
   else
