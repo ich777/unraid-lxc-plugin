@@ -30,7 +30,7 @@ foreach ($avail_containers as $container) {
 <input type=\"submit\" name=\"snapshotDELETE\" value=\"Delete Snapshot\">
 </form>";
                 $formatted_date = str_replace(":", "_", $sorted[2]);
-                echo "<tr style='height: 50px;'><td>$sorted[0]</td><td>$formatted_date $sorted[3] </td><td style='display: flex;'><a href='LXCRestoreSnapshot?cont=" . $container . "&snap=" . $sorted[0] . "&date=" . $formatted_date . "_" . $sorted[3] . "' class='button'>Create From Snapshot</a>" . $delete_snapshot_button . "</td></tr>";
+                echo "<tr style='height: 50px;'><td>$sorted[0]</td><td>$formatted_date $sorted[3] </td><td style='display: flex;'><a href='LXCRestoreSnapshot?cont=" . $container . "&snap=" . $sorted[0] . "&date=" . $formatted_date . "_" . $sorted[3] . "' class='button'>Create Container From Snapshot</a>" . $delete_snapshot_button . "</td></tr>";
             }
         } else {
             echo "<tr><td>No snapshots</td><tr>";
