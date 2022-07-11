@@ -24,14 +24,12 @@ $selected_timeout = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh se
     } else {
       return false;
     }
-  }  
+  }
 
   //Snapshot container pop up
-  function snapshotConfirm() {
+  function snapshotConfirm(cont) {
     if (confirm("This action will stop the LXC Container and start it again if it was running. Continue?") == true) {
-      return true;
-    } else {
-      return false;
+      openBox("/usr/local/emhttp/plugins/lxc/include/create_snapshot.sh&arg1=<?php echo $selected_timeout ?>&arg2="+cont,"Create Snapshot",600,800,true);
     }
   }
   
@@ -118,10 +116,7 @@ $destroy_button="<form id=\"destroy\" method=\"post\" onsubmit=\"return destroyC
 <input type=\"submit\" name=\"destroyCONT\" value=\"Destroy\">
 </form>";
 
-$snapshot_button="<form id=\"snapshot\" method=\"post\" onsubmit=\"return snapshotConfirm()\">
-<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-<input type=\"submit\" name=\"snapshotCONT\" value=\"Create\">
-</form>";
+$snapshot_button="<a href=\"#\" onclick=\"snapshotConfirm('" . $container_array['Name'] . "')\" class=\"button\">Create</a>";
 
 ?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><img src="/plugins/lxc/images/distributions/<?php echo $distribution;?>.png" width="30" height="30" title="ShowConfig" onclick="openBox('/usr/local/emhttp/plugins/lxc/include/show_config.sh&arg1=<?php echo $default_path; ?>&arg2=<?php echo $container_array['Name'];?>','Configuration - <?php echo $container_array['Name'];?>',700,800,false);return false"><font size="+1"><?php echo $container_array['Name'];?></input></a></a></font><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $terminal_button;?></td><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><?php echo $destroy_button;?></td><td><?php echo $snapshot_button; ?></td></tr></tbody>
 
@@ -163,10 +158,6 @@ echo '<script>parent.window.location.reload();</script>';
 } elseif(isset($_POST['destroyCONT'])) {
 $CONTname = $_POST["CONTname"];
 shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh destroy_Container ".escapeshellarg($CONTname)." ".escapeshellarg($default_path)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST["snapshotCONT"])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh create_snapshot ".escapeshellarg($CONTname)." " .escapeshellarg($selected_timeout)."");
 echo '<script>parent.window.location.reload();</script>';
 }
 ?>

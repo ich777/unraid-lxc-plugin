@@ -125,15 +125,6 @@ done
 lxc-destroy -s $1
 }
 
-function create_snapshot(){
-CONT_STATUS="$(lxc-info --name $1 | grep State: | cut -d ':' -f2 | sed -e 's/^[ \t]*//')"
-lxc-stop --timeout=${2} $1
-lxc-snapshot $1
-if [ "${CONT_STATUS}" == "RUNNING" ]; then
-  lxc-start $1
-fi
-}
-
 function get_snapshot(){
 SNAPSHOTS="$(lxc-snapshot -L $1)"
 for snapshot in "$SNAPSHOTS"; do
