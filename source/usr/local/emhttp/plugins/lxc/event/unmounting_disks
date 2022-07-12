@@ -1,13 +1,27 @@
 #!/bin/bash
 CONTAINERS="$(lxc-ls --active)"
+LXC_CONT_PATH="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
 TIMEOUT="$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "TIMEOUT" | cut -d '=' -f2 | sed 's/\"//g')"
 if [ -z "${TIMEOUT}" ]; then
   TIMEOUT=15
 fi
 for container in $CONTAINERS; do
-  logger "LXC: Stopping Container: $container..."
+  logger "LXC: Stopping container '$container'"
   lxc-stop --timeout=${TIMEOUT} $container 2>/dev/null
-  logger "LXC: Container $container successful stopped!"
+  logger "LXC: Container '$container' stopped"
 done
-sleep 5
+logger "LXC: unmounting rootfs from container(s)"
+ROOTFS_CONT="$(find ${LXC_CONT_PATH} -maxdepth 2 -type d -name "rootfs" 2>/dev/null)"
+ROOTFS_SNAPS="$(find ${LXC_CONT_PATH}/*/snaps -maxdepth 2 -type d -name "rootfs" 2>/dev/null)"
+for rootfscont in $ROOTFS_CONT; do
+  logger "LXC: umount $rootfscont"
+  umount $rootfscont
+done
+for rootfssnaps in $ROOTFS_SNAPS; do
+  logger "LXC: umount $rootfssnaps"
+  umount $rootfssnaps
+done
+logger "LXC: rootfs unmounting from container(s) done"
+sleep 2
 rm -rf /var/cache/lxc
+sleep 2

@@ -5,6 +5,6 @@ if [ ! -d ${LXC_DATADIRECTORY}/cache ]; then
 fi
 ln -s ${LXC_DATADIRECTORY}/cache /var/cache/lxc 2>/dev/null
 if [ "$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "SERVICE" | cut -d '=' -f2 | sed 's/\"//g')" == "enabled" ]; then
-  logger "LXC: executing autostart from container(s)"
+  logger "LXC: Executing autostart from container(s)"
   lxc-autostart
 fi
