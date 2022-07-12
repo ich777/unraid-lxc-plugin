@@ -1,0 +1,235 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+  <!ENTITY name      "lxc">
+  <!ENTITY author    "ich777">
+  <!ENTITY version   "2022.07.12">
+  <!ENTITY launch    "Settings/LXCSettings">
+  <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
+  <!ENTITY pluginURL "&gitURL;/&name;.plg">
+  <!ENTITY md5       "ca4d0552583f67791fd868b269ad9a17">
+  <!ENTITY plugin    "/boot/config/plugins/&name;">
+  <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
+]>
+
+<PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
+
+<CHANGES>
+
+###2022.07.12
+- Added Copy feature to the plugin - huge shout out to jmztaylor from the Unraid forums
+- Added Dialogue to prevent php timeout while creating Snapshots from big containers - huge shout out to jmztaylor from the Unraid forums
+- Added and unified LXC messages in syslog
+- Bugfix that prevented Array from stopping at certain conditions
+- Fixed few typos
+
+###2022.07.10
+- Added Snapshot feature to the plugin - huge shout out to jmztaylor from the Unraid forums
+
+###2022.06.09a
+- Added Distribution Logos
+- Moved link to show container configuration from container Name to the Distribution Logo
+
+###2022.06.09
+- Bugfix in VNC automatic install script showing wrong default user password at the end
+
+###2022.06.08
+- Added automatic installation from Debian Bullseye Desktop VNC container
+
+###2022.05.26
+- Added Terminal button to LXC page - Unraid 6.10.1-rc2 required
+
+###2022.05.24a
+- Small cosmetic modification to Add Container page
+
+###2022.05.24
+- Cleanup and a few changes to the appearance
+- Changed support link
+
+###2022.05.23a
+- Don't create default LXC directory on first plugin install
+
+###2022.05.23
+- Made path for LXC on settings page required
+
+###2022.05.21
+- Fixed destroy of running containers was not working
+- Forbid spaces in container, distirbuiton and release names
+- Moved plugin icon back from System Settings to User Utilities
+
+###2022.05.20
+- Added Timeout option to settings page
+- Lowered initial timeout from 30 to 15 seconds
+- Fixed stopped containers starting when clicking on Update on the Settings page
+- Plugin now links to Settings page instead to LXC pge
+- Moved plugin icon from User Utilities to System Settings
+- Renamed LXC Settings to LXC on Settings page
+
+###2022.05.19a
+- MAC Address translated to upper case if letters if input is lower case
+- Added Show configuration file when clicking on container name
+
+###2022.05.19
+- Added Start/Stop/Kill/Freeze/Unfreeze buttons
+- Added Autostart Enable/Disable button
+- Added Destroy container button
+
+###2022.05.18
+- Added warning about the LXC path
+- Added created Add Container page
+- Added container information on the LXC page
+- Warning from boot screen hidden
+
+###2022.05.12
+- Initial release
+
+</CHANGES>
+
+<FILE Run="/bin/bash">
+<INLINE>
+rm -f $(ls &plugin;/&name;*.txz 2>/dev/null|grep -v '&version;')
+</INLINE>
+</FILE>
+
+<FILE Name="&plugin;/&name;-&version;.txz" Run="upgradepkg --install-new">
+<URL>&gitURL;/packages/&name;-&version;.txz</URL>
+<MD5>&md5;</MD5>
+</FILE>
+
+<FILE Name="&emhttp;/README.md">
+<INLINE>
+**LXC**
+
+LXC is a well-known Linux container runtime that consists of tools, templates, and library and language bindings. It's pretty low level, very flexible and covers just about every containment feature supported by the upstream kernel.
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash">
+<INLINE>
+
+#Create setting files if not found
+if [ ! -f "&plugin;/plugin.cfg" ]; then
+  echo 'SERVICE=disabled
+TIMEOUT=15' > "&plugin;/plugin.cfg"
+fi
+
+if [ ! -f "&plugin;/lxc.conf" ]; then
+  echo 'lxc.lxcpath=/mnt/user/lxc' > "&plugin;/lxc.conf"
+fi
+
+if [ ! -f "&plugin;/default.conf" ]; then
+  echo 'lxc.net.0.type = veth
+lxc.net.0.flags = up
+lxc.net.0.link = br0
+lxc.net.0.name = eth0' > "&plugin;/default.conf"
+fi
+
+#Create packages directory
+if [ ! -d &plugin;/packages ]; then
+  mkdir -p &plugin;/packages
+fi
+
+#Wait for Network and timeout after 30 seconds
+HOST="8.8.8.8"
+for i in {1..10}; do
+  ping -c1 $HOST &amp;> /dev/null &amp;&amp; break;
+done
+
+#Set variables and get version numbers
+LXC_DATADIRECTORY="$(cat &plugin;/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
+LXC_SERVICE="$(cat &plugin;/plugin.cfg | grep -n "SERVICE" | cut -d '=' -f2 | sed 's/\"//g')"
+LAT_V="$(wget -qO- https://api.github.com/repos/ich777/unraid-lxc-plugin/releases/latest | jq -r '.tag_name')"
+CUR_V="$(ls &plugin;/packages/LXC-*-1.txz | sort -V | tail -1 | cut -d '-' -f2)"
+DL_URL="https://github.com/ich777/unraid-lxc-plugin/releases/download/$LAT_V"
+
+if [ -z "${LAT_V}" ]; then
+  if [ -z "${CUR_V}" ]; then
+    echo "---Something went horribly wrong, can't get latest version from LXC and no local version found!---"
+    removepkg &name;-&version;.txz
+    rm -rf &plugin;
+    exit 1
+  else
+    LAT_V=${CUR_V}
+  fi
+fi
+
+#Check for old packages
+rm -f $(ls &plugin;/packages/LXC-*-1.txz 2>/dev/null | grep -v "$LAT_V")
+
+download() {
+#Download LXC package
+if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packages/LXC-${LAT_V}-1.txz" "${DL_URL}/LXC-${LAT_V}-1.txz" ; then
+  if [ "$(md5sum "&plugin;/packages/LXC-${LAT_V}-1.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/LXC-${LAT_V}-1.txz.md5" | cut -d ' ' -f1)" ]; then
+    echo
+    echo "---CHECKSUM ERROR!---"
+    removepkg &name;-&version;.txz
+    rm -rf &plugin;
+    exit 1
+  fi
+  echo
+  echo "---Successfully downloaded LXC Package, installing...---"
+else
+  echo
+  echo "--------------Can't download LXC Package----------------"
+  exit 1
+fi
+}
+
+check() {
+if [ ! -f "&plugin;/packages/LXC-${LAT_V}-1.txz" ]; then
+  echo
+  echo "---------------Downloading LXC Package!-----------------"
+  echo "------------Please don't close this window!-------------"
+  download
+else
+  echo
+  echo "--------LXC Package found locally, installing...--------"
+fi
+}
+
+install() {
+#Install LXC Package
+/sbin/installpkg "&plugin;/packages/LXC-${LAT_V}-1.txz"
+ln -s &plugin;/default.conf /etc/lxc/default.conf
+ln -s &plugin;/lxc.conf /etc/lxc/lxc.conf
+}
+
+enable_lxc() {
+if [ ! -d ${LXC_DATADIRECTORY}/cache ]; then
+  mkdir -p ${LXC_DATADIRECTORY}/cache
+fi
+rm -rf /var/cache/lxc 
+ln -s ${LXC_DATADIRECTORY}/cache /var/cache/lxc
+}
+
+#Check if LXC Package is already downloaded
+check
+if [ "$(lxc-start --version 2>/dev/null)" != "${LAT_V}" ]; then
+  install > /dev/null
+  if [ "${LXC_SERVICE}" == "enabled" ]; then
+    enable_lxc
+  fi
+fi
+
+echo "---------------LXC installation complete!---------------"
+
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+
+echo "------------------------------"
+echo "---Uninstalling LXC Package---"
+echo "------------------------------"
+# Remove plugin related files
+removepkg &name;-&version;
+rm -rf &plugin;
+echo
+echo "------------------------------------------------------------------------------"
+echo "-------------LXC Package uninstalled, please reboot your server!--------------"
+echo "------------------------------------------------------------------------------"
+echo
+
+</INLINE>
+</FILE>
+</PLUGIN>
