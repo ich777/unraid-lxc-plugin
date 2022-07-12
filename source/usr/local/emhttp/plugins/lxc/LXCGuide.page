@@ -1,5 +1,6 @@
 Menu="LXC:2"
 Title="Readme"
+Cond="exec(\"lxc-ls 2>/dev/null\")"
 ---
 <h3>If you experience any bugs please report them on the support thread <a href="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/" target="_blank" rel="noopener">here</a>!</h3>
 <p><b>You find the manual page for the container configuration file <a href="https://linuxcontainers.org/lxc/manpages/man5/lxc.container.conf.5.html" target="_blank" rel="noopener">here</a>!</p></b>

@@ -1,5 +1,6 @@
 Menu="LXC:1"
 Title="Snapshots"
+Cond="exec(\"lxc-ls 2>/dev/null\")"
 ---
 <?php
 $avail_containers = explode("\n", shell_exec("lxc-ls"));
