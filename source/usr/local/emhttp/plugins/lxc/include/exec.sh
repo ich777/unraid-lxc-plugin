@@ -31,9 +31,9 @@ if [ "${1}" == "disabled" ]; then
     TIMEOUT=15
   fi
   for container in $CONTAINERS; do
-    logger "LXC: Stopping Container: $container..."
+    logger "LXC: Stopping container '$container'"
     lxc-stop --timeout=${TIMEOUT} $container 2>/dev/null
-    logger "LXC: Container $container successful stopped!"
+    logger "LXC: Container '$container' stopped"
   done
 fi
 if [ -d /var/cache/lxc ]; then
@@ -61,6 +61,7 @@ echo -n "$(grep "lxc.start.auto" $1/$2/config 2>/dev/null | cut -d '=' -f2 | sed
 }
 
 function enable_autostart(){
+logger "LXC: Enabled Autostart from container '$2'"
 if [ ! "$(grep "lxc.start.auto" $1/$2/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
 echo "
 # Autostart Settings
@@ -72,6 +73,7 @@ fi
 }
 
 function disable_autostart(){
+logger "LXC: Disabled Autostart from container '$2'"
 if [ ! "$(grep "lxc.start.auto" $1/$2/config 2>/dev/null | cut -d '=' -f2 | sed 's/ //g')" ]; then
 echo "
 # Autostart Settings
@@ -95,43 +97,46 @@ echo -n "$(grep -oP '(?<=dist )\w+' $1/$2/config | head -1 | sed 's/\"//g')"
 }
 
 function start_Container(){
+logger "LXC: Starting container '$1'"
 lxc-start $1
+logger "LXC: Container '$1' started"
 }
 
 function stop_Container(){
+logger "LXC: Stopping container '$1'"
 lxc-stop --timeout=${2} $1
+logger "LXC: Container '$1' stopped"
 }
 
 function freeze_Container(){
+logger "LXC: Freezing container '$1'"
 lxc-freeze $1
+logger "LXC: Container '$1' frozen"
 }
 
 function unfreeze_Container(){
+logger "LXC: Unfreezing container '$1'"
 lxc-unfreeze $1
+logger "LXC: Container '$1' unfrozen"
 }
 
 function kill_Container(){
+logger "LXC: Killing container '$1'"
 lxc-stop --kill $1
+logger "LXC: Container '$1' killed"
 }
 
 function destroy_Container(){
+logger "LXC: Destroying container '$1'"
 lxc-stop --kill $1
 sleep 0.5
 umount $2/$1/rootfs
-SNAPSHOTS="$(lxc-snapshot -L $1)"
+SNAPSHOTS="$(lxc-snapshot -L $1 | awk {'print $1'})"
 for snapshot in $SNAPSHOTS; do
   umount $2/$1/snaps/$snapshot/rootfs
 done
 lxc-destroy -s $1
-}
-
-function create_snapshot(){
-CONT_STATUS="$(lxc-info --name $1 | grep State: | cut -d ':' -f2 | sed -e 's/^[ \t]*//')"
-lxc-stop --timeout=${2} $1
-lxc-snapshot $1
-if [ "${CONT_STATUS}" == "RUNNING" ]; then
-  lxc-start $1
-fi
+logger "LXC: Container '$1' destroyed"
 }
 
 function get_snapshot(){
@@ -142,8 +147,10 @@ done
 }
 
 function delete_snapshot(){
+logger "LXC: Deleting Snapshot '$1' from container '$2'"
 umount $3/$2/snaps/$1/rootfs
 lxc-snapshot -d $1 $2
+logger "LXC: Snapshot '$1' from container '$2' deleted"
 }
 
 $@

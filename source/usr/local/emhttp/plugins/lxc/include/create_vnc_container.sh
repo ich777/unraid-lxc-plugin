@@ -1,5 +1,6 @@
 #!/bin/bash
-echo "Setting up Debian Bullseye LXC container, please wait...!"
+logger "LXC: Setting up Debian Bullseye VNC container"
+echo "Setting up Debian Bullseye LXC Container, please wait...!"
 echo
 
 # Create the container, exit if failed
@@ -209,3 +210,4 @@ echo '| The default user password for the user debian is: debian'
 echo '|'
 echo '| WARNING: It is strongly Recommended to change these passwords!'
 echo '+-----------------------------------------------------------------'"
+logger "LXC: Debian Bullseye VNC container set up"
