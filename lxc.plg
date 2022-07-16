@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.07.12">
+  <!ENTITY version   "2022.07.16">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2022.07.16
+- Bugfix that prevented Array from starting when using /mnt/user/... as data directory (it is recommended to use the real file path like /mnt/cache/... or /mnt/diskX/...!)
 
 ###2022.07.12
 - Added Copy feature to the plugin - huge shout out to jmztaylor from the Unraid forums
@@ -206,7 +209,9 @@ check
 if [ "$(lxc-start --version 2>/dev/null)" != "${LAT_V}" ]; then
   install > /dev/null
   if [ "${LXC_SERVICE}" == "enabled" ]; then
-    enable_lxc
+    if [ ! -z "$(pidof emhttpd)" ]; then
+      enable_lxc
+    fi
   fi
 fi
 
