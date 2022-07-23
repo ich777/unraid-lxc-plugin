@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.07.16">
+  <!ENTITY version   "2022.07.23">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "ca4d0552583f67791fd868b269ad9a17">
+  <!ENTITY md5       "e4c5b2a889556e8ec89364609e348bcc">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2022.07.23
+- Bugfix when using dark theme filetree wasn't visible on settings page - thank you SimonF
 
 ###2022.07.16
 - Bugfix that prevented Array from starting when using /mnt/user/... as data directory (it is recommended to use the real file path like /mnt/cache/... or /mnt/diskX/...!)
