@@ -9,6 +9,7 @@ $default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh defaul
 $avail_bridges = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh avail_bridges");
 $selected_bridge = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh selected_bridge");
 $selected_timeout = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh selected_timeout");
+$bgcolor = strstr('white,azure',$display['theme']) ? '#f2f2f2' : '#1c1c1c';
 ?>
 <link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.filetree.css')?>">
 <style>
