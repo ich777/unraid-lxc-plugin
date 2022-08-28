@@ -31,8 +31,7 @@ $cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; e
   <th>
     <a href="#" id="sorting" onclick="resetSorting()" title="Reset sorting">
       <i class="fa fa-th-list"></i>
-    </a>
-    Name/Status
+    </a>Name/Status
   </th>
   <th>
     CPUs
@@ -66,35 +65,40 @@ foreach ($allContainers as $container) {
   ?>
   <tbody align="left">
   <tr>
-    <a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px">
-      <th>
-        <img src="/plugins/lxc/images/distributions/<?= $container->distribution;?>.png" width="30" height="30" class="dropdown_btn" onclick="showDropdown('<?= $container->name ?>')">
-        <font size="+1">
-          &nbsp;<?= $container->name;?>
-        </font>
-    </a>
-    <br>
-    <span id='<?= $container->state ?>'><?= $container->state;?></span>
-    <ul id="dropdown_<?= $container->name;?>" class="dropdown-menu dropdown-context fa-ul">
-      <?php if ($container->state == "RUNNING") { ?>
-        <li><a href="#" title="Terminal" onclick="startConsole('<?= $container->name ?>')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>
-        <div class="divider"></div>
-        <li><a href="#" class="stopCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>
-        <li><a href="#" class="freezeCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Freeze</a></li>
-        <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
-      <?php } else if ($container->state =="STOPPED") {?>
-        <li><a href="#" class="startCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-play fa-lg"></i>  Start</a></li>
-      <?php } else if ($container->state == "FROZEN") {?>
-        <li><a href="#" class="unfreezeCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Unfreeze</a></li>
-        <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
-      <?php } ?>
-      <div class="divider"></div>
-      <li><a href="#" class="<?= $container->name ?>" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>
-      <li><a href="#" class="snapshotCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>
-      <li><a href="LXCCopyContainer?cont=<?= $container->name ?>" id="<?= $container->name ?>"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>
-      <div class="divider"></div>
-      <li><a href="#" class="destroyCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-trash fa-lg"></i>  Destroy</a></li>
-    </ul>
+    <td class="ct-name">
+      <span class="outer">
+        <span class="hand">
+          <img src="/plugins/lxc/images/distributions/<?= $container->distribution;?>.png" class="img" width="30" height="30" class="dropdown_btn" onclick="showDropdown('<?= $container->name ?>')">
+        </span>
+        <span class="inner">
+          <font size="+1">
+            <?= $container->name;?>
+          </font>
+          <br>
+          <span id='<?= $container->state ?>'><?= $container->state;?></span>
+          <ul id="dropdown_<?= $container->name;?>" class="dropdown-menu dropdown-context fa-ul">
+            <?php if ($container->state == "RUNNING") { ?>
+              <li><a href="#" title="Terminal" onclick="startConsole('<?= $container->name ?>')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>
+              <div class="divider"></div>
+              <li><a href="#" class="stopCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>
+              <li><a href="#" class="freezeCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Freeze</a></li>
+              <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
+            <?php } else if ($container->state =="STOPPED") {?>
+              <li><a href="#" class="startCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-play fa-lg"></i>  Start</a></li>
+            <?php } else if ($container->state == "FROZEN") {?>
+              <li><a href="#" class="unfreezeCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Unfreeze</a></li>
+              <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
+            <?php } ?>
+            <div class="divider"></div>
+            <li><a href="#" class="<?= $container->name ?>" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>
+            <li><a href="#" class="snapshotCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>
+            <li><a href="LXCCopyContainer?cont=<?= $container->name ?>" id="<?= $container->name ?>"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>
+            <div class="divider"></div>
+            <li><a href="#" class="destroyCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-trash fa-lg"></i>  Destroy</a></li>
+          </ul>
+        </span>
+      </span>
+    </td>
     <td>
       <?= $container->cpus;?>
     </td>
@@ -136,4 +140,3 @@ foreach ($allContainers as $container) {
 <?php } else { ?>
 <h3 style="text-align: center;">Please start the Array!</h3>
 <?php } ?>
-
