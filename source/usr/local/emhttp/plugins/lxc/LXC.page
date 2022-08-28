@@ -28,6 +28,11 @@ $cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; e
     <p>No containers installed! Click on Add Container to add one.</p>
 <? } else { ?>
 
+<div id="title" style="margin-top: 0px !important;">
+  <span class="left">
+    <i class="fa fa-cubes title"></i>LXC Containers
+  </span>
+</div>
 <table id="lxc_table" class="tablesorter four shift">
 <thead>
 <tr>
