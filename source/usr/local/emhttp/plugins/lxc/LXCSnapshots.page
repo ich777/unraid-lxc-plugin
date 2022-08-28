@@ -1,5 +1,6 @@
 Menu="LXC:1"
 Title="Snapshots"
+Tag="camera"
 Cond="exec(\"lxc-ls 2>/dev/null\")"
 ---
 <?php
