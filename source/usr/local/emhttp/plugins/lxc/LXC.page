@@ -21,7 +21,9 @@ $cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; e
 
 <? if (isset($started ) === true && trim($started ) !== '') { ?>
 <? if (count($allContainers) == 0) { ?>
-    <a href="LXCAddContainer" class="button">Add Container</a>
+    <a href="LXCAddContainer">
+      <input type="button" value="Add Container">
+    </a>
     <h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
     <p>No containers installed! Click on Add Container to add one.</p>
 <? } else { ?>
@@ -135,7 +137,9 @@ foreach ($allContainers as $container) {
 
   <? } ?>
   </table>
-  <a href="LXCAddContainer" class="button">Add Container</a>
+  <a href="LXCAddContainer">
+    <input type="button" value="Add Container">
+  </a>
 <? } ?>
 
 <?php } else { ?>
