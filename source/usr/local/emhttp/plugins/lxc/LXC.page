@@ -9,8 +9,8 @@ $started = $var['fsState']=='Started';
 
 require_once '/usr/local/emhttp/plugins/lxc/include/Container.php';
 $settings = new Settings();
-
 $allContainers = getAllContainers();
+$cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; else echo '2'; fi");
 
 ?>
 <link rel="stylesheet" href="<?autov('/plugins/lxc/css/lxc.css')?>">
@@ -37,9 +37,11 @@ $allContainers = getAllContainers();
   <th>
     CPUs
   </th>
+<? if ($cgroup2 === '1') { ?>
   <th>
     Memory/<br>Kernel Memory
   </th>
+<? } ?>
   <th>
     Address
   </th>
@@ -68,7 +70,7 @@ foreach ($allContainers as $container) {
       <th>
         <img src="/plugins/lxc/images/distributions/<?= $container->distribution;?>.png" width="30" height="30" class="dropdown_btn" onclick="showDropdown('<?= $container->name ?>')">
         <font size="+1">
-          <?= $container->name;?>
+          &nbsp;<?= $container->name;?>
         </font>
     </a>
     <br>
@@ -96,11 +98,13 @@ foreach ($allContainers as $container) {
     <td>
       <?= $container->cpus;?>
     </td>
+<? if ($cgroup2 === '1') { ?>
     <td>
       <?= $container->memoryUse;?>
       <br>
       <?= $container->kMemUse;?>
     </td>
+<? } ?>
     <td>
       <?= $container->ips;?>
     </td>
@@ -120,11 +124,11 @@ foreach ($allContainers as $container) {
       ?>
       <input class='autostart' type='checkbox' id="<?= $container->name ?>" title="<?= _('Toggle container autostart') ?>" <?= $checked ?>>
     </td>
+    </th>
   </tr>
   </tbody>
 
   <? } ?>
-
   </table>
   <a href="LXCAddContainer" class="button">Add Container</a>
 <? } ?>
