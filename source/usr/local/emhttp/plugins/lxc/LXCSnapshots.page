@@ -3,12 +3,18 @@ Title="Snapshots"
 Cond="exec(\"lxc-ls 2>/dev/null\")"
 ---
 <?php
-$avail_containers = explode("\n", shell_exec("lxc-ls"));
-
-foreach ($avail_containers as $container) {
-    if (!empty($container)) {
+require_once('/usr/local/emhttp/plugins/lxc/include/Container.php');
 ?>
-        <h2><?= $container ?></h2>
+
+<link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
+<script src="/plugins/lxc/js/lxc.js"></script>
+
+<?php
+
+$allContainers = getAllContainers();
+
+foreach ($allContainers as $container) { ?>
+        <h2><?= $container->name ?></h2>
         <br>
         <table id="snapshot_table" class="tablesorter two shift">
             <thead>
@@ -20,32 +26,32 @@ foreach ($avail_containers as $container) {
             </thead>
             <tbody align="left">
 <?
-        $snapshots = trim(shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_snapshot " . $container));
-        if (strpos($snapshots, "snapshots") === false) {
-            $new = explode("\n", $snapshots);
-            foreach ($new as $new_cont) {
-                $sorted = explode(" ", $new_cont);
-                $delete_snapshot_button="<form id=\"snapshot\" method=\"post\">
-<input hidden type = \"text\" name=\"CONTname\" value=\"$container\">
-<input hidden type = \"text\" name=\"SNAPname\" value=\"$sorted[0]\">
-<input type=\"submit\" name=\"snapshotDELETE\" value=\"Delete Snapshot\">
-</form>";
-                $formatted_date = str_replace(":", "_", $sorted[2]);
-                echo "<tr style='height: 50px;'><td>$sorted[0]</td><td>$formatted_date $sorted[3] </td><td style='display: flex;'><a href='LXCRestoreSnapshot?cont=" . $container . "&snap=" . $sorted[0] . "&date=" . $formatted_date . "_" . $sorted[3] . "' class='button'>Create Container From Snapshot</a>" . $delete_snapshot_button . "</td></tr>";
-            }
-        } else {
-            echo "<tr><td>No snapshots</td><tr>";
-        }
-        echo "</tbody></table>";
-    }
-}
 
-if(isset($_POST['snapshotDELETE'])) {
-$CONTname = $_POST["CONTname"];
-$SNAPname = $_POST["SNAPname"];
-$default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh delete_snapshot ".escapeshellarg($SNAPname)." ".escapeshellarg($CONTname)." " . escapeshellarg($default_path)."");
-echo '<script>parent.window.location.reload();</script>';
+        if (count($container->snapshots) > 0) {
+          foreach ($container->snapshots as $snapshot) {
+            ?>
+            <tr style='height: 50px;'>
+              <td>
+                <?= $snapshot->name?>
+              </td>
+              <td>
+                <?= $snapshot->date ?> <?= $snapshot->time ?>
+              </td>
+              <td style='display: flex;'>
+                <a href='LXCRestoreSnapshot?cont=<?= $container->name?>&snap=<?= $snapshot->name ?>&date=<?= $snapshot->date ?>_<?= $snapshot->time ?>' class='button'>
+                  Create Container From Snapshot
+                </a>
+                <a href="#" class="button deleteSNAP" id="<?= $container->name ?> <?= $snapshot->name ?>">
+                  Delete Snapshot
+                </a>
+              </td>
+            </tr>
+<?php
+          }
+        } else {
+          echo "<tr><td>No snapshots</td><tr>";
+        }
+          echo "</tbody></table>";
 }
 
 ?>

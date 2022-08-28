@@ -2,9 +2,10 @@ Title="Add LXC Container"
 Markdown="false"
 ---
 <?php
+require_once '/usr/local/emhttp/plugins/lxc/include/Settings.php';
+$settings = new Settings();
+
 $started = $var['fsState']=='Started';
-$macaddress = "52:54:00:" .strtoupper(implode(':', str_split(substr(md5(mt_rand()), 0, 6), 2)));
-$default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
 $active_containers = explode("\n", shell_exec("lxc-ls"));
 $container = $_GET['cont'];
 $snapshot = $_GET['snap'];
@@ -12,59 +13,43 @@ $date = $_GET['date'];
 ?>
 
 <script>
-  //Don't execute commands again if page is refreshed
-  if (window.history.replaceState) {
-    window.history.replaceState(null, null, window.location.href);
-  }
-
-  //Create container box
-  function createContainer(form) {
-    var regex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
-    if (!regex.test(form.contMac.value)) {
-      alert("Invalid MAC address");
-      return false;
-    }
-    var name = form.contName.value;
-    var autostart = form.contAutostart.checked;
-    var mac = form.contMac.value;
-    openBox("/usr/local/emhttp/plugins/lxc/include/create_container.sh&arg1=<?php echo $default_path; ?>&arg2=" + mac + "&arg3=" + name + "&arg4=null&arg5=null&arg6=" + autostart + "&arg7=snapshot&arg8=<?= $container ?>&arg9=<?= $snapshot ?>", "Create Container", 600, 800, true);
-    return false;
-  }
+  let container = '<?= $container ?>';
+  let snapshot = '<?= $snapshot ?>';
 </script>
+<link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
+<script src="/plugins/lxc/js/lxc.js"></script>
 
 <div id="canvas">
-<form method="post" autocomplete="off">
+<form method="post" id="fromSnapshot" autocomplete="off">
 
 <div class="">
 <dl>
 <dt>Container Name:</dt>
-<dd><input type="text" name="contName" onkeypress="return event.charCode != 32"
-           pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="true"></dd>
+<dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required></dd>
 </dl>
 </div>
 
 <div class="">
 <dl>
 <dt>Snapshot Container Name:</dt>
-<dd><input type="text" name="contSnap" onkeypress="return event.charCode != 32" required="true"
-           value="<?= $container ?>" disabled></dd>
+<dd><input type="text" name="contSnap" required value="<?= $container ?>" disabled></dd>
 </dl>
 </div>
 
 <div class="">
 <dl>
 <dt>Snapshot:</dt>
-<dd><input type="text" name="contSnapName" onkeypress="return event.charCode != 32" required="true"
-           value="<?= $snapshot ?> <?= $date ?>" disabled></dd>
+<dd><input type="text" name="contSnapName" required value="<?= $snapshot ?> <?= $date ?>" disabled></dd>
 </dl>
 </div>
 
 <div class="">
 <dl>
 <dt>Mac Address:</dt>
-<dd><input type="text" name="contMac" required="true" onkeypress="return event.charCode != 32"
-           pattern="[a-z0-9][a-z0-9_.-]+" style="text-transform:uppercase"
-           value="<?php echo $macaddress; ?>"></dd>
+  <dd style="display: grid;">
+    <input type="text" name="contMac" required id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>">
+    <div id="emac" class="emac">Invalid MAC address</div>
+  </dd>
 </dl>
 </div>
 
@@ -75,7 +60,7 @@ $date = $_GET['date'];
 </dl>
 </div>
 
-<input type="button" value="_(Create)_" onclick="createContainer(this.form)">
+<input type="submit" value="_(Create)_">
 <a href="LXC" class="button">Done</a>
 
 </form>

@@ -6,178 +6,130 @@ Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/d
 ---
 <?php
 $started = $var['fsState']=='Started';
-$avail_containers = shell_exec("lxc-ls");
-$default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
-$selected_timeout = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh selected_timeout");
+
+require_once '/usr/local/emhttp/plugins/lxc/include/Container.php';
+$settings = new Settings();
+
+$allContainers = getAllContainers();
+
 ?>
+<link rel="stylesheet" href="<?autov('/plugins/lxc/css/lxc.css')?>">
+<link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.switchbutton.css')?>">
+<script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
+<script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
 
-<script>
-  //Don't execute commands again if page is refreshed
-  if ( window.history.replaceState ) {
-    window.history.replaceState( null, null, window.location.href );
-  }
-
-  //Destroy container pop up
-  function destroyConfirm() {
-    if (confirm("ATTENTION: Do you really want to destroy this LXC Container? This is IRREVERSIBLE and will delete the container, snapshots and all data in it!") == true) {
-      return true;
-    } else {
-      return false;
-    }
-  }  
-
-  //Snapshot container pop up
-  function snapshotConfirm(cont) {
-    if (confirm("This action will stop the LXC Container and start it again if it was running. Continue?") == true) {
-      openBox("/usr/local/emhttp/plugins/lxc/include/create_snapshot.sh&arg1=<?php echo $selected_timeout ?>&arg2="+cont,"Create Snapshot",600,800,true);
-    }
-  }
-  
-  function startConsole(name) {
-    openTerminal('lxc',name);
-  }
-</script>
-
-<? if (isset($started ) === true && trim($started ) !== ''): ?>
-<? if (isset($avail_containers ) === true && trim($avail_containers ) !== ''): ?>
+<? if (isset($started ) === true && trim($started ) !== '') { ?>
+<? if (count($allContainers) == 0) { ?>
+    <a href="LXCAddContainer" class="button">Add Container</a>
+    <h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
+    <p>No containers installed! Click on Add Container to add one.</p>
+<? } else { ?>
 
 <table id="lxc_table" class="tablesorter four shift">
-<thead><tr><th><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px" onclick="resetSorting()" title="Reset sorting"><i class="fa fa-th-list"></i></a>Name/Status</th><th>Terminal</th><th></th><th>CPUs</th><th>Memory/</br>Kernel Memory</th><th>Address</th><th>Total RX/TX</th><th>PID</th><th>Autostart</th><th>Destroy</th><th>Snapshot/Copy</th></tr></thead>
+<thead>
+<tr>
+  <th>
+    <a href="#" id="sorting" onclick="resetSorting()" title="Reset sorting">
+      <i class="fa fa-th-list"></i>
+    </a>
+    Name/Status
+  </th>
+  <th>
+    CPUs
+  </th>
+  <th>
+    Memory/<br>Kernel Memory
+  </th>
+  <th>
+    Address
+  </th>
+  <th>
+    Total RX/TX
+  </th>
+  <th>
+    PID
+  </th>
+  <th>
+    Autostart
+  </th>
+</tr>
+</thead>
 
 <?php
-//Read containers and information about them
-$cont = trim($avail_containers, "\n");
-$data = explode("\n", $cont);
-foreach($data as $item){
-  $details = shell_exec("lxc-info $item");
-  $replaced = explode("\n", $details);
-  $raw_array = preg_replace('/\s\s+/', ' ', $replaced);
-  foreach($raw_array as $line)
-{
-  $tmp = explode(": ", $line);
-  $container_array[$tmp[0]] = $tmp[1];
-}
 
-//Get CPUs, autostart and IPs
-$CPUs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_CPUs ".escapeshellarg($container_array['PID'])."");
-$autostart = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_autostart ".escapeshellarg($default_path)." ".escapeshellarg($container_array['Name'])."");
-$IPs = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_IPs ".escapeshellarg($container_array['Name'])."");
-$distribution = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh get_distribution ".escapeshellarg($default_path)." ".escapeshellarg($container_array['Name'])."");
+foreach ($allContainers as $container) {
+  $disableAutoButton = '<input type="submit" class="disableAUTOSTART" value="Disable" id="' . $container->name .'">';
+  $enableAutoButton = '<input type="submit" class="enableAUTOSTART" value="Enable" id="' . $container->name .'">';
 
-// Set color from container status and create status buttons
-$status=$container_array['State'];
-if($status=="RUNNING")
-{
-  $color="color:green";
-  $status_buttons="<form id=\"stop\" method=\"post\" >
-<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-<input type=\"submit\" name=\"stopCONT\" value=\"Stop\">
-<input type=\"submit\" name=\"freezeCONT\" value=\"Freeze\">
-<input type=\"submit\" name=\"killCONT\" value=\"Kill\">
-  </form>";
-  $terminal_button="<font size=\"+1\"><a href='#' title='Terminal' onclick=\"startConsole('$container_array[Name]')\"><i class=\"icon-u-terminal system\"></i></a></font>";
-}
-else if($status=="FROZEN")
-{
-  $color="color:orange";
-  $status_buttons="<form id=\"unfreeze\" method=\"post\" >
-<input type=\"submit\" name=\"unfreezeCONT\" value=\"Unfreeze\">
-<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-<input type=\"submit\" name=\"killCONT\" value=\"Kill\">
-</form>";
-}
-else 
-{
-  $color="color:red;";
-  $status_buttons="<form id=\"start\" method=\"post\" >
-<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-<input type=\"submit\" name=\"startCONT\" value=\"Start\">
-</form>";
-}
+  ?>
+  <tbody align="left">
+  <tr>
+    <a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px">
+      <th>
+        <img src="/plugins/lxc/images/distributions/<?= $container->distribution;?>.png" width="30" height="30" class="dropdown_btn" onclick="showDropdown('<?= $container->name ?>')">
+        <font size="+1">
+          <?= $container->name;?>
+        </font>
+    </a>
+    <br>
+    <span id='<?= $container->state ?>'><?= $container->state;?></span>
+    <ul id="dropdown_<?= $container->name;?>" class="dropdown-menu dropdown-context fa-ul">
+      <?php if ($container->state == "RUNNING") { ?>
+        <li><a href="#" title="Terminal" onclick="startConsole('<?= $container->name ?>')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>
+        <div class="divider"></div>
+        <li><a href="#" class="stopCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>
+        <li><a href="#" class="freezeCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Freeze</a></li>
+        <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
+      <?php } else if ($container->state =="STOPPED") {?>
+        <li><a href="#" class="startCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-play fa-lg"></i>  Start</a></li>
+      <?php } else if ($container->state == "FROZEN") {?>
+        <li><a href="#" class="unfreezeCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Unfreeze</a></li>
+        <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
+      <?php } ?>
+      <div class="divider"></div>
+      <li><a href="#" class="<?= $container->name ?>" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>
+      <li><a href="#" class="snapshotCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>
+      <li><a href="LXCCopyContainer?cont=<?= $container->name ?>" id="<?= $container->name ?>"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>
+      <div class="divider"></div>
+      <li><a href="#" class="destroyCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-trash fa-lg"></i>  Destroy</a></li>
+    </ul>
+    <td>
+      <?= $container->cpus;?>
+    </td>
+    <td>
+      <?= $container->memoryUse;?>
+      <br>
+      <?= $container->kMemUse;?>
+    </td>
+    <td>
+      <?= $container->ips;?>
+    </td>
+    <td>
+      <?= $container->totalBytes;?>
+    </td>
+    <td>
+      <?= $container->pid;?>
+    </td>
+    <td>
+      <?php
+      if($container->autostart=="1") {
+        $checked = "checked";
+      } else {
+        $checked = "";
+      }
+      ?>
+      <input class='autostart' type='checkbox' id="<?= $container->name ?>" title="<?= _('Toggle container autostart') ?>" <?= $checked ?>>
+    </td>
+  </tr>
+  </tbody>
 
-//Create autostart buttons
-if($autostart=="1")
-{
-  $autostart_button="<form id=\"disable\" method=\"post\" >
-<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-<input type=\"submit\" name=\"disableAUTOSTART\" value=\"Disable\">
-</form>";
-}
-else 
-{
-  $autostart_button="<form id=\"enable\" method=\"post\" >
-<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-<input type=\"submit\" name=\"enableAUTOSTART\" value=\"Enable\">
-</form>";
-}
+  <? } ?>
 
-$destroy_button="<form id=\"destroy\" method=\"post\" onsubmit=\"return destroyConfirm()\">
-<input hidden type = \"text\" name=\"CONTname\" value=\"$container_array[Name]\">
-<input type=\"submit\" name=\"destroyCONT\" value=\"Destroy\">
-</form>";
+  </table>
+  <a href="LXCAddContainer" class="button">Add Container</a>
+<? } ?>
 
-$snapshot_button="<a href=\"#\" onclick=\"snapshotConfirm('" . $container_array['Name'] . "')\" class=\"button\">Snapshot</a>";
-
-?> <tbody align="left"><tr><a href="#" style="cursor:hand;margin-left:12px;display:inline-block;width:32px"><th><img src="/plugins/lxc/images/distributions/<?php echo $distribution;?>.png" width="30" height="30" title="ShowConfig" onclick="openBox('/usr/local/emhttp/plugins/lxc/include/show_config.sh&arg1=<?php echo $default_path; ?>&arg2=<?php echo $container_array['Name'];?>','Configuration - <?php echo $container_array['Name'];?>',700,800,false);return false"><font size="+1"><?php echo $container_array['Name'];?></input></a></a></font><br><span style='<?php echo "$color";?>'><?php echo $container_array['State'];?></span></th><td><?php echo $terminal_button;?></td><td><?php echo $status_buttons;?></td><td><?php echo $CPUs;?></td><td><?php echo $container_array['Memory use'];?></br><?php echo $container_array['KMem use'];?></td><td><?php echo $IPs;?></td><td><?php echo $container_array[' Total bytes'];?></td><td><?php echo $container_array['PID'];?></td><td><?php echo $autostart_button;?></td><td><?php echo $destroy_button;?></td><td><?php echo $snapshot_button; ?><a href="LXCCopyContainer?cont=<?php echo $container_array['Name'] ?>" class="button">Copy</a></td></tr></tbody>
-
-<?php
-//Unset container_array
-unset($container_array);
-unset($terminal_button);
-}
-
-//Post functions
-if(isset($_POST['startCONT'])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh start_Container ".escapeshellarg($CONTname)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST['stopCONT'])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh stop_Container ".escapeshellarg($CONTname)." ".escapeshellarg($selected_timeout)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST['freezeCONT'])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh freeze_Container ".escapeshellarg($CONTname)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST['killCONT'])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh kill_Container ".escapeshellarg($CONTname)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST['unfreezeCONT'])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh unfreeze_Container ".escapeshellarg($CONTname)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST['enableAUTOSTART'])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh enable_autostart ".escapeshellarg($default_path)." ".escapeshellarg($CONTname)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST['disableAUTOSTART'])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh disable_autostart ".escapeshellarg($default_path)." ".escapeshellarg($CONTname)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST['destroyCONT'])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh destroy_Container ".escapeshellarg($CONTname)." ".escapeshellarg($default_path)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST["snapshotCONT"])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh create_snapshot ".escapeshellarg($CONTname)." " .escapeshellarg($selected_timeout)."");
-echo '<script>parent.window.location.reload();</script>';
-} elseif(isset($_POST["copyCONT"])) {
-$CONTname = $_POST["CONTname"];
-shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh copy_container ".escapeshellarg($CONTname)." " .escapeshellarg($selected_timeout)."");
-echo '<script>parent.window.location.reload();</script>';
-}
-?>
-</table>
-
-<a href="LXCAddContainer" class="button">Add Container</a>
-<? else: ?>
-<h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
-<p>No containers installed! Click on Add Container to add one.</p>
-
-<a href="LXCAddContainer" class="button">Add Container</a>
-<? endif; ?>
-<? else: ?>
+<?php } else { ?>
 <h3 style="text-align: center;">Please start the Array!</h3>
-<? endif; ?>
+<?php } ?>
+

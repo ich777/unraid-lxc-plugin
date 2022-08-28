@@ -2,99 +2,94 @@ Title="Add LXC Container"
 Markdown="false"
 ---
 <?php
-$started = $var['fsState']=='Started';
-$macaddress = "52:54:00:" .strtoupper(implode(':', str_split(substr(md5(mt_rand()), 0, 6), 2)));
-$default_path = shell_exec("/usr/local/emhttp/plugins/lxc/include/exec.sh default_path");
+require_once '/usr/local/emhttp/plugins/lxc/include/Settings.php';
+$settings = new Settings();
+
+$started = $var['fsState'] == 'Started';
+$macaddress = getNewMacAddress();
+
 ?>
 
-<script>
-  //Don't execute commands again if page is refreshed
-  if ( window.history.replaceState ) {
-    window.history.replaceState( null, null, window.location.href );
-  }
+<link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
+<script src="/plugins/lxc/js/lxc.js"></script>
 
-  //Create container box
-  function createContainer(form) {
-    var regex = /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/;
-    if(!regex.test(form.contMac.value)) {
-      alert("Invalid MAC address");
-      return false;
-    }
-    var distribution = form.contDistribution.value;
-    var release = form.contRelease.value;
-    var name = form.contName.value;
-    var autostart = form.contAutostart.checked;
-    var mac = form.contMac.value;
-    openBox("/usr/local/emhttp/plugins/lxc/include/create_container.sh&arg1=<?php echo $default_path; ?>&arg2="+mac+"&arg3="+name+"&arg4="+distribution+"&arg5="+release+"&arg6="+autostart,"Create Container",600,800,true);
-    return false;
-    }
+<script>
 
   //Create VNC container box
   function createVNCContainer(form) {
     var name = form.VNCcontName.value;
-    openBox("/usr/local/emhttp/plugins/lxc/include/create_vnc_container.sh&arg1=<?php echo $default_path; ?>&arg2="+name,"Create VNC Container",600,800,true);
+    openBox("/usr/local/emhttp/plugins/lxc/include/create_vnc_container.sh&arg1=<?php echo $settings->default_path; ?>&arg2=" + name, "Create VNC Container", 600, 800, true);
     return false;
-    }
+  }
 </script>
 
 <div id="canvas">
-<form method="post" autocomplete="off">
+  <form id="addContainer" autocomplete="off">
+    <div class="">
+      <dl>
+        <dt>Container Name:</dt>
+        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required value="DebianLXC">
+        </dd>
+      </dl>
+    </div>
 
-<div class="">
-<dl>
-<dt>Container Name:</dt>
-<dd><input type="text" name="contName" onkeypress="return event.charCode != 32" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="true" value="DebianLXC"></dd>
-</dl>
-</div>
+    <div class="">
+      <dl>
+        <dt>Distribution:</dt>
+        <dd><input type="text" name="contDistribution" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+"
+                   style="text-transform:lowercase" required="true" value="debian"> You can get a full list of available
+          container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/"
+                              target="_blank">HERE</a></dd>
+      </dl>
+    </div>
 
-<div class="">
-<dl>
-<dt>Distribution:</dt>
-<dd><input type="text" name="contDistribution" onkeypress="return event.charCode != 32" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="debian"> You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></dd>
-</dl>
-</div>
+    <div class="">
+      <dl>
+        <dt>Release:</dt>
+        <dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye"></dd>
+      </dl>
+    </div>
 
-<div class="">
-<dl>
-<dt>Release:</dt>
-<dd><input type="text" name="contRelease" onkeypress="return event.charCode != 32" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye"></dd>
-</dl>
-</div>
+    <div class="">
+      <dl>
+        <dt>Mac Address:</dt>
+        <dd style="display: grid;">
+          <input type="text" name="contMac" required="true" id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>">
+          <div id="emac" class="emac">Invalid MAC address</div>
+        </dd>
 
-<div class="">
-<dl>
-<dt>Mac Address:</dt>
-<dd><input type="text" name="contMac" required="true" onkeypress="return event.charCode != 32" pattern="[a-z0-9][a-z0-9_.-]+" style="text-transform:uppercase" value="<?php echo $macaddress;?>"></dd>
-</dl>
-</div>
+      </dl>
+    </div>
 
-<div class="">
-<dl>
-<dt>Autostart:</dt>
-<dd><input type="checkbox" name="contAutostart" checked></dd>
-</dl>
-</div>
+    <div class="">
+      <dl>
+        <dt>Autostart:</dt>
+        <dd><input type="checkbox" name="contAutostart" checked></dd>
+      </dl>
+    </div>
 
-<input type="button" value="_(Create)_" onclick="createContainer(this.form)">
-<a href="LXC" class="button">Done</a>
+    <input type="submit" value="_(Create)_">
+    <a href="LXC" class="button">Done</a>
 
-</form>
+  </form>
 </div>
 
 
 <div id="title">
-    <span class="left"></span>
+  <span class="left"></span>
 </div>
 
 <form method="post" autocomplete="off">
 
 
-<div class="">
-<dl>
-<dt>VNC Container Name:</dt>
-<dd><input type="text" name="VNCcontName" onkeypress="return event.charCode != 32" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="true" value="DebianVNC">
-<input type="button" value="_(Create VNC Container)_" onclick="createVNCContainer(this.form)"></dd>
-</dl>
+  <div class="">
+    <dl>
+      <dt>VNC Container Name:</dt>
+      <dd>
+        <input type="text" name="VNCcontName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" value="DebianVNC">
+        <input type="button" value="_(Create VNC Container)_" onclick="createVNCContainer(this.form)">
+      </dd>
+    </dl>
 
-</div>
+  </div>
 </form>
