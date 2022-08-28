@@ -2,6 +2,7 @@ Menu="Tasks:71"
 Type="xmenu"
 Title="LXC"
 Tabs="true"
+Tag="list"
 Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/dev/null\")"
 ---
 <?php
