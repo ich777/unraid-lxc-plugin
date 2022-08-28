@@ -29,14 +29,13 @@ class Container {
     $this->autostart = getVariable($this->config, 'lxc.start.auto');
     $this->mac = getVariable($this->config, 'lxc.net.0.hwaddr');
     $this->snapshots = $this->getSnapshots();
-    $this->ips = trim(exec("lxc-info " . $this->name . " -iH"));
+    $this->ips = nl2br(trim(shell_exec("lxc-info " . $this->name . " -iH")));
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
     $this->memoryUse = getContainerStats($this->name, "Memory use");
     $this->kMemUse = getContainerStats($this->name, "KMem use");
     $this->totalBytes = getContainerStats($this->name, "Total bytes");
     $this->pid = getContainerStats($this->name, "PID");
     $this->cpus = $this->getCpus();
-
   }
 
   private function getSnapshots() {
