@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.08.28">
+  <!ENTITY version   "2022.08.28a">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "9238ea49bbbeb5c3b74116e1b51c384a">
+  <!ENTITY md5       "16fa921c07eb4e55c0fadad270ea6edf">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,11 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2022.08.28a
+- Bugfix show all IPs instead of last one
+- Bugfix hide Kernel/Memory usage when using cgroup v2
+- Visual improvements
 
 ###2022.08.28
 - Added Drop-Down and Autostart switch - huge shout out to jmztaylor from the Unraid Forums
