@@ -2,6 +2,7 @@ Menu="Tasks:71"
 Type="xmenu"
 Title="LXC"
 Tabs="true"
+Tag="list"
 Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/dev/null\")"
 ---
 <?php
@@ -20,11 +21,18 @@ $cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; e
 
 <? if (isset($started ) === true && trim($started ) !== '') { ?>
 <? if (count($allContainers) == 0) { ?>
-    <a href="LXCAddContainer" class="button">Add Container</a>
+    <a href="LXCAddContainer">
+      <input type="button" value="Add Container">
+    </a>
     <h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
     <p>No containers installed! Click on Add Container to add one.</p>
 <? } else { ?>
 
+<div id="title" style="margin-top: 0px !important;">
+  <span class="left">
+    <i class="fa fa-cubes title"></i>LXC Containers
+  </span>
+</div>
 <table id="lxc_table" class="tablesorter four shift">
 <thead>
 <tr>
@@ -36,11 +44,11 @@ $cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; e
   <th>
     CPUs
   </th>
-  <? if ($cgroup2 === '1') { ?>
+<? if ($cgroup2 === '1') { ?>
   <th>
     Memory/<br>Kernel Memory
   </th>
-  <? } ?>
+<? } ?>
   <th>
     Address
   </th>
@@ -102,13 +110,13 @@ foreach ($allContainers as $container) {
     <td>
       <?= $container->cpus;?>
     </td>
-    <? if ($cgroup2 === '1') { ?>
+<? if ($cgroup2 === '1') { ?>
     <td>
       <?= $container->memoryUse;?>
       <br>
       <?= $container->kMemUse;?>
     </td>
-    <? } ?>
+<? } ?>
     <td>
       <?= $container->ips;?>
     </td>
@@ -134,7 +142,9 @@ foreach ($allContainers as $container) {
 
   <? } ?>
   </table>
-  <a href="LXCAddContainer" class="button">Add Container</a>
+  <a href="LXCAddContainer">
+    <input type="button" value="Add Container">
+  </a>
 <? } ?>
 
 <?php } else { ?>
