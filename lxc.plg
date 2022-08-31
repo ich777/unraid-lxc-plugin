@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.08.29">
+  <!ENTITY version   "2022.08.31">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "95395d1a6adb31452acf9acee55444fd">
+  <!ENTITY md5       "3454d56d6363de89f4ccf8b84cd76f49">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2022.08.31
+- Added delay option on settings page for when the Array is started - defaults to 10 seconds
 
 ###2022.08.29
 - Visual improvements on LXC page - thank you S3ppo from the Unraid Forums
@@ -133,7 +136,13 @@ LXC is a well-known Linux container runtime that consists of tools, templates, a
 #Create setting files if not found
 if [ ! -f "&plugin;/plugin.cfg" ]; then
   echo 'SERVICE=disabled
-TIMEOUT=15' > "&plugin;/plugin.cfg"
+TIMEOUT=15
+AUTOSTART_DELAY=10' > "&plugin;/plugin.cfg"
+fi
+
+#Add autostart delay entry if not exists
+if [ ! "$(grep -q "AUTOSTART_DELAY=" &plugin;/plugin.cfg)" ]; then
+  echo "AUTOSTART_DELAY=10" &gt;&gt; &plugin;/plugin.cfg
 fi
 
 if [ ! -f "&plugin;/lxc.conf" ]; then
@@ -151,12 +160,6 @@ fi
 if [ ! -d &plugin;/packages ]; then
   mkdir -p &plugin;/packages
 fi
-
-#Wait for Network and timeout after 30 seconds
-HOST="8.8.8.8"
-for i in {1..10}; do
-  ping -c1 $HOST &amp;> /dev/null &amp;&amp; break;
-done
 
 #Set variables and get version numbers
 LXC_DATADIRECTORY="$(cat &plugin;/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
