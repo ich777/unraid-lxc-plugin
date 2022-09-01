@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2022.08.31">
+  <!ENTITY version   "2022.09.01">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "3454d56d6363de89f4ccf8b84cd76f49">
+  <!ENTITY md5       "19426d7436b21465520bb24472eee406">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2022.09.01
+- Bugfix for autostart delay event script
+- Bugfix for autostart delay line injection into config
 
 ###2022.08.31
 - Added delay option on settings page for when the Array is started - defaults to 10 seconds
@@ -141,9 +145,7 @@ AUTOSTART_DELAY=10' > "&plugin;/plugin.cfg"
 fi
 
 #Add autostart delay entry if not exists
-if [ ! "$(grep -q "AUTOSTART_DELAY=" &plugin;/plugin.cfg)" ]; then
-  echo "AUTOSTART_DELAY=10" &gt;&gt; &plugin;/plugin.cfg
-fi
+grep -q "AUTOSTART_DELAY=" &plugin;/plugin.cfg || echo "AUTOSTART_DELAY=10" &gt;&gt; &plugin;/plugin.cfg
 
 if [ ! -f "&plugin;/lxc.conf" ]; then
   echo 'lxc.lxcpath=/mnt/user/lxc' > "&plugin;/lxc.conf"
