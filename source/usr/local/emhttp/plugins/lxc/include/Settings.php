@@ -5,6 +5,7 @@ class Settings {
 
   public $default_path;
   public $default_timeout;
+  public $default_startdelay;
   public $default_bridge;
   public $available_bridges;
   public $status;
@@ -12,12 +13,13 @@ class Settings {
   function __construct() {
     $this->default_path = getVariable('/boot/config/plugins/lxc/lxc.conf', 'lxc.lxcpath');
     $this->default_timeout = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'TIMEOUT');
+    $this->default_startdelay = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'AUTOSTART_DELAY');
     $this->default_bridge = getVariable('/boot/config/plugins/lxc/default.conf', 'lxc.net.0.link');
     $this->available_bridges = getAvailableBridges();
     $this->status = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'SERVICE');
   }
 
-  function changeConfig($started, $default_path, $service, $timeout, $bridge) {
+  function changeConfig($started, $default_path, $service, $timeout, $startdelay, $bridge) {
     $activeContainers = getActiveContainers();
 
     foreach ($activeContainers as $container) {
@@ -32,6 +34,7 @@ class Settings {
 
     setVariable('/boot/config/plugins/lxc/lxc.conf', 'lxc.lxcpath', $default_path);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'TIMEOUT', $timeout);
+    setVariable('/boot/config/plugins/lxc/plugin.cfg', 'AUTOSTART_DELAY', $startdelay);
     setVariable('/boot/config/plugins/lxc/default.conf', 'lxc.net.0.link', $bridge);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'SERVICE', $service);
 
