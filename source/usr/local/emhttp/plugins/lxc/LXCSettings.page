@@ -50,11 +50,16 @@ Default network bridge:
   </select>
 
 LXC Stop Timeout:
-:  <input type="text" name="TIMEOUT" required="true" pattern="[0-9][0-9]+" value="<?php echo $settings->default_timeout;?>" required> seconds
+:  <input type="text" name="TIMEOUT" required="true" pattern="[0-9]+" style="width: 40px" value="<?php echo $settings->default_timeout;?>" required> seconds
 
 <p>&nbsp;</p>
 
-Update configuration file:
+LXC Autostart Delay after Array is started:
+:  <input type="text" name="AUTOSTART_DELAY" required="true" pattern="[0-9]+" style="width: 40px" value="<?php echo $settings->default_startdelay;?>" required> seconds
+
+<p>&nbsp;</p>
+
+Update configuration file:<br/><span style="color: #ff0000;">(Clicking UPDATE will restart the LXC service!)</span>
 :  <input type="submit" name="changeCFG" value="Update">
 </form>
 
@@ -76,7 +81,7 @@ Update configuration file:
 
 <?php
 if(isset($_POST['changeCFG'])) {
-$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["BRNAME"]);
+$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["BRNAME"]);
 echo '<script>parent.window.location.reload();</script>';
 }
 ?>
