@@ -19,6 +19,12 @@ $cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; e
 <script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
 <script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
 
+<style>
+label+.content {
+    margin-top: 40px !important;
+}
+</style>
+
 <? if (isset($started ) === true && trim($started ) !== '') { ?>
 <? if (count($allContainers) == 0) { ?>
     <a href="LXCAddContainer">

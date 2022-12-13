@@ -46,7 +46,7 @@ $macaddress = getNewMacAddress();
     <div class="">
       <dl>
         <dt>Release:</dt>
-        <dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye"></dd>
+        <dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye"></dd>
       </dl>
     </div>
 
