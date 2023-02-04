@@ -86,7 +86,11 @@ foreach ($allContainers as $container) {
         </span>
         <span class="inner">
           <font size="+1">
-            <?= $container->name;?>
+            <?= $container->name;?>  
+            <?
+              if ($container->description != "")
+              echo "(" . $container->description . ")";
+             ?>
           </font>
           <br>
           <span id='<?= $container->state ?>'><?= $container->state;?></span>
@@ -104,6 +108,7 @@ foreach ($allContainers as $container) {
               <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
             <?php } ?>
             <div class="divider"></div>
+            <li><a href="#" class="descCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-comment fa-lg"></i>  Set Description</a></li>
             <li><a href="#" class="<?= $container->name ?>" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>
             <li><a href="#" class="snapshotCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>
             <li><a href="LXCCopyContainer?cont=<?= $container->name ?>" id="<?= $container->name ?>"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>
@@ -156,4 +161,3 @@ foreach ($allContainers as $container) {
 <?php } else { ?>
 <h3 style="text-align: center;">Please start the Array!</h3>
 <?php } ?>
-
