@@ -422,6 +422,37 @@ $(function() {
       }
     }, "This action will stop the LXC Container and start it again if it was running.");
   });
+
+  // Listener to set description
+  $(".descCONT").on("click", function() {
+    let id = this.id;
+    var descr = prompt('Description (max 40 alphanumeric characters)');
+    if(descr != null && descr != undefined && descr != "" && descr.length <= 40 && /^[\w.]+/.test( descr )) {
+      let postData = {
+        'lxc'   : '',
+        'action'     : "setDescription",
+        'container': id,
+        'description': descr
+      };
+      $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
+        parent.window.location.reload();
+      });
+    }
+  });
+
+  // Listener to delete description
+  $(".descDelCONT").on("click", function() {
+    let id = this.id;
+    let postData = {
+      'lxc'   : '',
+      'action'     : "delDescription",
+      'container': id
+    };    
+    $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
+      parent.window.location.reload();
+    });
+  });
+
 })
 
 $('.autostart').switchButton({labels_placement:'right', on_label:"On", off_label:"Off"});
