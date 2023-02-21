@@ -426,7 +426,7 @@ $(function() {
   $(".descCONT").on("click", function() {
     let id = this.id;
     var descr = prompt('Description');
-    if(descr != null && descr != undefined && descr != "") {
+    if(descr != null && descr != undefined && descr != "" && descr.length <= 40 && /^[\w.]+/.test( descr )) {
       let postData = {
         'lxc'   : '',
         'action'     : "setDescription",
