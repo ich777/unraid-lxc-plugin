@@ -439,6 +439,19 @@ $(function() {
     }
   });
 
+  // Listener to delete description
+  $(".descDelCONT").on("click", function() {
+    let id = this.id;
+    let postData = {
+      'lxc'   : '',
+      'action'     : "delDescription",
+      'container': id
+    };    
+    $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
+      parent.window.location.reload();
+    });
+  });
+
 })
 
 $('.autostart').switchButton({labels_placement:'right', on_label:"On", off_label:"Off"});
