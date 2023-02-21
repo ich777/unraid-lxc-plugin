@@ -21,7 +21,7 @@ $cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; e
 
 <style>
 label+.content {
-    margin-top: 40px !important;
+    margin-top: 50px !important;
 }
 </style>
 
@@ -39,11 +39,11 @@ label+.content {
     <i class="fa fa-cubes title"></i>LXC Containers
   </span>
 </div>
-<table id="lxc_table" class="tablesorter four shift">
+<table id="lxc_table" class="tablesorter four shift" style="margin-top: 0px !important;">
 <thead>
 <tr>
   <th>
-    <a href="#" id="sorting" onclick="resetSorting()" title="Reset sorting">
+    <a href="#" id="sorting">
       <i class="fa fa-th-list"></i>
     </a>Name/Status
   </th>
@@ -89,7 +89,7 @@ foreach ($allContainers as $container) {
             <?= $container->name;?>  
             <?
               if ($container->description != "")
-              echo "(" . $container->description . ")";
+              echo " | <font size='-1'>" . $container->description . "</font>";
              ?>
           </font>
           <br>
@@ -108,7 +108,13 @@ foreach ($allContainers as $container) {
               <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
             <?php } ?>
             <div class="divider"></div>
-            <li><a href="#" class="descCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-comment fa-lg"></i>  Set Description</a></li>
+            <?
+            if ($container->description == "")
+            echo "<li><a href=\"#\" class=\"descCONT\" id=\"$container->name\"><i class=\"fa fa-fw fa-comment fa-lg\"></i>  Set Description</a></li>";
+            else
+            echo "<li><a href=\"#\" class=\"descCONT\" id=\"$container->name\"><i class=\"fa fa-fw fa-comment fa-lg\"></i>  Change Description</a></li>";
+            echo "<li><a href=\"#\" class=\"descDelCONT\" id=\"$container->name\"><i class=\"fa fa-fw fa-comment fa-lg\"></i>  Delete Description</a></li>";
+            ?>
             <li><a href="#" class="<?= $container->name ?>" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>
             <li><a href="#" class="snapshotCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>
             <li><a href="LXCCopyContainer?cont=<?= $container->name ?>" id="<?= $container->name ?>"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>
@@ -161,3 +167,4 @@ foreach ($allContainers as $container) {
 <?php } else { ?>
 <h3 style="text-align: center;">Please start the Array!</h3>
 <?php } ?>
+
