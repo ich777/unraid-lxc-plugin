@@ -137,6 +137,10 @@ class Container {
     setVariable($this->config, '#container_description', $desc);
   }
 
+  function delDescription(){
+    setVariable($this->config, '#container_description', '');
+  }
+
   function showConfig() {
     while (@ ob_end_flush());
     $proc = popen("cat " . $this->config, "r");
