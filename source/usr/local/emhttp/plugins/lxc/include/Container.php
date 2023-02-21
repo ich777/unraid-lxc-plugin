@@ -19,6 +19,7 @@ class Container {
   public $settings;
   public $config;
   public $path;
+  public $description;
 
   function __construct($name) {
     $this->settings = new Settings();
@@ -36,6 +37,7 @@ class Container {
     $this->totalBytes = getContainerStats($this->name, "Total bytes");
     $this->pid = getContainerStats($this->name, "PID");
     $this->cpus = $this->getCpus();
+    $this->description = getVariable($this->config, '#container_description');
   }
 
   private function getSnapshots() {
@@ -129,6 +131,14 @@ class Container {
 
   function setMac($mac) {
     setVariable($this->config, 'lxc.net.0.hwaddr', $mac);
+  }
+
+  function setDescription($desc){
+    setVariable($this->config, '#container_description', $desc);
+  }
+
+  function delDescription(){
+    setVariable($this->config, '#container_description', '');
   }
 
   function showConfig() {

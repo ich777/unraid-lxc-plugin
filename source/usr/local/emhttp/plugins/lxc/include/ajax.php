@@ -56,6 +56,14 @@ if (isset($_POST['lxc'])) {
     case 'fromSnapshot':
       createFromSnapshot($_POST['name'], $_POST['container'], $_POST['snapshot'], $_POST['autostart'], $_POST['mac']);
       break;
+    case 'setDescription':
+      $container = new Container($_POST['container']);
+      $container->setDescription($_POST['description']);
+      break;
+    case 'delDescription':
+      $container = new Container($_POST['container']);
+      $container->delDescription();
+      break;
     default:
       break;
   }
