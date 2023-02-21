@@ -60,6 +60,10 @@ if (isset($_POST['lxc'])) {
       $container = new Container($_POST['container']);
       $container->setDescription($_POST['description']);
       break;
+    case 'delDescription':
+      $container = new Container($_POST['container']);
+      $container->delDescription();
+      break;      
     default:
       break;
   }
