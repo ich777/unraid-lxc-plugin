@@ -11,7 +11,6 @@ $started = $var['fsState']=='Started';
 require_once '/usr/local/emhttp/plugins/lxc/include/Container.php';
 $settings = new Settings();
 $allContainers = getAllContainers();
-$cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; else echo '2'; fi");
 
 ?>
 <link rel="stylesheet" href="<?autov('/plugins/lxc/css/lxc.css')?>">
@@ -21,7 +20,7 @@ $cgroup2 = exec("if ! $(grep -wq unraidcgroup2 /proc/cmdline) ; then echo '1'; e
 
 <style>
 label+.content {
-    margin-top: 40px !important;
+    margin-top:50px !important;
 }
 </style>
 
@@ -39,22 +38,17 @@ label+.content {
     <i class="fa fa-cubes title"></i>LXC Containers
   </span>
 </div>
-<table id="lxc_table" class="tablesorter four shift">
+<table id="lxc_table" class="tablesorter four shift" style="margin-top: 0px !important;">
 <thead>
 <tr>
   <th>
-    <a href="#" id="sorting" onclick="resetSorting()" title="Reset sorting">
+    <a href="#" id="sorting">
       <i class="fa fa-th-list"></i>
     </a>Name/Status
   </th>
   <th>
     CPUs
   </th>
-<? if ($cgroup2 === '1') { ?>
-  <th>
-    Memory/<br>Kernel Memory
-  </th>
-<? } ?>
   <th>
     Address
   </th>
@@ -86,7 +80,11 @@ foreach ($allContainers as $container) {
         </span>
         <span class="inner">
           <font size="+1">
-            <?= $container->name;?>
+            <?= $container->name;?>  
+            <?
+              if ($container->description != "")
+              echo " | <font size='-1'>" . $container->description . "</font>";
+             ?>
           </font>
           <br>
           <span id='<?= $container->state ?>'><?= $container->state;?></span>
@@ -107,6 +105,14 @@ foreach ($allContainers as $container) {
             <li><a href="#" class="<?= $container->name ?>" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>
             <li><a href="#" class="snapshotCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>
             <li><a href="LXCCopyContainer?cont=<?= $container->name ?>" id="<?= $container->name ?>"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>
+            <?
+            if ($container->description == "") {
+            echo "<li><a href=\"#\" class=\"descCONT\" id=\"$container->name\"><i class=\"fa fa-fw fa-comment fa-lg\"></i>  Set Description</a></li>";
+            } else {
+            echo "<li><a href=\"#\" class=\"descCONT\" id=\"$container->name\"><i class=\"fa fa-fw fa-comment fa-lg\"></i>  Change Description</a></li>";
+            echo "<li><a href=\"#\" class=\"descDelCONT\" id=\"$container->name\"><i class=\"fa fa-fw fa-comment fa-lg\"></i>  Delete Description</a></li>";
+            }
+            ?>
             <div class="divider"></div>
             <li><a href="#" class="destroyCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-trash fa-lg"></i>  Destroy</a></li>
           </ul>
@@ -116,13 +122,6 @@ foreach ($allContainers as $container) {
     <td>
       <?= $container->cpus;?>
     </td>
-<? if ($cgroup2 === '1') { ?>
-    <td>
-      <?= $container->memoryUse;?>
-      <br>
-      <?= $container->kMemUse;?>
-    </td>
-<? } ?>
     <td>
       <?= $container->ips;?>
     </td>
