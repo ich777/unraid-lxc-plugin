@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.02.21">
+  <!ENTITY version   "2023.02.22">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "e50001d913c8041bb09d1605be029440">
+  <!ENTITY md5       "81baad795bf8312cfe63d95247e4b1cc">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -15,8 +15,11 @@
 
 <CHANGES>
 
+###2023.02.22
+- Added configuration location to Show Config
+
 ###2023.02.21
-- Discription can now be added to containers - max 40 alphanumeric characters
+- Description can now be added to containers - max 40 alphanumeric characters
 - Removed cgroup v1/v2 detection
 - Bugfix header spaceing
 
