@@ -142,6 +142,7 @@ class Container {
   }
 
   function showConfig() {
+    echo nl2br("Configuration file location: " . $this->config . "\n\n");
     while (@ ob_end_flush());
     $proc = popen("cat " . $this->config, "r");
     while (!feof($proc)) {
