@@ -1,5 +1,5 @@
 Menu="Dashboard:0"
-Cond="version_compare(parse_ini_file('/etc/unraid-version')['version'],'6.12.0-beta6', '>')"
+Cond="$var['fsState'] == 'Started' && version_compare(parse_ini_file('/etc/unraid-version')['version'],'6.12.0-beta6', '>')"
 ---
 <?php
 
@@ -50,11 +50,6 @@ function LXCLayout() {
   $allContainers = getAllContainers();
 
   $page_render = '';
-
-  if (isset($started) !== true && trim($started) === '') {
-    $page_render .= '<span id="no_lxc_share">Please start your array!</span>';
-    return $page_render;
-  }
 
   if (count($allContainers) == 0) {
     $page_render .= '<span id="no_lxc_containers">No LXC containers installed, please go to the plugin page to configure the plugin first!</span>';
