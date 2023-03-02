@@ -45,26 +45,37 @@ $layout
 EOT;
 
 function LXCLayout() {
+  $started = $var['fsState']=='Started';
   $settings = new Settings();
   $allContainers = getAllContainers();
 
   $page_render = '';
 
+  if (isset($started) !== true && trim($started) === '') {
+    $page_render .= '<span id="no_lxc_share">Please start your array!</span>';
+    return $page_render;
+  }
+
+  if (count($allContainers) == 0) {
+    $page_render .= '<span id="no_lxc_containers">No LXC containers installed, please go to the plugin page to configure the plugin first!</span>';
+    return $page_render;
+  }
+
   foreach ($allContainers as $container) {
-    $page_render .= '<span class="outer solid">';
+    $page_render .= '<span class="outer solid" >';
     $page_render .= '<span class="hand" onclick="showDropdown(\'' . $container->name . '\')"><img src="/plugins/lxc/images/distributions/' . $container->distribution . '.png" class="img" width="30" height="30"></span>';
-    $page_render .= '<span class="inner"><span>' . $container->name;
+    $namedescr = $container->name;
     if ($container->description != "") {
-      $page_render .= '| <font size="-1">' . $container->description . '</font>';
+      $namedescr .= ' | ' . $container->description;
     }
-    $page_render .= '</span><br>';
+    $page_render .= '<span class="inner" style="overflow: hidden;"><span title="' . $namedescr . '">' . $namedescr . '</span><br>';
     if($container->state == "RUNNING") {
       $page_render .= '<i class="fa fa-play started green-text"></i>';
     } else {
       $page_render .= '<i class="fa fa-square stopped red-text"></i>';
     }
-    $page_render .= '<span class="state">' . $container->state . '</span>';
-    $page_render .= '<span style="position: relative !important; right: 100px;">';
+    $page_render .= '<span class="state">' . $container->state . '</span></span>';
+    $page_render .= '<span style="position: relative !important; right: 190px">';
     $page_render .= '<ul id="dropdown_' . $container->name .'" class="dropdown-menu dropdown-context fa-ul" style="z-index: 1;">';
     if($container->state == "RUNNING") {
       $page_render .= '<li><a href="#" title="Terminal" onclick="startConsole(\'' . $container->name .'\')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>';
@@ -92,7 +103,7 @@ function LXCLayout() {
     $page_render .= '<li><a href="#" class="destroyCONT" id="' . $container->name .'"><i class="fa fa-fw fa-trash fa-lg"></i>  Destroy</a></li>';
     $page_render .= '</ul>';
     $page_render .= '</span></span>';
-  }
+   }
 
   return $page_render;
 }
