@@ -16,7 +16,7 @@
 <CHANGES>
 
 ###2023.03.02
-- Added Dashboard tile for Unraid 6.12+
+- Added Dashboard tile for Unraid 6.12+ - huge shout out to s3ppo from the Unraid Forums
 - Removed unnecessary text from LXC page if no container is installed
 
 ###2023.02.22
