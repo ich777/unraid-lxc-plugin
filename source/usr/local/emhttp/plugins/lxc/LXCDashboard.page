@@ -1,0 +1,111 @@
+Menu="Dashboard:0"
+Cond="$var['fsState'] == 'Started' && version_compare(parse_ini_file('/etc/unraid-version')['version'],'6.12.0-beta6', '>')"
+---
+<?php
+
+    /*
+      MIT License
+
+      Copyright (c) 2020-2023 s3ppo
+
+      Permission is hereby granted, free of charge, to any person obtaining a copy
+      of this software and associated documentation files (the "Software"), to deal
+      in the Software without restriction, including without limitation the rights
+      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      copies of the Software, and to permit persons to whom the Software is
+      furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included in all
+      copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+      SOFTWARE.
+    */
+
+require_once '/usr/local/emhttp/plugins/lxc/include/Container.php';
+
+$pluginname = "LXC";
+
+$layout = LXCLayout() ;
+
+$mytiles[$pluginname]['column2'] =
+<<<EOT
+<tbody id="lxc" title="$pluginname">
+<tr><td>$pluginname</i>
+<a href="Dashboard/Settings/LXCSettings" title="_(Go to LXC settings)_"><i class="fa fa-fw fa-cog control"></i></a></td></tr></td></tr>
+<tr><td>
+$layout
+</td></tr>
+</tbody>
+EOT;
+
+function LXCLayout() {
+  $started = $var['fsState']=='Started';
+  $settings = new Settings();
+  $allContainers = getAllContainers();
+
+  $page_render = '';
+
+  if (count($allContainers) == 0) {
+    $page_render .= '<span id="no_lxc_containers">No LXC containers installed, please go to the plugin page to configure the plugin first!</span>';
+    return $page_render;
+  }
+
+  foreach ($allContainers as $container) {
+    $page_render .= '<span class="outer solid" >';
+    $page_render .= '<span class="hand" onclick="showDropdown(\'' . $container->name . '\')"><img src="/plugins/lxc/images/distributions/' . $container->distribution . '.png" class="img" width="30" height="30"></span>';
+    $namedescr = $container->name;
+    if ($container->description != "") {
+      $namedescr .= ' | ' . $container->description;
+    }
+    $page_render .= '<span class="inner" style="overflow: hidden;"><span title="' . $namedescr . '">' . $namedescr . '</span><br>';
+    if($container->state == "RUNNING") {
+      $page_render .= '<i class="fa fa-play started green-text"></i>';
+    } else {
+      $page_render .= '<i class="fa fa-square stopped red-text"></i>';
+    }
+    $page_render .= '<span class="state">' . $container->state . '</span></span>';
+    $page_render .= '<span style="position: relative !important; right: 190px">';
+    $page_render .= '<ul id="dropdown_' . $container->name .'" class="dropdown-menu dropdown-context fa-ul" style="z-index: 1;">';
+    if($container->state == "RUNNING") {
+      $page_render .= '<li><a href="#" title="Terminal" onclick="startConsole(\'' . $container->name .'\')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>';
+      $page_render .= '<div class="divider"></div>';
+      $page_render .= '<li><a href="#" class="stopCONT" id="' . $container->name .'"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>';
+      $page_render .= '<li><a href="#" class="freezeCONT" id="' . $container->name .'"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Freeze</a></li>';
+      $page_render .= '<li><a href="#" class="killCONT" id="' . $container->name .'"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>';
+    } else if ($container->state =="STOPPED") {
+      $page_render .= '<li><a href="#" class="startCONT" id="' . $container->name .'"><i class="fa fa-fw fa-play fa-lg"></i>  Start</a></li>';
+    } else if ($container->state == "FROZEN") {
+      $page_render .= '<li><a href="#" class="unfreezeCONT" id="' . $container->name .'"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Unfreeze</a></li>';
+      $page_render .= '<li><a href="#" class="killCONT" id="' . $container->name .'"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>';
+    }
+    $page_render .= '<div class="divider"></div>';
+    $page_render .= '<li><a href="#" class="' . $container->name .'" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>';
+    $page_render .= '<li><a href="#" class="snapshotCONT" id="' . $container->name .'"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>';
+    $page_render .= '<li><a href="LXCCopyContainer?cont=' . $container->name .'" id="' . $container->name .'"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>';
+    if ($container->description == "") {
+      $page_render .= '<li><a href="#" class="descCONT" id="' . $container->name .'"><i class="fa fa-fw fa-comment fa-lg"></i>  Set Description</a></li>';
+    } else {
+      $page_render .= '<li><a href="#" class="descCONT" id="' . $container->name .'"><i class="fa fa-fw fa-comment fa-lg"></i>  Change Description</a></li>';
+      $page_render .= '<li><a href="#" class="descDelCONT" id="' . $container->name .'"><i class="fa fa-fw fa-comment fa-lg"></i>  Delete Description</a></li>';
+    }
+    $page_render .= '<div class="divider"></div>';
+    $page_render .= '<li><a href="#" class="destroyCONT" id="' . $container->name .'"><i class="fa fa-fw fa-trash fa-lg"></i>  Destroy</a></li>';
+    $page_render .= '</ul>';
+    $page_render .= '</span></span>';
+   }
+
+  return $page_render;
+}
+
+?>
+
+<link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
+<link type="text/css" rel="stylesheet" href="/webGui/styles/jquery.switchbutton.css">
+<script src="/webGui/javascript/jquery.switchbutton.js"></script>
+<script src="/plugins/lxc/js/lxc.js"></script>

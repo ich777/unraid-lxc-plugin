@@ -30,7 +30,6 @@ label+.content {
       <input type="button" value="Add Container">
     </a>
     <h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
-    <p>No containers installed! Click on Add Container to add one.</p>
 <? } else { ?>
 
 <div id="title" style="margin-top: 0px !important;">
