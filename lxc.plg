@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.03.02">
+  <!ENTITY version   "2023.03.03">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "bdfcb22535821e7f392ae384d16905b2">
+  <!ENTITY md5       "d8e4c8902a5ec6d2722b89baa800a35a">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.03.03
+- Added status icon for pause to Dashboard
+- Added icons to status on LXC page and adjusted size
 
 ###2023.03.02
 - Added Dashboard tile for Unraid 6.12+ - huge shout out to s3ppo from the Unraid Forums
