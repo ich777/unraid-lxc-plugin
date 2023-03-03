@@ -66,6 +66,8 @@ function LXCLayout() {
     $page_render .= '<span class="inner" style="overflow: hidden;"><span title="' . $namedescr . '">' . $namedescr . '</span><br>';
     if($container->state == "RUNNING") {
       $page_render .= '<i class="fa fa-play started green-text"></i>';
+    } elseif($container->state == "FROZEN") {
+      $page_render .= '<i class="fa fa-pause frozen orange-text"></i>';
     } else {
       $page_render .= '<i class="fa fa-square stopped red-text"></i>';
     }
