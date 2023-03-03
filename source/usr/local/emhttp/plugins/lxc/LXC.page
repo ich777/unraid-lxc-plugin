@@ -86,7 +86,7 @@ foreach ($allContainers as $container) {
              ?>
           </font>
           <br>
-          <span id='<?= $container->state ?>' style="font-size:9pt"><i class='<?php if($container->state == "RUNNING") { echo "fa fa-play started green-text"; } elseif($container->state == "FROZEN") { echo "fa fa-pause frozen orange-text"; } else { echo "fa fa-square stopped red-text"; } ?>'></i> <?= $container->state;?></span>
+          <span style="font-size:9pt"><i class='<?php if($container->state == "RUNNING") { echo "fa fa-play started green-text"; } elseif($container->state == "FROZEN") { echo "fa fa-pause paused orange-text"; } else { echo "fa fa-square stopped red-text"; } ?>'></i> <?php if($container->state == "RUNNING") { echo "started"; } elseif($container->state == "FROZEN") { echo "paused"; } else { echo "stopped"; } ?></span>
           <ul id="dropdown_<?= $container->name;?>" class="dropdown-menu dropdown-context fa-ul">
             <?php if ($container->state == "RUNNING") { ?>
               <li><a href="#" title="Terminal" onclick="startConsole('<?= $container->name ?>')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>
