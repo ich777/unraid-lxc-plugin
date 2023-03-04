@@ -61,9 +61,18 @@ function getAllContainers() {
 
 function setVariable($file, $variable, $value) {
   $contents = file_get_contents($file);
+
+  if($contents === false) {
+    return;
+  }
+
   $newFile = [];
   $lines = explode("\n", $contents);
   $found = false;
+
+  if(count($lines) <= 1) {
+    return;
+  }
 
   foreach($lines as $line) {
     if (strpos($line, $variable) === 0) {
@@ -73,7 +82,7 @@ function setVariable($file, $variable, $value) {
       $newFile[] = $line;
     }
   }
-  if (!$found) {
+  if (!$found && count($newFile) >= 1 ) {
     $newFile[] = $variable . "=" . $value;
   }
 
