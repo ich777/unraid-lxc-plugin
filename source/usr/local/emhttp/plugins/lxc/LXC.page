@@ -138,7 +138,7 @@ foreach ($allContainers as $container) {
         $checked = "";
       }
       ?>
-      <input class='autostart' type='checkbox' id="<?= $container->name ?>" title="<?= _('Toggle container autostart') ?>" <?= $checked ?>>
+      <input class='lxc autostart' type='checkbox' id="<?= $container->name ?>" title="<?= _('Toggle container autostart') ?>" <?= $checked ?>>
     </td>
     </th>
   </tr>
