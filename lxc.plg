@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.03.04">
+  <!ENTITY version   "2023.03.08">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "a7cd3d29ce43eab7c81bdc8213ec95b6">
+  <!ENTITY md5       "4eae55ad6c7713620cef159dbc5cdca4">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.03.08
+- Fixed issue where notification bell was not shown on LXC and Dashboard page - Unraid 6.12+
+- Fixed issue where switches on Dashboard stopped working - Unraid 6.12+
 
 ###2023.03.04
 - Bugfix for function Delete Description
