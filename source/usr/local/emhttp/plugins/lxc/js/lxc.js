@@ -385,7 +385,7 @@ $(function() {
     }
   });
 
-  let checkboxes = $("input[type=checkbox]")
+  let checkboxes = $("input[type=checkbox].lxc")
   checkboxes.change(function(e) {
     let postData = {
       'lxc'   : '',
