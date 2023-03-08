@@ -84,7 +84,7 @@ function showStatus(action, id, title, text) {
 
 
 function showDropdown(contName) {
-  document.getElementById("dropdown_" + contName).classList.toggle("show");
+  document.getElementById("dropdown_" + contName).classList.toggle("show_lxc");
 }
 
 // Function that creates a new container
@@ -378,8 +378,8 @@ $(function() {
       var i;
       for (i = 0; i < dropdowns.length; i++) {
         var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
+        if (openDropdown.classList.contains('show_lxc')) {
+          openDropdown.classList.remove('show_lxc');
         }
       }
     }
@@ -387,7 +387,6 @@ $(function() {
 
   let checkboxes = $("input[type=checkbox]")
   checkboxes.change(function(e) {
-    e.stopImmediatePropagation();
     let postData = {
       'lxc'   : '',
       'action'     : "autostart",
@@ -399,7 +398,7 @@ $(function() {
 
   $(document).mouseup(function (e) {
     if ($(e.target).closest(".btn_dropdown").length === 0) {
-      $('.dropdown-menu').removeClass('show');
+      $('.dropdown-menu').removeClass('show_lxc');
     }
   });
 
