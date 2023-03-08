@@ -100,7 +100,7 @@ h3.startArray, h2.noContainers {
     text-align: center;
 }
 
-.show {
+.show_lxc {
     display:block;
     top: unset !important;
 }
