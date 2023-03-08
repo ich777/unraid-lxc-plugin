@@ -387,6 +387,7 @@ $(function() {
 
   let checkboxes = $("input[type=checkbox]")
   checkboxes.change(function(e) {
+    e.stopImmediatePropagation();
     let postData = {
       'lxc'   : '',
       'action'     : "autostart",
