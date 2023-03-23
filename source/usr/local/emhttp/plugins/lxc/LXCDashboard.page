@@ -1,5 +1,5 @@
 Menu="Dashboard:0"
-Cond="$var['fsState'] == 'Started' && version_compare(parse_ini_file('/etc/unraid-version')['version'],'6.12.0-beta6', '>')"
+Cond="$var['fsState'] == 'Started' && version_compare(parse_ini_file('/etc/unraid-version')['version'],'6.12.0-beta6', '>') && parse_ini_file('/boot/config/plugins/lxc/plugin.cfg')['SERVICE'] == 'enabled'"
 ---
 <?php
 
