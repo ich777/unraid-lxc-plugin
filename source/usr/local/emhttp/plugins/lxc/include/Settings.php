@@ -55,7 +55,8 @@ class Settings {
 
     symlink($default_path . "/cache", "/var/cache/lxc");
 
-    if ($started == "enabled") {
+    $service_status = parse_ini_file('/boot/config/plugins/lxc/plugin.cfg')['SERVICE'];
+    if ($started == "enabled" && $service_status == "enabled") {
       exec('lxc-autostart');
     }
   }
