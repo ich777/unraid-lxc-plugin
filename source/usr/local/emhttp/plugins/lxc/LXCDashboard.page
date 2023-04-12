@@ -58,7 +58,7 @@ function LXCLayout() {
 
   foreach ($allContainers as $container) {
     $page_render .= '<span class="outer solid" >';
-    $page_render .= '<span class="hand" onclick="showDropdown(\'' . $container->name . '\')"><img src="/plugins/lxc/images/distributions/' . $container->distribution . '.png" class="img" width="30" height="30"></span>';
+    $page_render .= '<span class="hand" onclick="showDropdown(\'' . $container->name . '\')"><img src="' . (file_exists('/usr/local/emhttp/plugins/lxc/images/distributions/' . $container->distribution . '.png') ? '/plugins/lxc/images/distributions/' . $container->distribution . '.png' : '/plugins/lxc/images/distributions/question.png') . '" class="img" width="30" height="30"></span>';
     $namedescr = $container->name;
     if ($container->description != "") {
       $namedescr .= ' | ' . $container->description;
