@@ -75,7 +75,13 @@ foreach ($allContainers as $container) {
     <td class="ct-name">
       <span class="outer">
         <span class="hand">
-          <img src="/plugins/lxc/images/distributions/<?= $container->distribution;?>.png" class="img" width="30" height="30" class="dropdown_btn" onclick="showDropdown('<?= $container->name ?>')">
+          <?php
+            if (file_exists('/usr/local/emhttp/plugins/lxc/images/distributions/' . $container->distribution . '.png')) {
+              echo '<img src="/plugins/lxc/images/distributions/' . $container->distribution . '.png" class="img" width="30" height="30" class="dropdown_btn" onclick="showDropdown(\'' . $container->name . '\')">';
+            } else {
+              echo '<img src="/plugins/lxc/images/distributions/question.png" class="img" width="30" height="30" class="dropdown_btn" onclick="showDropdown(\'' . $container->name . '\')">';
+            }
+          ?>
         </span>
         <span class="inner">
           <font size="+1">
