@@ -83,6 +83,8 @@ function LXCLayout() {
     $page_render .= '<span style="position: relative !important; right: 190px">';
     $page_render .= '<ul id="dropdown_' . $container->name .'" class="dropdown-menu dropdown-context fa-ul" style="z-index: 1;">';
     if($container->state == "RUNNING") {
+      if ($container->lxcwebui != "")
+        $page_render .= '<li><a target="_blank" href="' . $container->lxcwebui . '"><i class="fa fa-fw fa-globe fa-lg"></i> WebUI</a></li>';
       $page_render .= '<li><a href="#" title="Terminal" onclick="startConsole(\'' . $container->name .'\')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>';
       $page_render .= '<div class="divider"></div>';
       $page_render .= '<li><a href="#" class="stopCONT" id="' . $container->name .'"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>';
