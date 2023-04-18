@@ -11,7 +11,6 @@ $started = $var['fsState']=='Started';
 require_once '/usr/local/emhttp/plugins/lxc/include/Container.php';
 $settings = new Settings();
 $allContainers = getAllContainers();
-
 ?>
 <link rel="stylesheet" href="<?autov('/plugins/lxc/css/lxc.css')?>">
 <link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.switchbutton.css')?>">
@@ -76,7 +75,9 @@ foreach ($allContainers as $container) {
       <span class="outer">
         <span class="hand">
           <?php
-            if (file_exists('/usr/local/emhttp/plugins/lxc/images/distributions/' . $container->distribution . '.png')) {
+            if (file_exists($settings->default_path . '/custom-icons/' . $container->name . '.png')) {
+              echo '<img src="' . $settings->default_path . '/custom-icons/' . $container->name . '.png" class="img" width="30" height="30" class="dropdown_btn" onclick="showDropdown(\'' . $container->name . '\')">';
+            } elseif (file_exists('/usr/local/emhttp/plugins/lxc/images/distributions/' . $container->distribution . '.png')) {
               echo '<img src="/plugins/lxc/images/distributions/' . $container->distribution . '.png" class="img" width="30" height="30" class="dropdown_btn" onclick="showDropdown(\'' . $container->name . '\')">';
             } else {
               echo '<img src="/plugins/lxc/images/distributions/question.png" class="img" width="30" height="30" class="dropdown_btn" onclick="showDropdown(\'' . $container->name . '\')">';
@@ -98,6 +99,7 @@ foreach ($allContainers as $container) {
               <li><a href="#" title="Terminal" onclick="startConsole('<?= $container->name ?>')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>
               <div class="divider"></div>
               <li><a href="#" class="stopCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>
+              <li><a href="#" class="restartCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-refresh fa-lg"></i>  Restart</a></li>
               <li><a href="#" class="freezeCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Freeze</a></li>
               <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
             <?php } else if ($container->state =="STOPPED") {?>

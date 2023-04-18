@@ -58,7 +58,13 @@ function LXCLayout() {
 
   foreach ($allContainers as $container) {
     $page_render .= '<span class="outer solid" >';
-    $page_render .= '<span class="hand" onclick="showDropdown(\'' . $container->name . '\')"><img src="' . (file_exists('/usr/local/emhttp/plugins/lxc/images/distributions/' . $container->distribution . '.png') ? '/plugins/lxc/images/distributions/' . $container->distribution . '.png' : '/plugins/lxc/images/distributions/question.png') . '" class="img" width="30" height="30"></span>';
+    if (file_exists($settings->default_path . '/custom-icons/' . $container->name . '.png')) {
+      $page_render .= '<span class="hand" onclick="showDropdown(\'' . $container->name . '\')"><img src="' . $settings->default_path . '/custom-icons/' . $container->name . '.png" class="img" width="30" height="30"></span>';
+    } elseif (file_exists('/usr/local/emhttp/plugins/lxc/images/distributions/' . $container->distribution . '.png')) {
+      $page_render .= '<span class="hand" onclick="showDropdown(\'' . $container->name . '\')"><img src="/plugins/lxc/images/distributions/' . $container->distribution . '.png" class="img" width="30" height="30"></span>';
+    } else {
+      $page_render .= '<span class="hand" onclick="showDropdown(\'' . $container->name . '\')"><img src="/plugins/lxc/images/distributions/question.png" class="img" width="30" height="30"></span>';    
+    }
     $namedescr = $container->name;
     if ($container->description != "") {
       $namedescr .= ' | ' . $container->description;
@@ -80,6 +86,7 @@ function LXCLayout() {
       $page_render .= '<li><a href="#" title="Terminal" onclick="startConsole(\'' . $container->name .'\')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>';
       $page_render .= '<div class="divider"></div>';
       $page_render .= '<li><a href="#" class="stopCONT" id="' . $container->name .'"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>';
+      $page_render .= '<li><a href="#" class="restartCONT" id="' . $container->name .'"><i class="fa fa-fw fa-refresh fa-lg"></i>  Restart</a></li>';
       $page_render .= '<li><a href="#" class="freezeCONT" id="' . $container->name .'"><i class="fa fa-fw fa-snowflake-o fa-lg"></i>  Freeze</a></li>';
       $page_render .= '<li><a href="#" class="killCONT" id="' . $container->name .'"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>';
     } else if ($container->state =="STOPPED") {
