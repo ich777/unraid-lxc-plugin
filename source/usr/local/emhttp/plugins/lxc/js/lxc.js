@@ -336,7 +336,7 @@ $(function() {
   });
 
   // Listener for all button actions
-  $(".stopCONT, .freezeCONT, .killCONT, .unfreezeCONT, .startCONT, .disableAUTOSTART").on("click", function(e) {
+  $(".stopCONT, .restartCONT, .freezeCONT, .killCONT, .unfreezeCONT, .startCONT, .disableAUTOSTART").on("click", function(e) {
     e.stopImmediatePropagation();
     postAction($(this).attr("class"), this.id);
   });
