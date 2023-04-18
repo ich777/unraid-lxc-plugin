@@ -38,6 +38,7 @@ class Container {
     $this->pid = getContainerStats($this->name, "PID");
     $this->cpus = $this->getCpus();
     $this->description = getVariable($this->config, '#container_description');
+    $this->lxcwebui = getVariable($this->config, '#container_webui');
   }
 
   private function getSnapshots() {
