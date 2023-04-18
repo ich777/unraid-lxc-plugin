@@ -11,6 +11,10 @@ if (isset($_POST['lxc'])) {
       $container = new Container($_POST['container']);
       $container->stopContainer();
       break;
+    case 'restartCONT':
+      $container = new Container($_POST['container']);
+      $container->restartContainer();
+      break;
     case 'freezeCONT':
       $container = new Container($_POST['container']);
       $container->freezeContainer();

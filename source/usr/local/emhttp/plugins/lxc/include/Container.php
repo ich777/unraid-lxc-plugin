@@ -72,6 +72,13 @@ class Container {
     exec('lxc-stop --timeout=' . $this->settings->default_timeout . ' ' . $this->name);
     exec('logger "LXC: Container ' . $this->name . ' stopped"');
   }
+  function restartContainer() {
+    exec('logger "LXC: Restarting container ' . $this->name . '"');
+    exec('lxc-stop --timeout=' . $this->settings->default_timeout . ' ' . $this->name);
+    sleep(1);
+    exec('lxc-start ' . $this->name);
+    exec('logger "LXC: Container ' . $this->name . ' restarted"');
+  }
 
   function freezeContainer() {
     exec('logger "LXC: Freezing container ' . $this->name . '"');
