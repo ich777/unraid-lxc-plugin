@@ -44,6 +44,19 @@ function showDialog(callback, text) {
     });
 }
 
+function showPrompt(callback, title, text) {
+  swal({
+      title: title,
+      text: text,
+      type: "input",
+      showCancelButton: true,
+      closeOnConfirm: true,
+      inputPlaceholder: "Your description"}, 
+    function(confirm) {
+    callback(confirm);
+  });
+}
+
 // Function that shows the status dialog
 function showStatus(action, id, title, text) {
   let statusInterval;
@@ -84,7 +97,9 @@ function showStatus(action, id, title, text) {
 
 
 function showDropdown(contName) {
-  document.getElementById("dropdown_" + contName).classList.toggle("show_lxc");
+  setTimeout(function() {
+    document.getElementById("dropdown_" + contName).classList.toggle("show_lxc");
+  }, 100);
 }
 
 // Function that creates a new container
@@ -96,7 +111,7 @@ function createContainer(name, distribution, release, autostart, mac) {
     player: 'html',
     title: "Create Container",
     onClose: function () {
-      location.reload();
+      location.href = '/LXC';
     },
     height: Math.min(screen.availHeight, 800),
     width: Math.min(screen.availWidth, 1200)
@@ -132,11 +147,12 @@ function createContainer(name, distribution, release, autostart, mac) {
         }, 5000);
       },
       success: function (data) {
-        dialogContent.append("<p>To connect to the container, start the container first, open up a Unraid terminal and type in:</p>");
+        dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
+        dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
         dialogContent.append("<p>lxc-attach " + name + "</p>")
         dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
         dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
-        dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.reload()">Done</button></p>');
+        dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
         clearInterval(statusInterval);
       }
     });
@@ -187,7 +203,8 @@ function createCopy(name, autostart, mac) {
         }, 5000);
       },
       success: function (data) {
-        dialogContent.append("<p>To connect to the container, start the container first, open up a Unraid terminal and type in:</p>");
+        dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
+        dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
         dialogContent.append("<p>lxc-attach " + name + "</p>")
         dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
         dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
@@ -196,6 +213,11 @@ function createCopy(name, autostart, mac) {
       }
     });
   });
+}
+
+function showSpinner() {
+  // Show spinner
+  document.querySelector('.spinner').style.display = 'block';
 }
 
 $(function() {
@@ -214,7 +236,7 @@ $(function() {
 
     swal({
         title: "Proceed?",
-        text: "ATTENTION: Do you really want to destroy this Snapshot? This is IRREVERSIBLE and will delete the snapshot and all data in it!",
+        text: "<span style=\"color:red;font-weight:bold;\">ATTENTION</span><br/>Do you really want to destroy this Snapshot? This is IRREVERSIBLE and will delete the snapshot and all data in it!",
         type: 'warning',
         html: true,
         showCancelButton: true,
@@ -284,7 +306,8 @@ $(function() {
           }, 5000);
         },
         success: function (data) {
-          dialogContent.append("<p>To connect to the container, start the container first, open up a Unraid terminal and type in:</p>");
+          dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
+          dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
           dialogContent.append("<p>lxc-attach " + name + "</p>")
           dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
           dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
@@ -336,8 +359,9 @@ $(function() {
   });
 
   // Listener for all button actions
-  $(".stopCONT, .restartCONT, .freezeCONT, .killCONT, .unfreezeCONT, .startCONT, .disableAUTOSTART").on("click", function(e) {
+  $(".stopCONT, .restartCONT, .freezeCONT, .killCONT, .unfreezeCONT, .startCONT").on("click", function(e) {
     e.stopImmediatePropagation();
+    showSpinner();
     postAction($(this).attr("class"), this.id);
   });
 
@@ -410,7 +434,7 @@ $(function() {
       if (response) {
         showStatus("destroyCONT", id, "Destroy Container", "Destroying Container " + id);
       }
-    }, "ATTENTION: Do you really want to destroy this LXC Container? This is IRREVERSIBLE and will delete the container, snapshots and all data in it!");
+    }, "<span style=\"color:red;font-weight:bold;\">ATTENTION</span><br/>Do you really want to destroy the LXC Container: <span style=\"font-weight:bold\">" + id + "</span>?<br/>This is IRREVERSIBLE and will delete the container, snapshots and all data in it!");
   });
 
   // Listener to snapshot container
@@ -426,18 +450,19 @@ $(function() {
   // Listener to set description
   $(".descCONT").on("click", function() {
     let id = this.id;
-    var descr = prompt('Description (max 40 alphanumeric characters)');
-    if(descr != null && descr != undefined && descr != "" && descr.length <= 40 && /^[\w.]+/.test( descr )) {
-      let postData = {
-        'lxc'   : '',
-        'action'     : "setDescription",
-        'container': id,
-        'description': descr
-      };
-      $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
-        parent.window.location.reload();
-      });
-    }
+    showPrompt(function(response) {
+      if (response != undefined && response != null && response != false && response != "" && response.length <= 40 && /^[\w.]+/.test( response )) {
+        let postData = {
+          'lxc'   : '',
+          'action'     : "setDescription",
+          'container': id,
+          'description': response
+        };
+        $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
+          parent.window.location.reload();
+        });
+      }
+    }, 'Description', '(max 40 alphanumeric characters)')
   });
 
   // Listener to delete description
