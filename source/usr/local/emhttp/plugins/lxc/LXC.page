@@ -17,6 +17,7 @@ $allContainers = getAllContainers();
 <script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
 <script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
 
+
 <style>
 label+.content {
     margin-top:50px !important;
@@ -67,7 +68,6 @@ label+.content {
 foreach ($allContainers as $container) {
   $disableAutoButton = '<input type="submit" class="disableAUTOSTART" value="Disable" id="' . $container->name .'">';
   $enableAutoButton = '<input type="submit" class="enableAUTOSTART" value="Enable" id="' . $container->name .'">';
-
   ?>
   <tbody align="left">
   <tr>
@@ -153,12 +153,12 @@ foreach ($allContainers as $container) {
     </th>
   </tr>
   </tbody>
-
   <? } ?>
   </table>
   <a href="LXCAddContainer">
     <input type="button" value="Add Container">
   </a>
+  <div class="spinner"></div>
 <? } ?>
 
 <?php } else { ?>

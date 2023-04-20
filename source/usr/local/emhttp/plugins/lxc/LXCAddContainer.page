@@ -11,10 +11,10 @@ $macaddress = getNewMacAddress();
 ?>
 
 <link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
-<script src="/plugins/lxc/js/lxc.js"></script>
+<script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
+<script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
 
 <script>
-
   //Create VNC container box
   function createVNCContainer(form) {
     var name = form.VNCcontName.value;
