@@ -72,3 +72,17 @@ if (isset($_POST['lxc'])) {
       break;
   }
 }
+
+
+require_once 'Container.php';
+if (isset($_POST['action']) && $_POST['action'] == 'updateValues') {
+    $containerNames = json_decode($_POST['containerNames']);
+    $data = [];
+    foreach ($containerNames as $name) {
+        $container = new Container($name);
+        $ips = $container->ips;
+        $totalBytes = $container->totalBytes;
+        $data[] = ['name' => $name, 'ips' => $ips, 'totalBytes' => $totalBytes];
+    }
+    echo json_encode($data);
+}
