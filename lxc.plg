@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.04.24">
+  <!ENTITY version   "2023.05.09">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "da3c69e5676767d612d0dbf348ade4ac">
+  <!ENTITY md5       "d77aaccad6dd5dc69efa210daf7f1115">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,12 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.05.09
+- Added context menu entry to add a WebUI URL
+- Removed "Remove Description" button from context menu. To remove the description open the "Change Description" dialogue and leave it empty.
+- Bugfix for LXC page to show table as zebra striped
+- Added a function to remove custom icons if one is found when destroying a container - this function is disabled for now
 
 ###2023.04.24
 - Added real time stats for IP addresses and network traffic
