@@ -16,7 +16,7 @@
 <CHANGES>
 
 ###2023.05.12
-- Pull index for container images from http://images.linuxcontainers.org/ and present them as drop downs on Add Container page, fallback to text inputs if pull from index fails
+- Pull index for container images from images.linuxcontainers.org and present them as drop downs on Add Container page, fallback to text inputs if pull from index fails
 
 ###2023.05.09
 - Added context menu entry to add a WebUI URL
