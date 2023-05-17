@@ -16,7 +16,7 @@
 <CHANGES>
 
 ###2023.05.17
-- Show icon and text for LXC on Azure theme instead of text only
+- Show icon and text for LXC on Azure and Grey theme instead of text only
 
 ###2023.05.12
 - Pull index for container images from images.linuxcontainers.org and present them as drop downs on Add Container page, fallback to text inputs if pull from index fails
