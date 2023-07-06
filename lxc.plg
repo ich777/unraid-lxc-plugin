@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.06.16">
+  <!ENTITY version   "2023.07.06">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "e26763546e2020e77fb141d7ef9b59a8">
+  <!ENTITY md5       "35a7c28f7990163b0b53cd958fb038ba">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.07.06
+- Added icon and container numbers to Dashbaord tile
 
 ###2023.06.16
 - Added ability to use [IP] in the WebUI URL, the container will then use the IP from the container instead of [IP] (if the container has more then one IP it will use the first one shown on the LXC page eg: http://[IP]:8080 will translate into http://192.168.0.100:8080 in this case the first container IP is 192.168.0.100).
