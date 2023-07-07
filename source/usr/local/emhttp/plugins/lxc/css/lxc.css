@@ -114,3 +114,10 @@ h3.startArray, h2.noContainers {
   transform: translate(-50%, -50%);
 }
 
+.spoiler[open] summary::after {
+  content: attr(data-open);
+}
+
+.spoiler:not([open]) summary::after {
+  content: attr(data-close);
+}
