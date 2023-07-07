@@ -1,6 +1,10 @@
 Title="Add LXC Container"
 Markdown="false"
 ---
+<link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
+<script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
+<script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
+
 <?php
 require_once '/usr/local/emhttp/plugins/lxc/include/Settings.php';
 $settings = new Settings();
@@ -8,11 +12,29 @@ $settings = new Settings();
 $started = $var['fsState'] == 'Started';
 $macaddress = getNewMacAddress();
 
+// Get images from linuxcontainers.org
+downloadLXCproducts('http://images.linuxcontainers.org/meta/simplestreams/v1/index.json');
+
+// Filter out only products from json
+$json_data = file_get_contents("/tmp/lxc/images.linuxcontainers.org.json");
+$json_data = json_decode($json_data, true);
+$json_data = json_encode($json_data['index']['images']['products']);
+$json_data = json_decode($json_data, true);
+
+
+$avail_images = [];
+
+foreach ($json_data as $item) {
+    list($distribution, $release, $architecture, $type) = explode(':', $item);
+    
+    $avail_images[$distribution][$release][$architecture][$type] = true;
+}
+
+$avail_images_json = json_encode($avail_images);
+
 ?>
 
-<link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
-<script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
-<script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
+
 
 <script>
   //Create VNC container box
@@ -24,6 +46,7 @@ $macaddress = getNewMacAddress();
 </script>
 
 <div id="canvas">
+<?php if (empty($json_data)) { ?>
   <form id="addContainer" autocomplete="off">
     <div class="">
       <dl>
@@ -49,6 +72,35 @@ $macaddress = getNewMacAddress();
         <dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye"></dd>
       </dl>
     </div>
+
+<?php } else { ?>
+  <form id="addContainer" autocomplete="off">
+    <div class="">
+      <dl>
+        <dt>Container Name:</dt>
+        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required placeholder="Container Name">
+        </dd>
+      </dl>
+    </div>
+
+    <div class="">
+      <dl>
+        <dt>Distribution:</dt>
+        <dd><select id="distribution-select" name="contDistribution" required>
+        <option name="contDistribution" value="">Select a Distribution</option>
+        <?php foreach ($avail_images as $distribution => $releases) : ?>
+        <option value="<?= $distribution ?>"><?= $distribution ?></option>
+        <?php endforeach; ?></select></dd>
+      </dl>
+    </div>
+
+    <div class="">
+      <dl>
+        <dt>Release:</dt>
+        <dd><select name="contRelease" id="release-select" required></select></dd>
+      </dl>
+    </div>
+<?php } ?>
 
     <div class="">
       <dl>
@@ -81,7 +133,6 @@ $macaddress = getNewMacAddress();
 
 <form method="post" autocomplete="off">
 
-
   <div class="">
     <dl>
       <dt>VNC Container Name:</dt>
@@ -93,3 +144,34 @@ $macaddress = getNewMacAddress();
 
   </div>
 </form>
+
+<script>
+var avail_images = <?= $avail_images_json ?>;
+var distributionSelect = document.getElementById("distribution-select");
+var releaseSelect = document.getElementById("release-select");
+
+var defaultOption = document.createElement("option");
+defaultOption.value = "";
+defaultOption.text = "Select a Release";
+releaseSelect.add(defaultOption);
+releaseSelect.disabled = true;
+
+distributionSelect.addEventListener("change", function() {
+  var distribution = this.value;
+  releaseSelect.disabled = false;
+
+  while (releaseSelect.firstChild) {
+    releaseSelect.removeChild(releaseSelect.firstChild);
+  }
+
+  if (distribution !== "") {
+    var releases = Object.keys(avail_images[distribution]);
+    releases.forEach(function(release) {
+      var option = document.createElement("option");
+      option.value = release;
+      option.text = release;
+      releaseSelect.add(option);
+    });
+  }
+});
+</script>
