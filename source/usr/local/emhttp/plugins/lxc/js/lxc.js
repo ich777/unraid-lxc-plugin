@@ -44,14 +44,14 @@ function showDialog(callback, text) {
     });
 }
 
-function showPrompt(callback, title, text) {
+function showPrompt(callback, title, text, placeholder) {
   swal({
       title: title,
       text: text,
       type: "input",
       showCancelButton: true,
       closeOnConfirm: true,
-      inputPlaceholder: "Your description"}, 
+      inputPlaceholder: placeholder}, 
     function(confirm) {
     callback(confirm);
   });
@@ -451,7 +451,16 @@ $(function() {
   $(".descCONT").on("click", function() {
     let id = this.id;
     showPrompt(function(response) {
-      if (response != undefined && response != null && response != false && response != "" && response.length <= 40 && /^[\w.]+/.test( response )) {
+      if (response === "") {
+        let postData = {
+          'lxc'   : '',
+          'action'     : "delDescription",
+          'container': id
+        };    
+        $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
+          parent.window.location.reload();
+        });
+      } else if (response != undefined && response != null && response != false && response != "" && response.length <= 40 && /^[\w.]+/.test( response )) {
         let postData = {
           'lxc'   : '',
           'action'     : "setDescription",
@@ -462,20 +471,33 @@ $(function() {
           parent.window.location.reload();
         });
       }
-    }, 'Description', '(max 40 alphanumeric characters)')
+    }, 'Description', 'Max. 40 alphanumeric characters.\nLeave empty to delete the description.', 'Description or empty')
   });
 
-  // Listener to delete description
-  $(".descDelCONT").on("click", function() {
+  $(".webuiCONT").on("click", function() {
     let id = this.id;
-    let postData = {
-      'lxc'   : '',
-      'action'     : "delDescription",
-      'container': id
-    };    
-    $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
-      parent.window.location.reload();
-    });
+    showPrompt(function(response) {
+      if (response === "") {
+        let postData = {
+          'lxc'   : '',
+          'action'     : "delWebUIURL",
+          'container': id
+        };    
+        $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
+          parent.window.location.reload();
+        });
+      } else if (response != undefined && response != null && response != false && response != "" && /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i.test( response )) {
+        let postData = {
+          'lxc'   : '',
+          'action'     : "setWebUIURL",
+          'container': id,
+          'webuiurl': response
+        };
+        $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
+          parent.window.location.reload();
+        });
+      }
+    }, 'WebUI URL', 'Enter your URL like: http://192.168.0.10:8080 or https://subdomain.yourdomain.net\nLeave empty to delete the WebUI URL.', 'WebUI URL or empty')
   });
 
 })
