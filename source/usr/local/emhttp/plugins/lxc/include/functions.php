@@ -162,3 +162,23 @@ function createFromSnapshot($name, $container, $snapshot, $autostart, $mac) {
 
   $container->setAutostart($autostart);
 }
+
+function downloadLXCproducts($url) {
+  $urlparse = parse_url($url);
+  $filename = $urlparse['host'];
+  $path = '/tmp/lxc';
+  if (!is_dir($path)) {
+    mkdir($path, 0755, true);
+  }
+  if (!file_exists($path . '/' . $filename . '.json')) {
+      $json = file_get_contents($url);
+      file_put_contents($path . '/' . $filename . '.json', $json);
+  } else {
+    $fileage =  time() - filemtime($path . '/' . $filename . '.json');
+    if ($fileage > 3600) {
+      unlink($path . '/' . $filename . '.json');
+      $json = file_get_contents($url);
+      file_put_contents($path . '/' . $filename . '.json', $json);
+    }
+  }
+}

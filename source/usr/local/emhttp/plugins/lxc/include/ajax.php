@@ -68,11 +68,18 @@ if (isset($_POST['lxc'])) {
       $container = new Container($_POST['container']);
       $container->delDescription();
       break;
+    case 'setWebUIURL':
+      $container = new Container($_POST['container']);
+      $container->setWebuiurl($_POST['webuiurl']);
+      break;
+    case 'delWebUIURL':
+      $container = new Container($_POST['container']);
+      $container->delWebuiurl();
+      break;
     default:
       break;
   }
 }
-
 
 require_once 'Container.php';
 if (isset($_POST['action']) && $_POST['action'] == 'updateValues') {

@@ -20,6 +20,7 @@ class Container {
   public $config;
   public $path;
   public $description;
+  public $lxcwebui;
 
   function __construct($name) {
     $this->settings = new Settings();
@@ -115,6 +116,10 @@ class Container {
     $this->killContainer();
     exec('umount ' . $this->path . '/rootfs');
     exec('lxc-destroy -s ' . $this->name);
+// disabled removal from custom container icons for now since they won't take much space
+//	if (file_exists($this->settings->default_path . '/custom-icons/' . $this->name . '.png')) {
+//      exec('rm ' . $this->settings->default_path . '/custom-icons/' . $this->name . '.png');
+//	}
     exec('logger "LXC: Container ' . $this->name . ' destroyed"');
   }
 
@@ -147,6 +152,14 @@ class Container {
 
   function delDescription(){
     setVariable($this->config, '#container_description', '');
+  }
+
+  function setWebuiurl($webuiurl){
+    setVariable($this->config, '#container_webui', $webuiurl);
+  }
+
+  function delWebuiurl(){
+    setVariable($this->config, '#container_webui', '');
   }
 
   function showConfig() {
