@@ -31,12 +31,15 @@ require_once '/usr/local/emhttp/plugins/lxc/include/Container.php';
 
 $pluginname = "LXC";
 
+$container_count = count(getAllContainers());
+$active_count = count(getActiveContainers());
+
 $layout = LXCLayout() ;
 
 $mytiles[$pluginname]['column2'] =
 <<<EOT
 <tbody id="lxc" title="$pluginname">
-<tr><td>$pluginname</i>
+<tr><td><i class='fa fa-cubes f32'></i><div class='section'>$pluginname<span><br>Container count: $container_count with $active_count running</span><br></div>
 <a href="Dashboard/Settings/LXCSettings" title="_(Go to LXC settings)_"><i class="fa fa-fw fa-cog control"></i></a></td></tr></td></tr>
 <tr><td>
 $layout
