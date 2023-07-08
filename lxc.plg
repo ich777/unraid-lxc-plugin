@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.07.06">
+  <!ENTITY version   "2023.07.08">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "35a7c28f7990163b0b53cd958fb038ba">
+  <!ENTITY md5       "6fdae4fc40cb959ad40bd2ed28bff02f">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.07.08
+- Added ability to change download URL from LXC Containers
 
 ###2023.07.06
 - Added icon and container numbers to Dashbaord tile
@@ -218,11 +221,15 @@ LXC is a well-known Linux container runtime that consists of tools, templates, a
 if [ ! -f "&plugin;/plugin.cfg" ]; then
   echo 'SERVICE=disabled
 TIMEOUT=15
-AUTOSTART_DELAY=10' > "&plugin;/plugin.cfg"
+AUTOSTART_DELAY=10
+LXC_CONTAINER_URL=images.linuxcontainers.org' > "&plugin;/plugin.cfg"
 fi
 
-#Add autostart delay entry if not exists
+#Add AUTOSTART_DELAY entry if not exists
 grep -q "AUTOSTART_DELAY=" &plugin;/plugin.cfg || echo "AUTOSTART_DELAY=10" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_CONTAINER_URL entry if not exists
+grep -q "LXC_CONTAINER_URL=" &plugin;/plugin.cfg || echo "LXC_CONTAINER_URL=images.linuxcontainers.org" &gt;&gt; &plugin;/plugin.cfg
 
 if [ ! -f "&plugin;/lxc.conf" ]; then
   echo 'lxc.lxcpath=/mnt/user/lxc' > "&plugin;/lxc.conf"
@@ -317,6 +324,10 @@ if [ "$(lxc-start --version 2>/dev/null)" != "${LAT_V}" ]; then
     fi
   fi
 fi
+
+#Change download URL based on settings file entry
+LXC_CONT_URL=$(cat &plugin;/plugin.cfg | grep "LXC_CONTAINER_URL" | cut -d '=' -f2 | sed 's/\"//g')
+sed -i "/^DOWNLOAD_SERVER=\"*/c\DOWNLOAD_SERVER=\"${LXC_CONT_URL}\"" /usr/share/lxc/templates/lxc-download
 
 echo "---------------LXC installation complete!---------------"
 
