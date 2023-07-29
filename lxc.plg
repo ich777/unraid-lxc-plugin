@@ -18,7 +18,7 @@
 ###2023.07.29
 - Added 'lxc-autosnapshot' to easily create scheduled snapshots with User Scripts plugin, for more information issue: 'lxc-autosnapshot' from a Unraid terminal
 - Removed Create VNC container
-- Bugfix for Address & Total RX/TX indicators on LXC page
+- Bugfix for Address and Total RX/TX indicators on LXC page
 
 ###2023.07.08
 - Added ability to change download URL from LXC Containers
