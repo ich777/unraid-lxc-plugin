@@ -165,7 +165,7 @@ function createFromSnapshot($name, $container, $snapshot, $autostart, $mac) {
 
 function downloadLXCproducts($url) {
   $urlparse = parse_url($url);
-  $filename = $urlparse['host'];
+  $filename = "lxcimages";
   $path = '/tmp/lxc';
   if (!is_dir($path)) {
     mkdir($path, 0755, true);

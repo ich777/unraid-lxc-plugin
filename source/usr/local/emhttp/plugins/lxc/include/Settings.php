@@ -9,6 +9,7 @@ class Settings {
   public $default_bridge;
   public $available_bridges;
   public $status;
+  public $default_cont_url;
 
   function __construct() {
     $this->default_path = getVariable('/boot/config/plugins/lxc/lxc.conf', 'lxc.lxcpath');
@@ -17,9 +18,10 @@ class Settings {
     $this->default_bridge = getVariable('/boot/config/plugins/lxc/default.conf', 'lxc.net.0.link');
     $this->available_bridges = getAvailableBridges();
     $this->status = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'SERVICE');
+    $this->default_cont_url = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_CONTAINER_URL');
   }
 
-  function changeConfig($started, $default_path, $service, $timeout, $startdelay, $bridge) {
+  function changeConfig($started, $default_path, $service, $timeout, $startdelay, $bridge, $default_cont_url) {
     $activeContainers = getActiveContainers();
 
     foreach ($activeContainers as $container) {
@@ -37,6 +39,7 @@ class Settings {
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'AUTOSTART_DELAY', $startdelay);
     setVariable('/boot/config/plugins/lxc/default.conf', 'lxc.net.0.link', $bridge);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'SERVICE', $service);
+    setVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_CONTAINER_URL', $default_cont_url);
 
     unlink('/var/cache/lxc');
 
@@ -59,5 +62,7 @@ class Settings {
     if ($started == "enabled" && $service_status == "enabled") {
       exec('lxc-autostart');
     }
+    
+    exec("sed -i '/^DOWNLOAD_SERVER=\"*/c\DOWNLOAD_SERVER=\"" . escapeshellarg($default_cont_url) . "\"' /usr/share/lxc/templates/lxc-download");
   }
 }
