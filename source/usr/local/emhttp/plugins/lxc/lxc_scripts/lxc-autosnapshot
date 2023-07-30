@@ -1,0 +1,85 @@
+#!/bin/bash
+# Display usage if variables where not passed over correctly
+if [[ -z "${1}" || -z "${2}" ]]; then
+  LXC_CONTAINERS=$(lxc-ls | awk '{ for (i=1; i<=NF; i++) print $i }')
+  if [ -z "${LXC_CONTAINERS}" ]; then
+    LXC_EXAMPLE=DebianLXC
+  else
+    LXC_EXAMPLE=$(echo "$LXC_CONTAINERS" | shuf -n 1)
+  fi
+  echo "Usage: lxc-autosnapshot <LXC_CONT_NAME> <SNAPSHOTS_TO_KEEP>"
+  echo
+  echo "  <LXC_CONT_NAME>     = LXC Container name"
+  echo "  <SNAPSHOTS_TO_KEEP> = A integer of snapshots to keep, the oldest ones will"
+  echo "                        be deleted first (must be greater than 0)"
+  echo
+  echo "Example: lxc-autosnapshot ${LXC_EXAMPLE} 2"
+  echo "  This will create a snapshot from the container ${LXC_EXAMPLE} and keep"
+  echo "  the last two snapshots"
+  echo
+  echo "WARNING: Taking a snapshot will stop the container and start the container"
+  echo "         again if it was running"
+  echo
+  echo "lxc-autosnapshot by Christoph Hummer v2023.07.30"
+  exit 1
+else
+  LXC_CONTAINERS=$(lxc-ls | awk '{ for (i=1; i<=NF; i++) print $i }')
+  if [ -z "$(echo "${LXC_CONTAINERS}" | grep -wFx "$1")" ]; then
+    echo "Container name $1 not found!"
+    exit 1
+  fi
+  if [[ ! $2 =~ ^[0-9]+$ ]]; then
+    echo "You have to use an integer for how many snapshots you want to keep!"
+    exit 1
+  else
+    if [ $2 == 0 ]; then
+      echo "Snapshots to keep can't be 0!"
+      exit 1
+    fi
+  fi
+fi
+
+# Get LXC variables
+LXC_PATH=$(cat /boot/config/plugins/lxc/lxc.conf | grep "lxc.lxcpath=" | cut -d '=' -f2-)
+TIMEOUT=$(cat /boot/config/plugins/lxc/plugin.cfg | grep "TIMEOUT=" | cut -d '=' -f2- | head -1)
+
+# Determine if container is running or not
+if [ "$(lxc-info -n $1 2>/dev/null | grep "State:" | awk '{print $2}')" == "RUNNING" ]; then
+  START_AFTER_SNAPSHOT=true
+else
+  START_AFTER_SNAPSHOT=false
+fi
+
+# Take snapshot:
+if [ "${START_AFTER_SNAPSHOT}" == "true" ]; then
+  echo "Stopping container $1" | tee >(logger -t "LXC: lxc-autosnapshot")
+fi
+lxc-stop --timeout=${TIMEOUT} -n $1 2>/dev/null 
+umount ${LXC_PATH}/$1/rootfs 2>/dev/null
+if [ "${START_AFTER_SNAPSHOT}" == "true" ]; then
+  echo "Container $1 stopped" | tee >(logger -t "LXC: lxc-autosnapshot")
+fi
+echo "Creating snapshot from container $1" | tee >(logger -t "LXC: lxc-autosnapshot")
+lxc-snapshot -n $1 2>/dev/null
+echo "Taking snapshot from container $1 finished" | tee >(logger -t "LXC: lxc-autosnapshot")
+
+# Start container if it was running before
+if [ "${START_AFTER_SNAPSHOT}" == "true" ]; then
+  echo "Starting container $1" | tee >(logger -t "LXC: lxc-autosnapshot")
+  lxc-start -n $1
+  echo "Container $1 started" | tee >(logger -t "LXC: lxc-autosnapshot")
+fi
+
+# Delete snapshots
+# Get snapshots to delete depending on date and number to keep
+SNAPS_TO_DELETE=$(lxc-snapshot -n $1 -L 2>/dev/null | sort -k4,4 -k5,5 | head -n -$2 | awk '{print $1}')
+
+if [ ! -z "${SNAPS_TO_DELETE}" ]; then
+  while read -r snap;
+  do
+    echo "Deleting snapshot $snap from container $1" | tee >(logger -t "LXC: lxc-autosnapshot")
+    umount ${LXC_PATH}/$1/snaps/$snap/rootfs 2>/dev/null
+    lxc-snapshot -d $snap -n $1
+    echo "Snapshot $snap from container $1 deleted" | tee >(logger -t "LXC: lxc-autosnapshot")
+  done  <<< "${SNAPS_TO_DELETE}"
+fi

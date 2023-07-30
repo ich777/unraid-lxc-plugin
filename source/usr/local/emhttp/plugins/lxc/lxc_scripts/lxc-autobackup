@@ -1,0 +1,341 @@
+#!/bin/bash
+# Set default variables
+RESTORE=false
+FROM_SNAPSHOT=false
+THREADS=$(($(nproc --all) / 2))
+COMPRESSION=6
+DATE=$(date +%H.%M.%S_%Y-%m-%d)
+
+# Help function
+function show_help {
+  echo "Usage: lxc-autobackup <LXC_CONT_NAME> <BACKUP_PATH> <BACKUPS_TO_KEEP>"
+  echo "       lxc-autobackup -s <LXC_CONT_NAME> <BACKUP_PATH> <BACKUPS_TO_KEEP>"
+  echo "       lxc-autobackup -r <LXC_CONT_NAME> <BACKUP_PATH> <NEW_CONTAINER_NAME>"
+  echo
+  echo "  -n, --name             LXC Container name which you want to backup"
+  echo "  -p, --path             Backup path where to save or restore backup to/from"
+  echo "  -b, --backups-to-keep  last NUM backups that you want to keep"
+  echo "  -c, --compression      compression preset; default is 6;"
+  echo "                         WARNING: 7-9 will need at least 12GB of free RAM!"
+  echo "  -t, --threads          use at most NUM threads; the default is half of"
+  echo "                         physical available threads; set to 0 or all to"
+  echo "                         use as many threads as physical available"
+  echo "  -s, --from-snapshot    use this option to create a temporary snapshot"
+  echo "                         from which the backup will be created from; this"
+  echo "                         is usefull if you use a high compression ratio"
+  echo "                         and you have a container that has to be up and"
+  echo "                         running as quickly as possible again"
+  echo "  -r, --restore          restore previously created backup"
+  echo "  -N, --newname          NEWNAME for the restored container; if you are"
+  echo "                         using a existing container name this container"
+  echo "                         will be overwritten"
+  echo "  -h, --help             Display this help message"
+  echo
+  echo "lxc-autobackup by Christoph Hummer v2023.07.30"
+}
+
+# Check if restore and from snapshot where used at the same time
+if [[ $@ =~ (-r|--restore) ]] && [[ $@ =~ (-s|--from-snapshot) ]]; then
+  echo "You can't use -r|--restore and -s|--from-snapshot at the same time!"
+  exit 1
+fi
+
+# Process arguments and functions
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -r | --restore)
+      RESTORE=true
+      if [[ $2 == *=* ]]; then
+        CONT_NAME="${2#*=}"
+      else
+        CONT_NAME="$2"
+      fi
+      shift ;;
+    -s | --from-snapshot)
+      FROM_SNAPSHOT=true
+      if [[ $2 == *=* ]]; then
+        CONT_NAME="${2#*=}"
+      else
+        CONT_NAME="$2"
+      fi
+      shift ;;
+    -h | --help)
+      show_help
+      exit 0 ;;
+    -n | --name | -n=* | --name=*)
+      if [[ $1 == *=* ]]; then
+        CONT_NAME="${1#*=}"
+      else
+        CONT_NAME="$2"
+        shift
+      fi ;;
+    -p | --path | -p=* | --path=*)
+      if [[ $1 == *=* ]]; then
+        BACKUP_PATH="${1#*=}"
+      else
+        BACKUP_PATH="$2"
+        shift
+      fi ;;
+    -b | --backups-to-keep | -b=* | --backups-to-keep=*)
+      if [[ $1 == *=* ]]; then
+        BACKUPS_TO_KEEP="${1#*=}"
+      else
+        BACKUPS_TO_KEEP="$2"
+        shift
+      fi ;;
+    -t | --threads | -t=* | --threads=*)
+      if [[ $1 == *=* ]]; then
+        THREADS="${1#*=}"
+      else
+        THREADS="$2"
+        shift
+      fi ;;
+    -c | --compression | -c=* | --compression=*)
+      if [[ $1 == *=* ]]; then
+        COMPRESSION="${1#*=}"
+      else
+        COMPRESSION="$2"
+        shift
+      fi ;;
+    -N | --newname | -N=* | --newname=*)
+      if [[ $1 == *=* ]]; then
+        NEW_NAME="${1#*=}"
+      else
+        NEW_NAME="$2"
+        shift
+      fi ;;
+    -*)
+      show_help
+      exit 1 ;;
+    *)
+      if [ -z "${CONT_NAME}" ]; then
+        CONT_NAME="$1"
+      elif [ -z "${BACKUP_PATH}" ]; then
+        BACKUP_PATH="$1"
+      else
+        BACKUPS_TO_KEEP="$1"
+      fi
+      if [ "${RESTORE}" == "true" ]; then
+         if [ -z "${NEW_NAME}" ]; then
+           NEW_NAME="$2"
+         fi
+      fi;;
+  esac
+  shift
+done
+
+# Backup function
+backup_lxc_container() {
+  # Determine if container is running or not
+  if [ "$(lxc-info -n ${CONT_NAME} 2>/dev/null | grep "State:" | awk '{print $2}')" == "RUNNING" ]; then
+    START_AFTER_BACKUP=true
+  else
+    START_AFTER_BACKUP=false
+  fi
+
+  if [ "${START_AFTER_BACKUP}" == "true" ]; then
+    echo "Stopping container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+  fi
+  lxc-stop --timeout=${TIMEOUT} -n ${CONT_NAME} 2>/dev/null
+  umount ${LXC_PATH}/${CONT_NAME}/rootfs 2>/dev/null
+  if [ ! -d ${BACKUP_PATH}/${CONT_NAME} ]; then
+    mkdir -p ${BACKUP_PATH}/${CONT_NAME}
+  fi
+  if [ "${FROM_SNAPSHOT}" == "true" ]; then
+    echo "Creating temporary snapshot from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    CUR_SNAPS=$(lxc-snapshot -n ${CONT_NAME} -L | awk '{print $1}' | sort)
+    lxc-snapshot -n ${CONT_NAME} 2>/dev/null
+    echo "Taking temporary snapshot from container ${CONT_NAME} finished" | tee >(logger -t "LXC: lxc-autobackup")
+    NEW_SNAPS=$(lxc-snapshot -n ${CONT_NAME} -L | awk '{print $1}' | sort)
+    if [ "${START_AFTER_BACKUP}" == "true" ]; then
+      echo "Starting container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+      lxc-start -n ${CONT_NAME}
+      echo "Container ${CONT_NAME} started" | tee >(logger -t "LXC: lxc-autobackup")
+    fi
+    TEMP_SNAP=$(diff <(echo "$CUR_SNAPS") <(echo "$NEW_SNAPS") | grep '^>' | cut -c 3-)
+    echo "Creating backup from temporary snaphot ${TEMP_SNAP} from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    cd ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}
+    tar -cf - . | xz -${COMPRESSION} --threads=${THREADS} > ${BACKUP_PATH}/${CONT_NAME}/${CONT_NAME}_${DATE}.tar.xz
+    echo "Taking backup from temporary snapshot ${TEMP_SNAP} from container ${CONT_NAME} finished" | tee >(logger -t "LXC: lxc-autobackup")
+    echo "Deleting temporary snapshot ${TEMP_SNAP} from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    umount ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}/rootfs 2>/dev/null
+    lxc-snapshot -n ${CONT_NAME} -d ${TEMP_SNAP} 2>/dev/null
+    echo "Temporary snapshot ${TEMP_SNAP} from container ${CONT_NAME} deleted" | tee >(logger -t "LXC: lxc-autobackup")
+  else
+    cd ${LXC_PATH}/${CONT_NAME}
+    echo "Creating backup from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    tar --exclude="snaps" -cf - . | xz -${COMPRESSION} --threads=${THREADS} > ${BACKUP_PATH}/${CONT_NAME}/${CONT_NAME}_${DATE}.tar.xz
+    echo "Taking backup from container ${CONT_NAME} finished" | tee >(logger -t "LXC: lxc-autobackup")
+    # Start container if it was running before
+    if [ "${START_AFTER_BACKUP}" == "true" ]; then
+      echo "Starting container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+      lxc-start -n ${CONT_NAME}
+      echo "Container ${CONT_NAME} started" | tee >(logger -t "LXC: lxc-autobackup")
+    fi
+  fi
+
+# Delete backups
+# Get backups, sort them by date and time and delete them depending on backups to keep
+BACKUPS_TO_DELETE=$(ls -1 ${BACKUP_PATH}/${CONT_NAME}/ 2>/dev/null | sort -t _ -k3,3 -k2,2 | head -n -${BACKUPS_TO_KEEP})
+if [ ! -z "${BACKUPS_TO_DELETE}" ]; then
+  echo "Deleting old backups from ${BACKUP_PATH}/${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+  cd ${BACKUP_PATH}/${CONT_NAME}
+  rm -f ${BACKUPS_TO_DELETE} 2>/dev/null
+  echo "Deleting old backups from ${BACKUP_PATH}/${CONT_NAME} finished" | tee >(logger -t "LXC: lxc-autobackup")
+fi
+}
+
+# Restore function
+restore_lxc_container() {
+  # Determine if container is running or not
+  if [ "$(lxc-info -n ${NEW_NAME} 2>/dev/null | grep "State:" | awk '{print $2}')" == "RUNNING" ]; then
+    START_AFTER_BACKUP=true
+  else
+    START_AFTER_BACKUP=false
+  fi
+
+  if [ "${START_AFTER_BACKUP}" == "true" ]; then
+    echo "Stopping container ${NEW_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    lxc-stop --timeout=${TIMEOUT} -n ${NEW_NAME} 2>/dev/null
+	echo "Container ${NEW_NAME} stopped" | tee >(logger -t "LXC: lxc-autobackup")
+    umount ${LXC_PATH}/${NEW_NAME}/rootfs 2>/dev/null
+	echo "Destroying container ${NEW_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    lxc-destroy -n ${NEW_NAME}
+	echo "Container ${NEW_NAME} destroyed" | tee >(logger -t "LXC: lxc-autobackup")
+  fi
+  echo "Creating ${NEW_NAME} from backup file ${RESTORE_FILE}" | tee >(logger -t "LXC: lxc-autobackup")
+  mkdir -p ${LXC_PATH}/${NEW_NAME}
+  tar -xf ${BACKUP_PATH}/${CONT_NAME}/${RESTORE_FILE} -C ${LXC_PATH}/${NEW_NAME}
+  sed -i "/lxc.rootfs.path = dir:/c\lxc.rootfs.path = dir:${LXC_PATH//\//\\\/}\/${NEW_NAME}\/rootfs" ${LXC_PATH}/${NEW_NAME}/config
+  sed -i "/lxc.uts.name =/c\lxc.uts.name = ${NEW_NAME}" ${LXC_PATH}/${NEW_NAME}/config
+  if [ -d ${LXC_PATH}/${NEW_NAME}/snaps ]; then
+    rm -rf ${LXC_PATH}/${NEW_NAME}/snaps
+  fi
+  echo "Creating container ${NEW_NAME} from backup file ${RESTORE_FILE} finished" | tee >(logger -t "LXC: lxc-autobackup")
+  # Start container if it was running before
+  if [ "${START_AFTER_BACKUP}" == "true" ]; then
+    echo "Starting container ${NEW_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    lxc-start -n ${NEW_NAME}
+    echo "Container ${NEW_NAME} started" | tee >(logger -t "LXC: lxc-autobackup")
+  fi
+}
+
+# Remove last / from BACKUP_PATH if exists and get LXC variables
+BACKUP_PATH=$(realpath -s ${BACKUP_PATH} 2>/dev/null)
+LXC_PATH=$(cat /boot/config/plugins/lxc/lxc.conf | grep "lxc.lxcpath=" | cut -d '=' -f2-)
+TIMEOUT=$(cat /boot/config/plugins/lxc/plugin.cfg | grep "TIMEOUT=" | cut -d '=' -f2- | head -1)
+
+# Check if restore is enabled
+if [ "${RESTORE}" == "true" ]; then
+  # Check if all necessary arguments are passed over
+  if [ -z "${CONT_NAME}" ] || [ -z "${BACKUP_PATH}" ] || [ -z "${NEW_NAME}" ]; then
+    echo "Container name from backup, backup path and newname must be specified!"
+    echo
+    show_help
+    exit 1
+  fi
+
+  # Check if backup path exists
+  if [ ! -d "${BACKUP_PATH}" ]; then
+    echo "The path: $BACKUP_PATH doesn't exist."
+    exit 1
+  fi
+
+  # Check if backup path for container exists and if backup files are in the specified directory
+  if [ ! -d "${BACKUP_PATH}/${CONT_NAME}" ]; then
+    echo "Backup path ${BACKUP_PATH}/${CONT_NAME} not found!"
+    exit 1
+  else
+    if [ -z "$(ls ${BACKUP_PATH}/${CONT_NAME}/*.tar.xz)" ]; then
+      echo "No tar.xz files in ${BACKUP_PATH}/${CONT_NAME}/ found!"
+      exit 1
+    fi
+  fi
+
+  # Check if newname includes only letters, numbers, - and _
+  if ! echo "$NEW_NAME" | grep -Eq '^[a-zA-Z0-9_-]+$' ; then
+    echo "Only Letters, numbers, - and _ are allowed for newname"
+    exit 1
+  fi
+
+  RESTORE_FILE=$(ls -1 ${BACKUP_PATH}/${CONT_NAME}/ 2>/dev/null | sort -t _ -k3,3 -k2,2 | tail -1)
+
+  # Check if specified newname already exists in LXC directory and display confirmation to overwrite
+  if [ -d "${LXC_PATH}/${NEW_NAME}" ]; then
+    echo -en "This will delete the old container ${CONT_NAME} and replace it with the backup!\nAre you really sure that you want to do that? [y/N] "
+    read -r response
+    response=${response,,}
+    if [[ "$response" =~ ^(yes|y)$ ]]; then
+      echo "Replacing container ${NEW_NAME} with backup ${RESTORE_FILE}" | tee >(logger -t "LXC: lxc-autobackup")
+      if [ -d "${LXC_PATH}/${NEW_NAME}/snaps" ]; then
+        SNAPS_TO_DELETE=$(lxc-snapshot -n ${NEW_NAME} -L 2>/dev/null | sort -k4,4 -k5,5 | awk '{print $1}')
+        if [ ! -z "${SNAPS_TO_DELETE}" ]; then
+          while read -r snap;
+          do
+            echo "Deleting snapshot $snap from container ${NEW_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+            umount ${LXC_PATH}/${NEW_NAME}/snaps/$snap/rootfs 2>/dev/null
+            lxc-snapshot -d $snap -n ${NEW_NAME}
+            echo "Snapshot $snap from container ${NEW_NAME} deleted" | tee >(logger -t "LXC: lxc-autobackup")
+          done  <<< "${SNAPS_TO_DELETE}"
+        fi
+      fi
+      # Execute restore function
+      restore_lxc_container
+    else
+      echo "Abort!"
+      exit 1
+    fi
+  else
+    # Execute restore function
+    restore_lxc_container
+  fi
+else
+  # Check if all necessary arguments are passed over
+  if [ -z "${CONT_NAME}" ] || [ -z "${BACKUP_PATH}" ] || [ -z "${BACKUPS_TO_KEEP}" ]; then
+    echo "Name, path and backups-to-keep must be specified!"
+    echo
+    show_help
+    exit 1
+  fi
+
+  # Check if passed over container name exists
+  LXC_CONTAINERS=$(lxc-ls | awk '{ for (i=1; i<=NF; i++) print $i }')
+  if [ -z "$(echo "${LXC_CONTAINERS}" | grep -wFx "${CONT_NAME}")" ]; then
+    echo "Container name ${CONT_NAME} not found!"
+    exit 1
+  fi
+
+  # Check if backup path exists, if not display message 
+  if [ ! -d "${BACKUP_PATH}" ]; then
+    echo "Path: $BACKUP_PATH doesn't exist, please create it first!"
+    exit 1
+  fi
+
+  # Check if backups to keep is an integer and is greater than 0
+  if [[ ! ${BACKUPS_TO_KEEP} =~ ^[0-9]+$ ]]; then
+    echo "Backups to keep must be an integer!"
+    exit 1
+  else
+    if [ ${BACKUPS_TO_KEEP} == 0 ]; then
+      echo "Backups to keep must be greater than 0!"
+      exit 1
+    fi
+  fi
+
+  # Check if compression is an integer between 0 and 9
+  if [[ ! ${COMPRESSION} =~ ^[0-9]$ ]]; then
+    echo "Compression must be an integer between 0 and 9!"
+    exit 1
+  fi
+
+  # Check if threads is set to all or if it's an integer
+  if [ "${THREADS}" == "all" ]; then
+    THREADS=$(nproc --all)
+  elif [[ ! ${THREADS} =~ ^[0-9]+$ ]]; then
+    echo "Threads must be an integer!"
+    exit 1
+  fi
+
+  # Execute backup function
+  backup_lxc_container
+fi
