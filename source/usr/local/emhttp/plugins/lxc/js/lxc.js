@@ -336,13 +336,6 @@ $(function() {
     createContainer(name, distribution, release, autostart, mac);
   });
 
-  // Listener for create VNC container form
-  $(document).on('submit','form#createVNC',function(event){
-    event.preventDefault();
-    let name = form.VNCcontName.value;
-    createContainer(name, distribution, release, autostart, mac);
-  });
-
   // Listener for copying container
   $(document).on('submit','form#copyCont',function(event){
     event.preventDefault();
