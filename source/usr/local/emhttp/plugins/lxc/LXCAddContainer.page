@@ -12,11 +12,15 @@ $settings = new Settings();
 $started = $var['fsState'] == 'Started';
 $macaddress = getNewMacAddress();
 
-// Get images from linuxcontainers.org
-downloadLXCproducts('http://images.linuxcontainers.org/meta/simplestreams/v1/index.json');
+if ($settings->default_cont_url === 'images.linuxcontainers.org') {
+  // Get images from linuxcontainers.org
+  downloadLXCproducts('https://images.linuxcontainers.org/meta/simplestreams/v1/index.json');
+} else {
+  downloadLXCproducts('https://' . $settings->default_cont_url . '/meta/simplestreams/v1/index.json');
+}
 
 // Filter out only products from json
-$json_data = file_get_contents("/tmp/lxc/images.linuxcontainers.org.json");
+$json_data = file_get_contents("/tmp/lxc/lxcimages.json");
 $json_data = json_decode($json_data, true);
 $json_data = json_encode($json_data['index']['images']['products']);
 $json_data = json_decode($json_data, true);
@@ -35,16 +39,6 @@ $avail_images_json = json_encode($avail_images);
 ?>
 
 
-
-<script>
-  //Create VNC container box
-  function createVNCContainer(form) {
-    var name = form.VNCcontName.value;
-    openBox("/usr/local/emhttp/plugins/lxc/include/create_vnc_container.sh&arg1=<?php echo $settings->default_path; ?>&arg2=" + name, "Create VNC Container", 600, 800, true);
-    return false;
-  }
-</script>
-
 <div id="canvas">
 <?php if (empty($json_data)) { ?>
   <form id="addContainer" autocomplete="off">
@@ -60,9 +54,12 @@ $avail_images_json = json_encode($avail_images);
       <dl>
         <dt>Distribution:</dt>
         <dd><input type="text" name="contDistribution" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+"
-                   style="text-transform:lowercase" required="true" value="debian"> You can get a full list of available
-          container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/"
-                              target="_blank">HERE</a></dd>
+                   style="text-transform:lowercase" required="true" value="debian">
+                   <?php if($settings->default_cont_url === 'images.linuxcontainers.org') {
+                     echo 'You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></dd>';
+                   } else {
+                     echo 'To go to your custom set mirror click <a href="https://' . $settings->default_cont_url . '" target="_blank">HERE</a></dd>';
+                   } ?>              
       </dl>
     </div>
 
@@ -130,20 +127,6 @@ $avail_images_json = json_encode($avail_images);
 <div id="title">
   <span class="left"></span>
 </div>
-
-<form method="post" autocomplete="off">
-
-  <div class="">
-    <dl>
-      <dt>VNC Container Name:</dt>
-      <dd>
-        <input type="text" name="VNCcontName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" value="DebianVNC">
-        <input type="button" value="_(Create VNC Container)_" onclick="createVNCContainer(this.form)">
-      </dd>
-    </dl>
-
-  </div>
-</form>
 
 <script>
 var avail_images = <?= $avail_images_json ?>;

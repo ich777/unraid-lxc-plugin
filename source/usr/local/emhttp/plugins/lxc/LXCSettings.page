@@ -59,9 +59,16 @@ LXC Autostart Delay after Array is started:
 
 <p>&nbsp;</p>
 
-Update configuration file:<br/><span style="color: #ff0000;">(Clicking UPDATE will restart the LXC service!)</span>
-:  <input type="submit" name="changeCFG" value="Update">
+LXC Container URL:
+:  <input type="text" name="LXC_CONTAINER_URL" required="true" style="width: 300px" value="<?php echo $settings->default_cont_url;?>" placeholder="images.linuxcontainers.org" required><span style="color: #ff0000;">Only change if you know what you are doing!</span> 
+
+<p>&nbsp;</p>
+
+Update configuration file:<br/>
+:  <input type="submit" name="changeCFG" value="Update"><span style="color: #ff0000;">(Clicking UPDATE will restart the LXC service!)</span>
 </form>
+
+<br><br><br>
 
 <table>
 <tr>
@@ -81,7 +88,7 @@ Update configuration file:<br/><span style="color: #ff0000;">(Clicking UPDATE wi
 
 <?php
 if(isset($_POST['changeCFG'])) {
-$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["BRNAME"]);
+$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["BRNAME"], $_POST["LXC_CONTAINER_URL"]);
 echo '<script>parent.window.location.reload();</script>';
 }
 ?>

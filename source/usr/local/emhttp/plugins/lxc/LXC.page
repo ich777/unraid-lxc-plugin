@@ -145,10 +145,10 @@ foreach ($allContainers as $container) {
     <td>
       <?= $container->cpus;?>
     </td>
-    <td id="ips-<?= $container->name;?>">
-      <?= $container->ips;?>
+    <td id="ips-<?= ($container->state == "RUNNING") ? $container->name : "";?>">
+      <?=  $container->ips;?>
     </td>
-    <td id="totalBytes-<?= $container->name;?>">
+    <td id="totalBytes-<?= ($container->state == "RUNNING") ? $container->name : "";?>">
       <?= $container->totalBytes;?>
     </td>
     <td>
