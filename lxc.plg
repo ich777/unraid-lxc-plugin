@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.07.29">
+  <!ENTITY version   "2023.07.30">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "76ebfb836103bd17f1fed115c25f8334">
+  <!ENTITY md5       "e2aa0e96ae11c1e0c018312c45c72551">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.07.30
+- Added 'lxc-autobackup' to easily create scheduled tar.xz backups with User Scripts plugin, for more information issue: 'lxc-autobackup from a Unraid terminal
+- Display messages when taking a snapshot with 'lxc-autosnapshot'
 
 ###2023.07.29
 - Added 'lxc-autosnapshot' to easily create scheduled snapshots with User Scripts plugin, for more information issue: 'lxc-autosnapshot' from a Unraid terminal
@@ -334,9 +338,14 @@ fi
 LXC_CONT_URL=$(cat &plugin;/plugin.cfg | grep "LXC_CONTAINER_URL" | cut -d '=' -f2 | sed 's/\"//g')
 sed -i "/^DOWNLOAD_SERVER=\"*/c\DOWNLOAD_SERVER=\"${LXC_CONT_URL}\"" /usr/share/lxc/templates/lxc-download
 
-#Create symlink for lxc-autostart if not exists
+#Create symlink for lxc-autosnapshot if not exists
 if [ ! -L /usr/bin/lxc-autosnapshot ]; then
   ln -s /usr/local/emhttp/plugins/lxc/lxc_scripts/lxc-autosnapshot /usr/bin/lxc-autosnapshot
+fi
+
+#Create symlink for lxc-autobackup if not exists
+if [ ! -L /usr/bin/lxc-autobackup ]; then
+  ln -s /usr/local/emhttp/plugins/lxc/lxc_scripts/lxc-autobackup /usr/bin/lxc-autobackup
 fi
 
 echo "---------------LXC installation complete!---------------"
@@ -353,7 +362,7 @@ echo "------------------------------"
 # Remove plugin related files
 removepkg &name;-&version;
 rm -rf &plugin;
-rm /usr/bin/lxc-autosnapshot
+rm /usr/bin/lxc-autosnapshot /usr/bin/lxc-autobackup
 echo
 echo "------------------------------------------------------------------------------"
 echo "-------------LXC Package uninstalled, please reboot your server!--------------"
