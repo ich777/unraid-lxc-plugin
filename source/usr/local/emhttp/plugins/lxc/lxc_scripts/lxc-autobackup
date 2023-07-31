@@ -31,7 +31,7 @@ function show_help {
   echo "                         will be overwritten"
   echo "  -h, --help             Display this help message"
   echo
-  echo "lxc-autobackup by Christoph Hummer v2023.07.30"
+  echo "lxc-autobackup by Christoph Hummer v2023.07.31"
 }
 
 # Check if restore and from snapshot where used at the same time
@@ -45,20 +45,10 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     -r | --restore)
       RESTORE=true
-      if [[ $2 == *=* ]]; then
-        CONT_NAME="${2#*=}"
-      else
-        CONT_NAME="$2"
-      fi
-      shift ;;
+      ;;
     -s | --from-snapshot)
       FROM_SNAPSHOT=true
-      if [[ $2 == *=* ]]; then
-        CONT_NAME="${2#*=}"
-      else
-        CONT_NAME="$2"
-      fi
-      shift ;;
+      ;;
     -h | --help)
       show_help
       exit 0 ;;
@@ -112,12 +102,11 @@ while [[ $# -gt 0 ]]; do
         CONT_NAME="$1"
       elif [ -z "${BACKUP_PATH}" ]; then
         BACKUP_PATH="$1"
-      else
+      elif [ "${RESTORE}" == "false" ]; then
         BACKUPS_TO_KEEP="$1"
-      fi
-      if [ "${RESTORE}" == "true" ]; then
+      elif [ "${RESTORE}" == "true" ]; then
          if [ -z "${NEW_NAME}" ]; then
-           NEW_NAME="$2"
+           NEW_NAME="$1"
          fi
       fi;;
   esac
