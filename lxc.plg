@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.08.02">
+  <!ENTITY version   "2023.08.02a">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "0526553a57daa96e5b26f4e1d96b86fd">
+  <!ENTITY md5       "f6907f01e895d5fc9fad5f25f40f5cb8">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,12 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.08.02a
+- Moved LXC to System Settings
+- Change logo for LXC on settings page
+- Allow override with command line options from global configuration for lxc-autobackup
+- Few minor visual changes
 
 ###2023.08.02
 - Split config page into individual pages
