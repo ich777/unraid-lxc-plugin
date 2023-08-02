@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.07.31">
+  <!ENTITY version   "2023.08.02">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "9e2c3e88f80a39049bea3752c4e5cf8c">
+  <!ENTITY md5       "0526553a57daa96e5b26f4e1d96b86fd">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,11 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.08.02
+- Split config page into individual pages
+- Added global configuration for lxc-autobackup (see LXC Settings page)
+- Minor bugfixes
 
 ###2023.07.31
 - Bugfix in 'lxc-autobackup' for certain parameters not working if a mix of them is used
@@ -234,7 +239,13 @@ if [ ! -f "&plugin;/plugin.cfg" ]; then
   echo 'SERVICE=disabled
 TIMEOUT=15
 AUTOSTART_DELAY=10
-LXC_CONTAINER_URL=images.linuxcontainers.org' > "&plugin;/plugin.cfg"
+LXC_CONTAINER_URL=images.linuxcontainers.org
+LXC_BACKUP_SERVICE=disabled
+LXC_BACKUP_PATH=
+LXC_BACKUP_KEEP=
+LXC_BACKUP_THREADS=
+LXC_BACKUP_COMPRESSION=
+LXC_BACKUP_USE_SNAPSHOT=' > "&plugin;/plugin.cfg"
 fi
 
 #Add AUTOSTART_DELAY entry if not exists
@@ -242,6 +253,24 @@ grep -q "AUTOSTART_DELAY=" &plugin;/plugin.cfg || echo "AUTOSTART_DELAY=10" &gt;
 
 #Add LXC_CONTAINER_URL entry if not exists
 grep -q "LXC_CONTAINER_URL=" &plugin;/plugin.cfg || echo "LXC_CONTAINER_URL=images.linuxcontainers.org" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_BACKUP_SERVICE entry if not exists
+grep -q "LXC_BACKUP_SERVICE=" &plugin;/plugin.cfg || echo "LXC_BACKUP_SERVICE=disabled" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_BACKUP_PATH entry if not exists
+grep -q "LXC_BACKUP_PATH=" &plugin;/plugin.cfg || echo "LXC_BACKUP_PATH=" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_BACKUP_KEEP entry if not exists
+grep -q "LXC_BACKUP_KEEP=" &plugin;/plugin.cfg || echo "LXC_BACKUP_KEEP=" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_BACKUP_THREADS entry if not exists
+grep -q "LXC_BACKUP_THREADS=" &plugin;/plugin.cfg || echo "LXC_BACKUP_THREADS=" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_BACKUP_COMPRESSION entry if not exists
+grep -q "LXC_BACKUP_COMPRESSION=" &plugin;/plugin.cfg || echo "LXC_BACKUP_COMPRESSION=" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_BACKUP_USE_SNAPSHOT entry if not exists
+grep -q "LXC_BACKUP_USE_SNAPSHOT=" &plugin;/plugin.cfg || echo "LXC_BACKUP_USE_SNAPSHOT=" &gt;&gt; &plugin;/plugin.cfg
 
 if [ ! -f "&plugin;/lxc.conf" ]; then
   echo 'lxc.lxcpath=/mnt/user/lxc' > "&plugin;/lxc.conf"
