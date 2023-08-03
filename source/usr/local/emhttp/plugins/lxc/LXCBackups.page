@@ -1,0 +1,51 @@
+Menu="LXC:2"
+Title="Backups"
+Tag="archive"
+Cond="exec(\"lxc-ls 2>/dev/null\") && parse_ini_file('/boot/config/plugins/lxc/plugin.cfg')['LXC_BACKUP_SERVICE'] == 'enabled'"
+---
+<?php
+
+$allContainers = getAllContainers();
+
+foreach ($allContainers as $container) { ?>
+        <h2><?= $container->name ?></h2>
+        <br>
+        <table id="snapshot_table" class="tablesorter two shift">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date/Time</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody align="left">
+<?
+
+        if (count($container->backups) > 0) {
+          foreach ($container->backups as $backup) {
+            ?>
+            <tr style='height: 50px;'>
+              <td>
+                <?= $backup->name?>
+              </td>
+              <td>
+                <?= $backup->date ?> <?= $backup->time ?>
+              </td>
+              <td style='display: flex;'>
+                <a href='LXCRestoreBackup?cont=<?= $container->name?>&backup=<?= $backup->time ?>_<?= $backup->date ?>.tar.xz' class='button'>
+                  Create Container From Backup
+                </a>
+                <a href="#" class="button deleteBACKUP" id="<?= $container->name ?> <?= $backup->name ?>_<?= $backup->time ?>_<?= $backup->date ?>">
+                  Delete Backup
+                </a>
+              </td>
+            </tr>
+<?php
+          }
+        } else {
+          echo "<tr><td>No backups</td><tr>";
+        }
+          echo "</tbody></table>";
+}
+
+?>

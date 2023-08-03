@@ -1,0 +1,98 @@
+Menu="LXCSettings:1"
+Title="General"
+Tag="wrench"
+---
+<?
+require_once '/usr/local/emhttp/plugins/lxc/include/Settings.php';
+$settings = new Settings();
+
+$started = $var['fsState']=='Started';
+$bgcolor = strstr('white,azure',$display['theme']) ? '#f2f2f2' : '#1c1c1c';
+?>
+<link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.filetree.css')?>">
+<style>
+body{-webkit-overflow-scrolling:touch}
+.errortext{color:#EF3D47;display:none}
+.fileTree{background:<?=$bgcolor?>;width:300px;max-height:150px;overflow-y:scroll;overflow-x:hidden;position:absolute;z-index:100;display:none}
+.basic{display:block}
+.advanced{display:none}
+</style>
+
+<link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
+<script src="/plugins/lxc/js/lxc.js"></script>
+
+
+<form markdown="1" id="changecfg" method="post" >
+Enable LXC:
+: <select id="SERVICE" name="SERVICE">
+  <?= mk_option($settings->status, 'disabled', 'No')?>
+  <?= mk_option($settings->status, 'enabled', 'Yes')?>
+  </select>
+
+Default LXC storage path:
+: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$" required></br>
+  <span style="color: #ff0000;">ATTENTION: It is strongly recommended to not use a FUSE path like /mnt/user/lxc/ instead use the real path to the share like /mnt/cache/lxc/ or /mnt/diskX/lxc/</br>Don't share this directory via SMB or NFS or change the permissions from this directory!</br>(If this path doesn't exist it will be created when LXC is enabled for the first time)</span>
+  <?if (!$started):?><span><i class="fa fa-warning icon warning"></i> Modify with caution: unable to validate path until Array is Started</span>
+  <?elseif (!is_dir($settings->default_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist</span><?endif;?>
+
+
+Default network bridge:
+:  <select name="BRNAME" >
+  <?php
+  foreach($settings->available_bridges as $item){
+  if ( $item == $settings->default_bridge ) {
+    echo "<option selected=\"selected\" value=\"$item\"> $item</option>";
+  } else {
+    echo "<option value=\"$item\"> $item</option>";
+  }
+}
+?>
+  </select>
+
+  <input type="hidden" name="TIMEOUT" value="<?php echo $settings->default_timeout;?>">
+  <input type="hidden" name="AUTOSTART_DELAY" value="<?php echo $settings->default_startdelay;?>">
+  <input type="hidden" name="LXC_CONTAINER_URL" value="<?php echo $settings->default_cont_url;?>">
+  <input type="hidden" name="BACKUP_ENABLED" value="<?php echo $settings->backup_enabled;?>">
+  <input type="hidden" name="BACKUPDIR" value="<?php echo $settings->backup_path;?>">
+  <input type="hidden" name="BACKUPS_TO_KEEP" value="<?php echo $settings->backup_keep;?>">
+  <input type="hidden" name="CPU_THREADS" value="<?php echo $settings->backup_threads;?>">
+  <input type="hidden" name="COMPRESSION_RATIO" value="<?php echo $settings->backup_compression;?>">
+  <input type="hidden" name="USE_SNAPSHOT" value="<?php echo $settings->backup_use_snapshot;?>">
+
+<p>&nbsp;</p>
+
+Update configuration file:
+:  <input type="submit" name="changeCFG" value="Update"><span style="color: #ff0000;">(This will restart the LXC service and containers!)</span>
+
+</form>
+
+<p>&nbsp;</p>
+
+<table>
+<tr>
+<th>
+<div id="title"><span class="left"><i class="title fa fa-list"></i>lxc.conf</span></div>
+</th>
+<th>
+<div id="title"><span class="left"><i class="title fa fa-list"></i>default.conf</span></div>
+</th>
+</tr>
+
+<tr>
+<td><?="<pre id='btrfs-scrub'>".shell_exec("cat /boot/config/plugins/lxc/lxc.conf")."</pre>"?></td>
+<td><?="<pre id='btrfs-scrub'>".shell_exec("cat /boot/config/plugins/lxc/default.conf")."</pre>"?></td>
+</tr>
+</table>
+
+<?php
+if(isset($_POST['changeCFG'])) {
+$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["BRNAME"], $_POST["LXC_CONTAINER_URL"], $_POST["BACKUP_ENABLED"], $_POST["BACKUPDIR"], $_POST["BACKUPS_TO_KEEP"], $_POST["CPU_THREADS"], $_POST["COMPRESSION_RATIO"], $_POST["USE_SNAPSHOT"]);
+echo '<script>parent.window.location.reload();</script>';
+}
+?>
+<script src="<?autov('/webGui/javascript/jquery.filetree.js')?>" charset="utf-8"></script>
+<script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
+
+<script>
+  $('#defaultdir').fileTreeAttach();
+</script>

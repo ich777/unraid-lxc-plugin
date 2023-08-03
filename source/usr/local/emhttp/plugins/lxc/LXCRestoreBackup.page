@@ -1,4 +1,4 @@
-Title="Create LXC Container from Snapshot"
+Title="Create LXC Container from Backup"
 Markdown="false"
 ---
 <?php
@@ -8,19 +8,18 @@ $settings = new Settings();
 $started = $var['fsState']=='Started';
 $active_containers = explode("\n", shell_exec("lxc-ls"));
 $container = $_GET['cont'];
-$snapshot = $_GET['snap'];
-$date = $_GET['date'];
+$backup = $_GET['backup'];
 ?>
 
 <script>
   let container = '<?= $container ?>';
-  let snapshot = '<?= $snapshot ?>';
+  let backup = '<?= $backup ?>';
 </script>
 <link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
 <script src="/plugins/lxc/js/lxc.js"></script>
 
 <div id="canvas">
-<form method="post" id="fromSnapshot" autocomplete="off">
+<form method="post" id="fromBackup" autocomplete="off">
 
 <div class="">
 <dl>
@@ -31,15 +30,15 @@ $date = $_GET['date'];
 
 <div class="">
 <dl>
-<dt>Snapshot Container Name:</dt>
-<dd><input type="text" name="contSnap" required value="<?= $container ?>" disabled></dd>
+<dt>Backup Container Name:</dt>
+<dd><input type="text" name="contBackupName" required value="<?= $container ?>" disabled></dd>
 </dl>
 </div>
 
 <div class="">
 <dl>
-<dt>Snapshot:</dt>
-<dd><input type="text" name="contSnapName" required value="<?= $snapshot ?> <?= $date ?>" disabled></dd>
+<dt>Backup:</dt>
+<dd><input type="text" name="contBackupDate" required value="<?= $backup ?>" disabled></dd>
 </dl>
 </div>
 

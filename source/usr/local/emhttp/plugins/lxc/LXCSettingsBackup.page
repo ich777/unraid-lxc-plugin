@@ -1,0 +1,84 @@
+Menu="LXCSettings:3"
+Title="Backup"
+Tag="archive"
+---
+<form markdown="1" id="changebackupcfg" method="post" >
+Enable Global Backup settings:
+: <select id="backup_enabled" name="BACKUP_ENABLED">
+  <?= mk_option($settings->backup_enabled, 'disabled', 'No')?>
+  <?= mk_option($settings->backup_enabled, 'enabled', 'Yes')?>
+  </select>
+
+<? if ($settings->backup_enabled === 'enabled') { ?>
+
+Default Backup path:
+: <input type="text" id="backupdir" name="BACKUPDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->backup_path)?>" placeholder="Click to Select" pattern="^[^\\]*/$" required></br>
+  <span style="color: #ff0000;">ATTENTION: This path will be created if it doesn't exist.</span>
+
+Backups to keep:
+:  <input type="text" id="backupstokeep" name="BACKUPS_TO_KEEP" required="true" pattern="[1-9][0-9]*" style="width: 40px" value="<?php echo $settings->backup_keep;?>" required>
+
+Compression Ratio:
+<?php $selectedRatio = (isset($settings->backup_compression) && trim($settings->backup_compression !== '')) ? $settings->backup_compression : "6"; ?>
+: <select id="compression_ratio" name="COMPRESSION_RATIO">
+  <?php
+  for ($i = 0; $i <= 9; $i++) {
+    echo "<option value='$i'" . ($i == $selectedRatio ? ' selected' : '') . ">$i</option>";
+  } ?>
+  </select>
+
+CPU Threads:
+<?php
+  $cpu_threads = shell_exec('nproc');
+  $selectedThreads = (isset($settings->backup_threads) && trim($settings->backup_threads !== '')) ? $settings->backup_threads : intdiv($cpu_threads, 2);
+?>
+: <select id="cpu_threads" name="CPU_THREADS">
+  <?php
+  for ($i = 1; $i <= $cpu_threads; $i++) {
+    echo "<option value='$i'" . ($i == $selectedThreads ? ' selected' : '') . ">$i</option>";
+  } ?>
+  </select>
+
+Use Snapshot:
+: <select id="use_snapshot" name="USE_SNAPSHOT">
+  <?= mk_option($settings->backup_use_snapshot, 'disabled', 'No')?>
+  <?= mk_option($settings->backup_use_snapshot, 'enabled', 'Yes')?>
+  </select>
+
+<?php } else { ?>
+
+  <input type="hidden" name="BACKUPDIR" value="<?php echo $settings->backup_path;?>">
+  <input type="hidden" name="BACKUPS_TO_KEEP" value="<?php echo $settings->backup_keep;?>">
+  <input type="hidden" name="CPU_THREADS" value="<?php echo $settings->backup_threads;?>">
+  <input type="hidden" name="COMPRESSION_RATIO" value="<?php echo $settings->backup_compression;?>">
+  <input type="hidden" name="USE_SNAPSHOT" value="<?php echo $settings->backup_use_snapshot;?>">
+
+<?php } ?>
+
+<p>&nbsp;</p>
+
+Update:
+:  <input type="submit" name="changeBACKUP" value="Update"><span>(This will NOT restart the LXC service)</span>
+</form>
+
+<?php
+if(isset($_POST['changeBACKUP'])) {
+$settings->changeBackup($_POST["BACKUP_ENABLED"], $_POST["BACKUPDIR"], $_POST["BACKUPS_TO_KEEP"], $_POST["CPU_THREADS"], $_POST["COMPRESSION_RATIO"], $_POST["USE_SNAPSHOT"]);
+echo '<script>parent.window.location.reload();</script>';
+}
+?>
+
+<script>
+  $('#backupdir').fileTreeAttach();
+
+  document.getElementById("backup_enabled").addEventListener("change", function() {
+    if (this.value === "Yes") {
+      document.getElementById("backupdir").required = true;
+      document.getElementById("backupstokeep").required = true;
+    } else {
+      document.getElementById("backupdir").required = false;
+      document.getElementById("backupstokeep").required = false;
+    }
+  });
+</script>
+
