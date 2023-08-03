@@ -10,6 +10,8 @@ class Container {
   public $mac;
   public $cpus;
   public $snapshots;
+  public $backups;
+  public $backup_path;
   public $ips;
   public $distribution;
   public $memoryUse;
@@ -31,6 +33,8 @@ class Container {
     $this->autostart = getVariable($this->config, 'lxc.start.auto');
     $this->mac = getVariable($this->config, 'lxc.net.0.hwaddr');
     $this->snapshots = $this->getSnapshots();
+    $this->backups = $this->getBackups();
+    $this->backup_path = realpath($this->settings->backup_path);
     $this->ips = nl2br(trim(shell_exec("lxc-info " . $this->name . " -iH")));
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
     $this->memoryUse = getContainerStats($this->name, "Memory use");
@@ -52,6 +56,19 @@ class Container {
       }
     }
     return $snapshots;
+  }
+
+  private function getBackups() {
+    $backups = array();
+    exec("ls -1 " . realpath($this->settings->backup_path) . "/" . $this->name . "/ 2>/dev/null", $backupList);
+    if (isset($backupList)) {
+      foreach ($backupList as $backup){
+        $pattern = '/^(.*?)_(\d+\.\d+\.\d+)_(\d{4}-\d{2}-\d{2})(\.tar\.xz)$/';
+        preg_match($pattern, $backup, $sorted);
+        $backups[] = new Backup($sorted[1], $sorted[3], $sorted[2]);
+      }
+    }
+    return $backups;
   }
 
   private function getCpus() {
@@ -139,6 +156,21 @@ class Container {
     exec('lxc-snapshot ' . $this->name);
     if ($this->state == "RUNNING") {
       $this->startContainer();
+    }
+  }
+
+  function createBackup() {
+    exec('lxc-autobackup ' . $this->name);
+  }
+
+  function deleteBackup($backup) {
+    exec('logger "LXC: Deleting backup ' . $backup . ' from container ' . $this->name . '"' );
+    unlink($this->backup_path . "/" . $this->name . "/" . $backup . ".tar.xz");
+    exec('logger "LXC: Backup ' . $backup . ' from container ' . $this->name. ' deleted"');
+    $files = glob($this->backup_path . "/" . $this->name . '/*');
+    if (empty($files)) {
+      rmdir($this->backup_path . "/" . $this->name);
+      exec('logger "LXC: Backup directory for container ' . $this->name . ' empty, deleting directory"');
     }
   }
 

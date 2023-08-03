@@ -163,6 +163,19 @@ function createFromSnapshot($name, $container, $snapshot, $autostart, $mac) {
   $container->setAutostart($autostart);
 }
 
+function createFromBackup($name, $container, $backup, $autostart, $mac) {
+  exec('lxc-autobackup --restore --gui-restore=' . $container . '_' . $backup . ' --name=' . $container . ' --newname=' . $name);
+  $container = new Container($name);
+  $container->setMac($mac);
+  if ($autostart == "true") {
+    $autostart = 1;
+  } else {
+    $autostart = 0;
+  }
+
+  $container->setAutostart($autostart);
+}
+
 function downloadLXCproducts($url) {
   $urlparse = parse_url($url);
   $filename = "lxcimages";

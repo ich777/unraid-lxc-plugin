@@ -47,6 +47,14 @@ if (isset($_POST['lxc'])) {
       $container = new Container($_POST['container']);
       $container->deleteSnapshot($_POST['snapshot']);
       break;
+    case 'backupCONT':
+      $container = new Container($_POST['container']);
+      $container->createBackup();
+      break;
+    case 'deleteBACKUP':
+      $container = new Container($_POST['container']);
+      $container->deleteBackup($_POST['backup']);
+      break;
     case 'createCONT':
       createContainer($_POST['name'], $_POST['distribution'], $_POST['release'], $_POST['autostart'], $_POST['mac']);
       break;
@@ -59,6 +67,9 @@ if (isset($_POST['lxc'])) {
       break;
     case 'fromSnapshot':
       createFromSnapshot($_POST['name'], $_POST['container'], $_POST['snapshot'], $_POST['autostart'], $_POST['mac']);
+      break;
+    case 'fromBackup':
+      createFromBackup($_POST['name'], $_POST['container'], $_POST['backup'], $_POST['autostart'], $_POST['mac']);
       break;
     case 'setDescription':
       $container = new Container($_POST['container']);
