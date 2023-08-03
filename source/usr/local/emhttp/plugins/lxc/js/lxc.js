@@ -168,7 +168,7 @@ function createCopy(name, autostart, mac) {
     player: 'html',
     title: "Copy Container",
     onClose: function () {
-      location.reload();
+      location.href = '/LXC';
     },
     height: Math.min(screen.availHeight, 800),
     width: Math.min(screen.availWidth, 1200)
@@ -208,7 +208,7 @@ function createCopy(name, autostart, mac) {
         dialogContent.append("<p>lxc-attach " + name + "</p>")
         dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
         dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
-        dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.reload()">Done</button></p>');
+        dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
         clearInterval(statusInterval);
       }
     });
@@ -258,6 +258,35 @@ $(function() {
       });
   });
 
+  // Listener for deleting backups
+  $(".deleteBACKUP").on("click", function() {
+    let id = this.id.split(" ")[0];
+    let backup = this.id.split(" ")[1];
+
+    swal({
+        title: "Proceed?",
+        text: "<span style=\"color:red;font-weight:bold;\">ATTENTION</span><br/>Do you really want to delete this backup? This is IRREVERSIBLE and will delete the backup!",
+        type: 'warning',
+        html: true,
+        showCancelButton: true,
+        confirmButtonText: "Proceed",
+        cancelButtonText: "Cancel"
+      },
+      function (p) {
+        if (p) {
+          let postData = {
+            'lxc'   : '',
+            'action'     : 'deleteBACKUP',
+            'container': id,
+            'backup': backup
+          };
+          $.post("/plugins/lxc/include/ajax.php", postData).done(function(){
+            parent.window.location.reload();
+          });
+        }
+      });
+  });
+
   // Listener for restoring from snapshot form
   $(document).on("submit", "form#fromSnapshot", function (event) {
     event.preventDefault();
@@ -268,9 +297,9 @@ $(function() {
     Shadowbox.open({
       content: '<div id="dialogContent" class="logLine spacing"></div>',
       player: 'html',
-      title: "Restoring Container",
+      title: "Restoring Container from snapshot",
       onClose: function () {
-        location.reload();
+        location.href = '/LXC';
       },
       height: Math.min(screen.availHeight, 800),
       width: Math.min(screen.availWidth, 1200)
@@ -311,9 +340,70 @@ $(function() {
           dialogContent.append("<p>lxc-attach " + name + "</p>")
           dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
           dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
-          dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.reload()">Done</button></p>');
+          dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
           clearInterval(statusInterval);
         }
+      });
+    });
+  });
+
+  // Listener for restoring from backup form
+  $(document).on("submit", "form#fromBackup", function (event) {
+    event.preventDefault();
+    let statusInterval;
+    let name = this.contName.value;
+    let autostart = this.contAutostart.checked;
+    let mac = this.contMac.value;
+    Shadowbox.open({
+      content: '<div id="dialogContent" class="logLine spacing"></div>',
+      player: 'html',
+      title: "Restoring Container from backup",
+      onClose: function () {
+        location.href = '/LXC';
+      },
+      height: Math.min(screen.availHeight, 800),
+      width: Math.min(screen.availWidth, 1200),
+    });
+    waitForElement("#dialogContent", function () {
+      let dialogContent = $("#dialogContent");
+      $.ajax({
+        type: "POST",
+        url: '/plugins/lxc/include/ajax.php',
+        data: {
+          'lxc': '',
+          'action': 'fromBackup',
+          'name': name,
+          'container': container,
+          'backup': backup,
+          'autostart': autostart,
+          'mac': mac
+        },
+        xhr: function() {
+          // get the native XmlHttpRequest object
+          const xhr = $.ajaxSettings.xhr();
+          // set the onprogress event handler
+          xhr.onprogress = function() {
+            // replace the '#output' element inner HTML with the received part of the response
+            dialogContent.html("<p>Creating container, please wait until the DONE button is displayed!</p><p>" + xhr.responseText + "</p>");
+          }
+          return xhr;
+        },
+        beforeSend: function () {
+          dialogContent.append("Creating container, please wait until the DONE button is displayed!");
+          statusInterval = setInterval(function () {
+            dialogContent.append("<p>......</p>");
+          }, 5000);
+        },
+        success: function (data) {
+          dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
+          dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
+          dialogContent.append("<p>lxc-attach " + name + "</p>")
+          dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
+          dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
+          dialogContent.append("<p>Note: You will only see as much backups as you have configured in the Global backups settings (oldest backups will be deleted first).</p>");
+          dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
+          clearInterval(statusInterval);
+        },
       });
     });
   });
@@ -427,7 +517,7 @@ $(function() {
       if (response) {
         showStatus("destroyCONT", id, "Destroy Container", "Destroying Container " + id);
       }
-    }, "<span style=\"color:red;font-weight:bold;\">ATTENTION</span><br/>Do you really want to destroy the LXC Container: <span style=\"font-weight:bold\">" + id + "</span>?<br/>This is IRREVERSIBLE and will delete the container, snapshots and all data in it!");
+    }, "<span style=\"color:red;font-weight:bold;\">ATTENTION</span><br/>Do you really want to destroy the LXC Container: <span style=\"font-weight:bold\">" + id + "</span>?<br/>This is IRREVERSIBLE and will delete the container, snapshots and all data in it!<br/><br/><i>Backups will not be deleted!</i>");
   });
 
   // Listener to snapshot container
@@ -438,6 +528,16 @@ $(function() {
         showStatus("snapshotCONT", id, "Snapshot Container", "Snapshotting Container " + id);
       }
     }, "This action will stop the LXC Container and start it again if it was running.");
+  });
+
+  // Listener to backup container
+  $(".backupCONT").on("click", function() {
+    let id = this.id;
+    showDialog(function(response) {
+      if (response) {
+        showStatus("backupCONT", id, "Backup Container", "Backup Container " + id);
+      }
+    }, "This action will stop the LXC Container and start it again if it was running.<br/><br/><span style=\"font-weight:bold;\">Note:</span> <i>You will only see as much backups as you have configured in the global backup settings (oldest backups will be deleted first).</i>");
   });
 
   // Listener to set description
