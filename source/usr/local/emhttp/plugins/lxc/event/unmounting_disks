@@ -1,7 +1,7 @@
 #!/bin/bash
 CONTAINERS="$(lxc-ls --active)"
-LXC_CONT_PATH="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
-TIMEOUT="$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "TIMEOUT" | cut -d '=' -f2 | sed 's/\"//g')"
+LXC_CONT_PATH="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "^lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
+TIMEOUT="$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "^TIMEOUT=" | cut -d '=' -f2 | sed 's/\"//g')"
 if [ -z "${TIMEOUT}" ]; then
   TIMEOUT=15
 fi
