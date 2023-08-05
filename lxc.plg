@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.08.03b">
+  <!ENTITY version   "2023.08.05">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "9899f8fd2915764b3108158ff6f547dc">
+  <!ENTITY md5       "902b418a1ebad259282858fa5164ab37">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.08.05
+- Bugfix for autostart on boot not working correctly with the new global backup settings
+- Minor improvements to disk unmount script
 
 ###2023.08.03b
 - Fixed bug backups not showing up correctly on Backup page when certain symbols are used in the container name
