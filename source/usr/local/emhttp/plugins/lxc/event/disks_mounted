@@ -1,20 +1,9 @@
 #!/bin/bash
 LXC_DATADIRECTORY="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "^lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
-AUTOSTART_DELAY="$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "^AUTOSTART_DELAY=" | cut -d '=' -f2 | sed 's/\"//g')"
 
-autostart() {
-if [ ! -z "${AUTOSTART_DELAY}" ]; then
-  logger "LXC: Waiting ${AUTOSTART_DELAY}s for autostart from container(s)"
-  sleep ${AUTOSTART_DELAY}s
-fi
 if [ ! -d ${LXC_DATADIRECTORY}/cache ]; then
   mkdir -p ${LXC_DATADIRECTORY}/cache
 fi
 ln -s ${LXC_DATADIRECTORY}/cache /var/cache/lxc 2>/dev/null
-if [ "$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "^SERVICE=" | cut -d '=' -f2 | sed 's/\"//g')" == "enabled" ]; then
-  logger "LXC: Executing autostart from container(s)"
-  lxc-autostart
-fi
-}
 
-autostart &
+echo "/usr/local/emhttp/plugins/lxc/lxc_scripts/lxc-startup.sh" | at now >/dev/null 2>&1
