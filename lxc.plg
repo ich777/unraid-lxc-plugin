@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.08.10">
+  <!ENTITY version   "2023.08.11">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "c7ff6a38741eeeced3c5146251f4ede2">
+  <!ENTITY md5       "897c5e839888eabe4b2acbbd0721b7c3">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,11 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.08.11
+- Show containers with faulty config too if there is only one container installed
+- Bugfix for updates on LXC page
+- Bugfix for pattern from LXC URL
 
 ###2023.08.10
 - Show containers which have a broken config file on LXC page
