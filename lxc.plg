@@ -17,6 +17,7 @@
 
 ###2023.08.11
 - Show containers with faulty config too if there is only one container installed
+- Show more interfaces in settings
 - Bugfix for updates on LXC page
 - Bugfix for pattern from LXC URL
 
