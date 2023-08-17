@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.08.12">
+  <!ENTITY version   "2023.08.17">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "0278326189d85bfeec72202b80acae1c">
+  <!ENTITY md5       "fffce7f3b35fa02bf2b35c865487e26e">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,13 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.08.17
+- Allow bond and eth as interfaces on Settings page
+- Sort interfaces on Settings page to show the most relevant interface as fist in the drop down
+- Disable checkbox to change container networks if Array is stopped
+- Few visual fixes/improvements
+- Code cleanup
 
 ###2023.08.12
 - Create checkbox to change container networks too if network is changed on the settings page (this will change the network from all containers if checked)
