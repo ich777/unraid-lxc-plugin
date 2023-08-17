@@ -9,8 +9,10 @@ function getNewMacAddress() {
 
 function getVariable($path, $option) {
   $content = file_get_contents($path);
-  preg_match('/^' . $option . '[^\r\n]*/m',$content,$line);
-  return trim(explode('=', $line[0])[1]);
+  if (preg_match('/^' . $option . '[^\r\n]*/m', $content, $line) && isset($line[0])) {
+    return trim(explode('=', $line[0])[1]);
+  }
+  return null;
 }
 
 function getContainerStats($container, $option) {
@@ -21,15 +23,23 @@ function getContainerStats($container, $option) {
   }
 }
 
-function getAvailableBridges() {
-  $bridges = array();
-  exec("brctl show", $output);
+function getAvailableInterfaces() {
+  $interfaces = array();
+  exec("ip -o link show | awk -F': ' '{print $2}'", $output);
   foreach ($output as $line) {
-    if (preg_match('/^(vir)?br\d\S*/', $line, $matches)) {
-      $bridges[] = strtok($matches[0], " ");
+    $interfaceName = trim($line);
+	  $interfaceName = explode('@', $interfaceName)[0];
+    if (preg_match('/^(virbr|vhost|bond|eth|br)\d\S*/', $interfaceName)) {
+        $interfaces[] = $interfaceName;
     }
+    $sortOrder = ['br', 'eth', 'bond', 'vhost', 'virbr'];
+    usort($interfaces, function ($a, $b) use ($sortOrder) {
+      $posA = array_search(substr($a, 0, strpos($a, '0')), $sortOrder);
+      $posB = array_search(substr($b, 0, strpos($b, '0')), $sortOrder);
+      return $posA - $posB;
+    });
   }
-  return $bridges;
+return $interfaces;
 }
 
 function getActiveContainers() {
