@@ -1,14 +1,22 @@
 Menu="LXCSettings:1"
-Title="General"
+Title="_(General)_"
 Tag="wrench"
 ---
+<script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
+
 <?
 require_once '/usr/local/emhttp/plugins/lxc/include/Settings.php';
 $settings = new Settings();
 
+if (substr($_SERVER['REQUEST_URI'],0,7) != '/LXCSettings') {
+  $lxc = "$docroot/languages/$locale/lxc.txt";
+  if (file_exists($lxc)) $language = array_merge($language,unserialize(file_get_contents($lxc)));
+}
+
 $started = $var['fsState']=='Started';
 $bgcolor = strstr('white,azure',$display['theme']) ? '#f2f2f2' : '#1c1c1c';
 ?>
+
 <link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.filetree.css')?>">
 <style>
 body{-webkit-overflow-scrolling:touch}
@@ -21,32 +29,37 @@ body{-webkit-overflow-scrolling:touch}
 <link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
 <script src="/plugins/lxc/js/lxc.js"></script>
 
-
-<form markdown="1" id="changecfg" method="post" >
-Enable LXC:
+<form markdown="1" id="changecfg" method="post" class="<?=$showAdditionalInfo?>">
+_(Enable LXC)_:
 : <select id="SERVICE" name="SERVICE">
-  <?= mk_option($settings->status, 'disabled', 'No')?>
-  <?= mk_option($settings->status, 'enabled', 'Yes')?>
+  <?= mk_option($settings->status, 'disabled', '_(No)_')?>
+  <?= mk_option($settings->status, 'enabled', '_(Yes)_')?>
   </select>
 
-Default LXC storage path:
-: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$" required></br>
-  <span style="color: #ff0000;">ATTENTION: It is strongly recommended to not use a FUSE path like /mnt/user/lxc/ instead use the real path to the share like /mnt/cache/lxc/ or /mnt/diskX/lxc/</br>Don't share this directory via SMB or NFS or change the permissions from this directory!</br>(If this path doesn't exist it will be created when LXC is enabled for the first time)</span>
+
+_(Default LXC storage path)_:
+: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$" required>
   <?if (!$started):?><span><i class="fa fa-warning icon warning"></i> Modify with caution: unable to validate path until Array is Started</span>
   <?elseif (!is_dir($settings->default_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist</span><?endif;?>
+  </br>
+  <span style="color: #ff0000;">_(ATTENTION: It is strongly recommended to not use a FUSE path like /mnt/user/lxc/ instead use the real path to the share like /mnt/cache/lxc/ or /mnt/diskX/lxc/</br>Don't share this directory via SMB or NFS or change the permissions from this directory!</br>(If this path doesn't exist it will be created when LXC is enabled for the first time))_</span>
 
 
-Default network bridge:
-:  <select name="BRNAME" >
+_(Default network interface)_:
+:  <select name="INTERFACENAME">
   <?php
-  foreach($settings->available_bridges as $item){
-  if ( $item == $settings->default_bridge ) {
+  foreach($settings->available_interfaces as $item){
+  if ( $item == $settings->default_interface ) {
     echo "<option selected=\"selected\" value=\"$item\"> $item</option>";
   } else {
     echo "<option value=\"$item\"> $item</option>";
   }
 }
 ?>
+  <input type="checkbox" name="CHANGENETCONT" <?php echo (!$started) ? "disabled" : ""; ?>>
+  <label for="CHANGENETCONT"><?php echo (!$started) ? 'Array must be started to change networks from containers' : 'Change network from existing containers'; ?></label>
+  
+
   </select>
 
   <input type="hidden" name="TIMEOUT" value="<?php echo $settings->default_timeout;?>">
@@ -61,8 +74,8 @@ Default network bridge:
 
 <p>&nbsp;</p>
 
-Update configuration file:
-:  <input type="submit" name="changeCFG" value="Update"><span style="color: #ff0000;">(This will restart the LXC service and containers!)</span>
+_(Update configuration)_:
+:  <input type="submit" name="changeCFG" value="_(Apply)_"><span style="color: #ff0000;">(_(This will restart the LXC service and containers!)_)</span>
 
 </form>
 
@@ -86,12 +99,11 @@ Update configuration file:
 
 <?php
 if(isset($_POST['changeCFG'])) {
-$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["BRNAME"], $_POST["LXC_CONTAINER_URL"], $_POST["BACKUP_ENABLED"], $_POST["BACKUPDIR"], $_POST["BACKUPS_TO_KEEP"], $_POST["CPU_THREADS"], $_POST["COMPRESSION_RATIO"], $_POST["USE_SNAPSHOT"]);
+$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["INTERFACENAME"], $_POST["CHANGENETCONT"], $_POST["LXC_CONTAINER_URL"], $_POST["BACKUP_ENABLED"], $_POST["BACKUPDIR"], $_POST["BACKUPS_TO_KEEP"], $_POST["CPU_THREADS"], $_POST["COMPRESSION_RATIO"], $_POST["USE_SNAPSHOT"]);
 echo '<script>parent.window.location.reload();</script>';
 }
 ?>
 <script src="<?autov('/webGui/javascript/jquery.filetree.js')?>" charset="utf-8"></script>
-<script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
 
 <script>
   $('#defaultdir').fileTreeAttach();
