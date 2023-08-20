@@ -1,0 +1,216 @@
+Title="Create LXC Container from Template"
+Markdown="false"
+---
+<?php
+require_once '/usr/local/emhttp/plugins/lxc/include/functions.php';
+
+$lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
+?>
+
+<div id="canvas">
+  <form id="addContainerCAApp" autocomplete="off">
+    <p />
+    <div>
+      <dl>
+        <dt>Name:</dt>
+        <dd>
+          <input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Name; ?>"placeholder="Container Name">
+        </dd>
+      </dl>
+    </div>
+    <div>
+      <div>
+        <dl>
+          <dt>Container Description:</dt>
+          <dd>
+            <input type="text" name="contDesc" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" placeholder="Your Description or empty">
+          </dd>
+        </dl>
+      </div>
+      <div>
+        <dl>
+          <dt>Description:</dt>
+          <dd>
+            <span id="lxcOverview" class="boxed blue-text" style="display: inline-block;">
+              <p><? echo nl2br($lxc->Overview); ?></p>
+              <br>
+            </span>
+          </dd>
+        </dl>
+      </div>
+      <div>
+        <dl>
+          <dt>Autostart:</dt>
+          <dd>
+            <?php
+            if ($lxc->Autostart == "true") {
+              $checked = "checked";
+            } else {
+              $checked = "";
+            }
+            ?>
+            <input class='autostart' id="contAutostart" type='checkbox' <?= $checked ?>>
+          </dd>
+        </dl>
+      </div>
+      <div>
+        <dl>
+          <dt>Distribution Details:</dt>
+          <details class="spoiler" close>
+            <summary data-open="Hide Distribution Details" data-close="Show Distribution Details"></summary>
+            <div>
+              <dl>
+                <dt>Distribution:</dt>
+                <dd>
+                  <input type="text" name="contDistribution" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Distribution; ?>" disabled>
+                </dd>
+              </dl>
+            </div>
+            <div>
+              <dl>
+                <dt>Release:</dt>
+                <dd>
+                  <input type="text" name="contRelease" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Release; ?>" disabled>
+                </dd>
+              </dl>
+            </div>
+            <div>
+              <dl>
+                <dt>Architecture:</dt>
+                <dd>
+                  <input type="text" name="contArchitecture" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Architecture; ?>" disabled>
+                </dd>
+              </dl>
+            </div>
+          </details>
+        </dl>
+        <dd>
+      </div>
+      <?php if (isset($lxc->PreInstallScript)) { ?>
+	  <div>
+        <dl>
+          <dt>Pre Install Script:</dt>
+          <dd>
+            <span style="display: inline-block;">
+			<input type="text" name="contPreInstallScript" value="<? echo $lxc->PreInstallScript; ?>" hidden>
+              <details class="spoiler" close>
+                <summary data-open="Hide Pre-Install Script" data-close="Show Pre-Install Script"></summary>
+                <p><code class="boxed blue-text"><pre><? echo $lxc->PreInstallScript; ?></pre></code></p>
+              </details>
+            </span>
+          </dd>
+        </dl>
+      </div>
+	  <?php } ?>
+      <div>
+        <dl>
+          <dt>Install Script:</dt>
+          <dd>
+            <span style="display: inline-block;">
+			<input type="text" name="contInstallScript" value="<? echo $lxc->InstallScript; ?>" hidden>
+              <details class="spoiler" close>
+                <summary data-open="Hide Install Script" data-close="Show Install Script"></summary>
+                <p><code class="boxed blue-text"><pre><? echo $lxc->InstallScript; ?></pre></code></p>
+              </details>
+            </span>
+          </dd>
+        </dl>
+      </div>
+      <?php if (isset($lxc->PostInstallScript)) { ?>
+      <div>
+        <dl>
+          <dt>Post Install Script:</dt>
+          <dd>
+            <span style="display: inline-block;">
+			<input type="text" name="contPostInstallScript" value="<? echo $lxc->PostInstallScript; ?>" hidden>
+              <details class="spoiler" close>
+                <summary data-open="Hide Post-Install Script" data-close="Show Post-Install Script"></summary>
+                <p><code class="boxed blue-text"><pre><? echo $lxc->PostInstallScript; ?></pre></code></p>
+              </details>
+            </span>
+          </dd>
+        </dl>
+      </div>
+	  <?php } ?>
+	  <?php if (isset($lxc->ConfigAddition)) { ?>
+      <div>
+        <dl>
+          <dt>Configuration additions:</dt>
+          <dd>
+            <span style="display: inline-block;">
+			<input type="text" name="contConfAdditions" value="<? echo nl2br($lxc->ConfigAddition) ?>" hidden>
+              <details class="spoiler" close>
+                <summary data-open="Hide Configuration Additions" data-close="Show Configuration Additions"></summary>
+                  <p><code class="boxed blue-text"><pre><? echo $lxc->ConfigAddition; ?></pre></code></p>
+              </details>
+              </span>
+          </dd>
+        </dl>
+      </div>
+	  <?php } ?>
+      <div>
+        <dl>
+          <dt>Advanced:</dt>
+          <details class="spoiler" close>
+            <summary data-open="Hide Advanced Configuration" data-close="Show/Edit Advanced Configuration"></summary>
+            <div>
+              <dl>
+                <dt>WebUI:</dt>
+                <dd>
+                  <input type="text" name="contWebUI" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->WebUI; ?>" placeholder="Full URL to WebGUI or empty for none">
+                </dd>
+              </dl>
+            </div>
+            <div>
+              <dl>
+                <dt>Icon URL:</dt>
+                <dd>
+                  <input type="text" name="contIcon" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Icon; ?>"placeholder="Empty for default icon or URL for custom .png">
+                </dd>
+              </dl>
+            </div>
+            <div>
+              <dl>
+                <dt>Requires:</dt>
+                <dd>
+                  <input type="text" name="contRequires" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Requires; ?>" disabled>
+                </dd>
+              </dl>
+            </div>
+          </details>
+        </dl>
+        <dd>
+      </div>
+      <div>
+        <dl>
+          <dt>Start after creation:</dt>
+          <dd>
+            <input name="contStart" type='checkbox' checked>
+          </dd>
+        </dl>
+      </div>
+      <div class="">
+        <dl>
+          <dt>Mac Address:</dt>
+          <dd>
+            <input type="text" name="contMac" required="true" id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>">
+            <div id="emac" class="emac">Invalid MAC address</div>
+          </dd>
+        </dl>
+      </div>
+      <div>
+        <dl>
+          <dt><br/></dt>
+          <dd>
+            <input type="submit" value="_(Create)_">
+            <a href="LXC" class="button">Done</a>
+          </dd>
+        </dl>
+      </div>
+  </form>
+</div>
+
+<link rel="stylesheet" href="<? autov('/plugins/lxc/css/lxc.css') ?>">
+<link type="text/css" rel="stylesheet" href="<? autov('/webGui/styles/jquery.switchbutton.css') ?>">
+<script src="<? autov('/webGui/javascript/jquery.switchbutton.js') ?>"></script>
+<script src="<? autov('/plugins/lxc/js/lxc.js') ?>"></script>

@@ -1,24 +1,24 @@
 Menu="LXCSettings:3"
-Title="Backup"
+Title="_(Backup)_"
 Tag="archive"
 ---
 <form markdown="1" id="changebackupcfg" method="post" >
-Enable Global Backup settings:
+_(Enable Global Backup settings)_:
 : <select id="backup_enabled" name="BACKUP_ENABLED">
-  <?= mk_option($settings->backup_enabled, 'disabled', 'No')?>
-  <?= mk_option($settings->backup_enabled, 'enabled', 'Yes')?>
+  <?= mk_option($settings->backup_enabled, 'disabled', '_(No)_')?>
+  <?= mk_option($settings->backup_enabled, 'enabled', '_(Yes)_')?>
   </select>
 
 <? if ($settings->backup_enabled === 'enabled') { ?>
 
-Default Backup path:
-: <input type="text" id="backupdir" name="BACKUPDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->backup_path)?>" placeholder="Click to Select" pattern="^[^\\]*/$" required></br>
-  <span style="color: #ff0000;">ATTENTION: This path will be created if it doesn't exist.</span>
+_(Default Backup path)_:
+: <input type="text" id="backupdir" name="BACKUPDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->backup_path)?>" placeholder="_(Click to Select)_" pattern="^[^\\]*/$" required></br>
+  <span style="color: #ff0000;">_(ATTENTION: This path will be created if it doesn't exist.)_</span>
 
-Backups to keep:
+_(Backups to keep)_:
 :  <input type="text" id="backupstokeep" name="BACKUPS_TO_KEEP" required="true" pattern="[1-9][0-9]*" style="width: 40px" value="<?php echo $settings->backup_keep;?>" required>
 
-Compression Ratio:
+_(Compression Ratio)_:
 <?php $selectedRatio = (isset($settings->backup_compression) && trim($settings->backup_compression !== '')) ? $settings->backup_compression : "6"; ?>
 : <select id="compression_ratio" name="COMPRESSION_RATIO">
   <?php
@@ -27,7 +27,7 @@ Compression Ratio:
   } ?>
   </select>
 
-CPU Threads:
+_(CPU Threads)_:
 <?php
   $cpu_threads = shell_exec('nproc');
   $selectedThreads = (isset($settings->backup_threads) && trim($settings->backup_threads !== '')) ? $settings->backup_threads : intdiv($cpu_threads, 2);
@@ -39,10 +39,10 @@ CPU Threads:
   } ?>
   </select>
 
-Use Snapshot:
+_(Use Snapshot)_:
 : <select id="use_snapshot" name="USE_SNAPSHOT">
-  <?= mk_option($settings->backup_use_snapshot, 'disabled', 'No')?>
-  <?= mk_option($settings->backup_use_snapshot, 'enabled', 'Yes')?>
+  <?= mk_option($settings->backup_use_snapshot, 'disabled', '_(No)_')?>
+  <?= mk_option($settings->backup_use_snapshot, 'enabled', '_(Yes)_')?>
   </select>
 
 <?php } else { ?>
@@ -57,8 +57,8 @@ Use Snapshot:
 
 <p>&nbsp;</p>
 
-Update:
-:  <input type="submit" name="changeBACKUP" value="Update"><span>(This will NOT restart the LXC service)</span>
+_(Update configuration)_:
+:  <input type="submit" name="changeBACKUP" value="_(Apply)_"><span>(_(This will NOT restart the LXC service)_)</span>
 </form>
 
 <?php
