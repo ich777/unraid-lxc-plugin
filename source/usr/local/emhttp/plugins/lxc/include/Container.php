@@ -35,7 +35,10 @@ class Container {
     $this->snapshots = $this->getSnapshots();
     $this->backups = $this->getBackups();
     $this->backup_path = realpath($this->settings->backup_path);
-    $this->ips = nl2br(trim(shell_exec("lxc-info " . $this->name . " -iH")));
+    $ipInfo = shell_exec("lxc-info " . $this->name . " -iH");
+    if ($ipInfo !== null) {
+      $this->ips = nl2br(trim($ipInfo));
+      }
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
     $this->memoryUse = getContainerStats($this->name, "Memory use");
     $this->kMemUse = getContainerStats($this->name, "KMem use");
@@ -82,8 +85,15 @@ class Container {
 
   function startContainer() {
     exec('logger "LXC: Starting container ' . $this->name . '"');
-    exec('lxc-start ' . $this->name);
-    exec('logger "LXC: Container ' . $this->name . ' started"');
+    exec('lxc-start ' . $this->name . ' 2>&1', $output, $retval);
+	if ($retval == 1) {
+      exec('logger "LXC: error: Container ' . $this->name . ' failed to start"');
+      foreach ($output as $error) {
+        exec('logger "LXC: ' . $error . '"');
+      }
+	} else {
+      exec('logger "LXC: Container ' . $this->name . ' started"');
+    }
   }
 
   function stopContainer() {
@@ -92,11 +102,9 @@ class Container {
     exec('logger "LXC: Container ' . $this->name . ' stopped"');
   }
   function restartContainer() {
-    exec('logger "LXC: Restarting container ' . $this->name . '"');
-    exec('lxc-stop --timeout=' . $this->settings->default_timeout . ' ' . $this->name);
+    $this->stopContainer();
     sleep(1);
-    exec('lxc-start ' . $this->name);
-    exec('logger "LXC: Container ' . $this->name . ' restarted"');
+    $this->startContainer();
   }
 
   function freezeContainer() {
@@ -192,6 +200,10 @@ class Container {
 
   function delWebuiurl(){
     setVariable($this->config, '#container_webui', '');
+  }
+
+  function addConfig($configadditions){
+    file_put_contents($this->config, "\n\n#ADDITIONAL ENTRIES FROM UNRAID CA APP TEMPLATE\n" . preg_replace('/<br\s*\/?>/', "\n", $configadditions), FILE_APPEND);
   }
 
   function showConfig() {

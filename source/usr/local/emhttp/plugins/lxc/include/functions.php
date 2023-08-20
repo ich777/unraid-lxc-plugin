@@ -118,22 +118,32 @@ function getCpus(){
 function createContainer($name, $distribution, $release, $autostart, $mac) {
   exec("logger LXC: Creating container " . $name);
   while (@ ob_end_flush());
-  $proc = popen("lxc-create --name " . $name . " --template download -- --dist " . $distribution . " --release " . $release . " --arch amd64", "r");
-  while (!feof($proc)) {
-    echo nl2br(fread($proc, 4096) . "\n");
-    @ flush();
-  }
-
-  exec("logger LXC: Container " . $name . " created");
-  $container = new Container($name);
-  $container->setMac($mac);
-  if ($autostart == "true") {
-    $autostart = 1;
+  exec("lxc-create --name " . $name . " --template download -- --dist " . $distribution . " --release " . $release . " --arch amd64 2>&1", $output, $retval);
+  if ($retval == 1) {
+    echo '<p style="color:red;">';
+    echo "ERROR, failed to create container " . $name . "!<br/><br/>";
+    exec("logger LXC: error: Failed to create Container " . $name);
+    foreach ($output as $error) {
+      exec('logger "LXC: ' . $error . '"');
+	  echo $error . "<br/>";
+    }
+    echo '</p>';
   } else {
-    $autostart = 0;
+    exec("logger LXC: Container " . $name . " created");
+    $container = new Container($name);
+    $container->setMac($mac);
+    if ($autostart == "true") {
+      $autostart = 1;
+    } else {
+      $autostart = 0;
+    }
+    $container->setAutostart($autostart);
+	echo '<p style="color:green;">';
+    foreach ($output as $message) {
+	  echo $message . "<br/>";
+    }
+	echo '</p>';
   }
-
-  $container->setAutostart($autostart);
 }
 
 function copyContainer($name, $container, $autostart, $mac) {
@@ -203,5 +213,35 @@ function downloadLXCproducts($url) {
       $json = file_get_contents($url);
       file_put_contents($path . '/' . $filename . '.json', $json);
     }
+  }
+}
+
+function prepareContainer($name, $description, $configadditions, $preinstall, $install, $postinstall, $webui, $iconurl, $startcont) {
+  $container = new Container($name);
+  $settings = new Settings();
+
+  if (!empty($description)) {
+    $container->setDescription($description);
+  }
+
+  if (!empty($webui)) {
+    $container->setWebuiurl($webui);
+  }
+
+  if (!empty($configadditions)) {
+    $container->addConfig($configadditions);
+  }
+
+  if (!empty($iconurl)) {
+    $path = $settings->default_path . '/custom-icons';
+    $icon = file_get_contents($iconurl);
+    if (!is_dir($path)) {
+      mkdir($path, 0755, true);
+    }
+    file_put_contents($path . '/' . $name . '.png' , $icon);
+  }
+
+  if ($startcont == "true") {
+    $container->startContainer($name);
   }
 }
