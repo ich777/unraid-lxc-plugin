@@ -147,17 +147,97 @@ function createContainer(name, distribution, release, autostart, mac) {
         }, 5000);
       },
       success: function (data) {
-        dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
-        dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
-        dialogContent.append("<p>lxc-attach " + name + "</p>")
-        dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
-        dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
-        dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
+		if (data.toLowerCase().indexOf("error, failed to create container") === -1) {
+          dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
+          dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
+          dialogContent.append("<p>lxc-attach " + name + "</p>")
+          dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
+          dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
+		}
+		dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
         clearInterval(statusInterval);
       }
     });
   });
 }
+
+// Function that creates a new container from the CA App
+function createContainerCAApp(name, description, distribution, release, configadditions, preinstall, install, postinstall, webui, icon, startcont, autostart, mac) {
+  let statusInterval;
+
+  Shadowbox.open({
+    content: '<div id="dialogContent" class="logLine spacing"></div>',
+    player: 'html',
+    title: "Create Container from CA App",
+    onClose: function () {
+      location.href = '/LXC';
+    },
+    height: Math.min(screen.availHeight, 800),
+    width: Math.min(screen.availWidth, 1200)
+  });
+
+  waitForElement("#dialogContent", function () {
+    let dialogContent = $("#dialogContent");
+
+    $.ajax({
+      type: "POST",
+      url: '/plugins/lxc/include/ajax.php',
+      data: {
+        'lxc': '',
+        'action': 'createCONT',
+        'name': name,
+        'distribution': distribution,
+        'release': release,
+        'autostart': autostart,
+        'mac': mac
+      },
+      xhr: function() {
+        const xhr = $.ajaxSettings.xhr();
+        xhr.onprogress = function() {
+          dialogContent.html("<p>Creating container, please wait until the DONE button is displayed!</p><p>" + xhr.responseText + "</p>");
+        }
+        return xhr;
+      },
+      beforeSend: function () {
+        dialogContent.append("Creating container, please wait until the DONE button is displayed!");
+        statusInterval = setInterval(function () {
+          dialogContent.append("<p>......</p>");
+        }, 5000);
+      },
+      success: function (data) {
+        dialogContent.append("<p>Initial step completed.</p>");
+
+        $.ajax({
+          type: "POST",
+          url: '/plugins/lxc/include/ajax.php',
+          data: {
+            'lxc': '',
+            'action': 'setupCONT',
+			'name': name,
+            'description': description,
+			'configadditions': configadditions,
+            'preinstall': preinstall,
+            'install': install,
+            'postinstall': postinstall,
+            'webui': webui,
+            'iconurl': icon,
+            'startcont': startcont
+          },
+          success: function (data) {
+            dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
+            dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
+            dialogContent.append("<p>lxc-attach " + name + "</p>")
+            dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
+            dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
+            dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
+            clearInterval(statusInterval);
+          }
+        });
+      }
+    });
+  });
+}
+
 
 // Function that copies a container
 function createCopy(name, autostart, mac) {
@@ -591,6 +671,26 @@ $(function() {
         });
       }
     }, 'WebUI URL', 'Enter your URL like: http://192.168.0.10:8080 or https://subdomain.yourdomain.net\nLeave empty to delete the WebUI URL.', 'WebUI URL or empty')
+  });
+
+  // Listener for add container from CA App
+  $(document).on('submit','form#addContainerCAApp',function(event){
+    event.preventDefault();
+	let name = this.contName.value;
+    let description = this.contDesc.value;
+    let distribution = this.contDistribution.value;
+    let release = this.contRelease.value;
+    let configadditions = this.contConfAdditions.value;
+    let preinstall = this.contPreInstallScript.value;
+    let install = this.contInstallScript.value;
+    let postinstall = this.contPostInstallScript.value;
+    let webui = this.contWebUI.value;
+    let icon = this.contIcon.value;
+    let startcont = this.contStart.checked;
+    let autostart = this.contAutostart.checked;
+    let mac = this.contMac.value;
+
+    createContainerCAApp(name, description, distribution, release, configadditions, preinstall, install, postinstall, webui, icon, startcont, autostart, mac);
   });
 
 })
