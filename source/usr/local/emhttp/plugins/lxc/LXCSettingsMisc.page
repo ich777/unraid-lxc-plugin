@@ -1,0 +1,28 @@
+Menu="LXCSettings:2"
+Title="_(Misc)_"
+Tag="list"
+---
+
+<form markdown="1" id="changemisccfg" method="post" >
+
+_(LXC Stop Timeout)_:
+:  <input type="text" name="TIMEOUT" required="true" pattern="[0-9]+" style="width: 40px" value="<?php echo $settings->default_timeout;?>" required> _(seconds)_
+
+_(LXC Autostart Delay after Array is started)_:
+:  <input type="text" name="AUTOSTART_DELAY" required="true" pattern="[0-9]+" style="width: 40px" value="<?php echo $settings->default_startdelay;?>" required> _(seconds)_
+
+_(LXC Container URL)_:
+:  <input type="text" name="LXC_CONTAINER_URL" required="true" style="width: 300px" pattern="^[a-zA-Z0-9\-_:\.]*$" value="<?php echo $settings->default_cont_url;?>" placeholder="images.linuxcontainers.org" required><span style="color: #ff0000;">_(Only change if you know what you are doing!)_</span> 
+
+<p>&nbsp;</p>
+
+_(Update configuration)_:
+:  <input type="submit" name="changeMISC" value="_(Apply)_"><span>(_(This will NOT restart the LXC service)_)</span>
+</form>
+
+<?php
+if(isset($_POST['changeMISC'])) {
+$settings->changeMisc($_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["LXC_CONTAINER_URL"]);
+echo '<script>parent.window.location.reload();</script>';
+}
+?>
