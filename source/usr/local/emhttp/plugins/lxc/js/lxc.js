@@ -103,7 +103,7 @@ function showDropdown(contName) {
 }
 
 // Function that creates a new container
-function createContainer(name, distribution, release, autostart, mac) {
+function createContainer(name, distribution, release, startcont, autostart, mac) {
   let statusInterval;
 
   Shadowbox.open({
@@ -127,6 +127,7 @@ function createContainer(name, distribution, release, autostart, mac) {
         'name': name,
         'distribution': distribution,
         'release': release,
+        'startcont': startcont,
         'autostart': autostart,
         'mac': mac
       },
@@ -154,7 +155,7 @@ function createContainer(name, distribution, release, autostart, mac) {
           dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
           dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
 		}
-		dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
+        dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
         clearInterval(statusInterval);
       }
     });
@@ -188,6 +189,7 @@ function createContainerCAApp(name, description, distribution, release, configad
         'name': name,
         'distribution': distribution,
         'release': release,
+        'startcont': '',
         'autostart': autostart,
         'mac': mac
       },
@@ -201,11 +203,12 @@ function createContainerCAApp(name, description, distribution, release, configad
       beforeSend: function () {
         dialogContent.append("Creating container, please wait until the DONE button is displayed!");
         statusInterval = setInterval(function () {
-          dialogContent.append("<p>......</p>");
-        }, 5000);
+          dialogContent.append(".");
+        }, 10000);
       },
       success: function (data) {
-        dialogContent.append("<p>Initial step completed.</p>");
+        dialogContent.append("<p>Sucessfully set up container " + name + "</p>");
+        dialogContent.append("<p>Preparing container, this can take some time, please wait and do not close this window!</p>");
 
         $.ajax({
           type: "POST",
@@ -213,9 +216,9 @@ function createContainerCAApp(name, description, distribution, release, configad
           data: {
             'lxc': '',
             'action': 'setupCONT',
-			'name': name,
+            'name': name,
             'description': description,
-			'configadditions': configadditions,
+            'configadditions': configadditions,
             'preinstall': preinstall,
             'install': install,
             'postinstall': postinstall,
@@ -223,12 +226,22 @@ function createContainerCAApp(name, description, distribution, release, configad
             'iconurl': icon,
             'startcont': startcont
           },
+          xhr: function() {
+            const xhr = $.ajaxSettings.xhr();
+            xhr.onprogress = function() {
+              clearInterval(statusInterval);
+              dialogContent.append("<p>" + xhr.responseText + "</p>");
+          }
+            return xhr;
+          },
           success: function (data) {
-            dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
-            dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
-            dialogContent.append("<p>lxc-attach " + name + "</p>")
-            dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
-            dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
+        		if (data.toLowerCase().indexOf("error, failed to execute") === -1) {
+              dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
+              dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
+              dialogContent.append("<p>lxc-attach " + name + "</p>")
+              dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
+              dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
+      		}
             dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
             clearInterval(statusInterval);
           }
@@ -500,10 +513,11 @@ $(function() {
     let distribution = this.contDistribution.value;
     let release = this.contRelease.value;
     let name = this.contName.value;
+    let startcont = this.contStart.checked;
     let autostart = this.contAutostart.checked;
     let mac = this.contMac.value;
 
-    createContainer(name, distribution, release, autostart, mac);
+    createContainer(name, distribution, release, startcont, autostart, mac);
   });
 
   // Listener for copying container
@@ -676,7 +690,7 @@ $(function() {
   // Listener for add container from CA App
   $(document).on('submit','form#addContainerCAApp',function(event){
     event.preventDefault();
-	let name = this.contName.value;
+	  let name = this.contName.value;
     let description = this.contDesc.value;
     let distribution = this.contDistribution.value;
     let release = this.contRelease.value;
