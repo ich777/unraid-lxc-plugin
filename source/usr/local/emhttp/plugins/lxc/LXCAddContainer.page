@@ -3,7 +3,7 @@ Markdown="false"
 ---
 <link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
 <script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
-<script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
+
 
 <?php
 require_once '/usr/local/emhttp/plugins/lxc/include/Settings.php';
@@ -113,7 +113,14 @@ $avail_images_json = json_encode($avail_images);
     <div class="">
       <dl>
         <dt>Autostart:</dt>
-        <dd><input type="checkbox" name="contAutostart" checked></dd>
+        <dd><input type="checkbox" name="contAutostart"></dd>
+      </dl>
+    </div>
+
+    <div class="">
+      <dl>
+        <dt>Start after creation:</dt>
+        <dd><input type="checkbox" name="contStart" checked></dd>
       </dl>
     </div>
 
@@ -128,6 +135,7 @@ $avail_images_json = json_encode($avail_images);
   <span class="left"></span>
 </div>
 
+<script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
 <script>
 var avail_images = <?= $avail_images_json ?>;
 var distributionSelect = document.getElementById("distribution-select");

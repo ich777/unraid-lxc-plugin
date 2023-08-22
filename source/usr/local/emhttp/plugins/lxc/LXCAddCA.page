@@ -1,6 +1,11 @@
 Title="Create LXC Container from Template"
 Markdown="false"
 ---
+<link rel="stylesheet" href="<? autov('/plugins/lxc/css/lxc.css') ?>">
+<link type="text/css" rel="stylesheet" href="<? autov('/webGui/styles/jquery.switchbutton.css') ?>">
+<script src="<? autov('/webGui/javascript/jquery.switchbutton.js') ?>"></script>
+
+
 <?php
 require_once '/usr/local/emhttp/plugins/lxc/include/functions.php';
 
@@ -92,7 +97,7 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
           <dt>Pre Install Script:</dt>
           <dd>
             <span style="display: inline-block;">
-			<input type="text" name="contPreInstallScript" value="<? echo $lxc->PreInstallScript; ?>" hidden>
+              <input type="text" name="contPreInstallScript" value="<? echo nl2br($lxc->PreInstallScript); ?>" hidden>
               <details class="spoiler" close>
                 <summary data-open="Hide Pre-Install Script" data-close="Show Pre-Install Script"></summary>
                 <p><code class="boxed blue-text"><pre><? echo $lxc->PreInstallScript; ?></pre></code></p>
@@ -107,7 +112,7 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
           <dt>Install Script:</dt>
           <dd>
             <span style="display: inline-block;">
-			<input type="text" name="contInstallScript" value="<? echo $lxc->InstallScript; ?>" hidden>
+              <input type="text" name="contInstallScript" value="<? echo nl2br($lxc->InstallScript); ?>" hidden>
               <details class="spoiler" close>
                 <summary data-open="Hide Install Script" data-close="Show Install Script"></summary>
                 <p><code class="boxed blue-text"><pre><? echo $lxc->InstallScript; ?></pre></code></p>
@@ -122,7 +127,7 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
           <dt>Post Install Script:</dt>
           <dd>
             <span style="display: inline-block;">
-			<input type="text" name="contPostInstallScript" value="<? echo $lxc->PostInstallScript; ?>" hidden>
+              <input type="text" name="contPostInstallScript" value="<? echo nl2br($lxc->PostInstallScript); ?>" hidden>
               <details class="spoiler" close>
                 <summary data-open="Hide Post-Install Script" data-close="Show Post-Install Script"></summary>
                 <p><code class="boxed blue-text"><pre><? echo $lxc->PostInstallScript; ?></pre></code></p>
@@ -138,7 +143,7 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
           <dt>Configuration additions:</dt>
           <dd>
             <span style="display: inline-block;">
-			<input type="text" name="contConfAdditions" value="<? echo nl2br($lxc->ConfigAddition) ?>" hidden>
+              <input type="text" name="contConfAdditions" value="<? echo nl2br($lxc->ConfigAddition) ?>" hidden>
               <details class="spoiler" close>
                 <summary data-open="Hide Configuration Additions" data-close="Show Configuration Additions"></summary>
                   <p><code class="boxed blue-text"><pre><? echo $lxc->ConfigAddition; ?></pre></code></p>
@@ -157,7 +162,7 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
               <dl>
                 <dt>WebUI:</dt>
                 <dd>
-                  <input type="text" name="contWebUI" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->WebUI; ?>" placeholder="Full URL to WebGUI or empty for none">
+                  <input type="text" name="contWebUI" required="" value="<? echo $lxc->WebUI; ?>" placeholder="Full URL to WebGUI or empty for none">
                 </dd>
               </dl>
             </div>
@@ -165,7 +170,7 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
               <dl>
                 <dt>Icon URL:</dt>
                 <dd>
-                  <input type="text" name="contIcon" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Icon; ?>"placeholder="Empty for default icon or URL for custom .png">
+                  <input type="text" name="contIcon" required="" value="<? echo $lxc->Icon; ?>"placeholder="Empty for default icon or URL for custom .png">
                 </dd>
               </dl>
             </div>
@@ -173,7 +178,7 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
               <dl>
                 <dt>Requires:</dt>
                 <dd>
-                  <input type="text" name="contRequires" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Requires; ?>" disabled>
+                  <input type="text" name="contRequires" required="" value="<? echo $lxc->Requires; ?>" disabled>
                 </dd>
               </dl>
             </div>
@@ -202,7 +207,7 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
         <dl>
           <dt><br/></dt>
           <dd>
-            <input type="submit" value="_(Create)_">
+            <input type="submit" value="Create">
             <a href="LXC" class="button">Done</a>
           </dd>
         </dl>
@@ -210,7 +215,4 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
   </form>
 </div>
 
-<link rel="stylesheet" href="<? autov('/plugins/lxc/css/lxc.css') ?>">
-<link type="text/css" rel="stylesheet" href="<? autov('/webGui/styles/jquery.switchbutton.css') ?>">
-<script src="<? autov('/webGui/javascript/jquery.switchbutton.js') ?>"></script>
 <script src="<? autov('/plugins/lxc/js/lxc.js') ?>"></script>

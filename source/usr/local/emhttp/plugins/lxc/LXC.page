@@ -255,28 +255,28 @@ if (count($differences) > 0) {
 ?>
 
 
-  <script>
-    var containerNames = <?= json_encode($containerNames); ?>;
-    function updateValues() {
-      $.ajax({
-        url: '/plugins/lxc/include/ajax.php',
-        type: 'POST',
-        data: {action: 'updateValues', containerNames: JSON.stringify(containerNames)},
-        success: function(response) {
-          var data = JSON.parse(response);
-          for (var i = 0; i < data.length; i++) {
-            $('#ips-' + data[i].name).html(data[i].ips);
-            $('#totalBytes-' + data[i].name).html(data[i].totalBytes);
-          }
+<script>
+  var containerNames = <?= json_encode($containerNames); ?>;
+  function updateValues() {
+    $.ajax({
+      url: '/plugins/lxc/include/ajax.php',
+      type: 'POST',
+      data: {action: 'updateValues', containerNames: JSON.stringify(containerNames)},
+      success: function(response) {
+        var data = JSON.parse(response);
+        for (var i = 0; i < data.length; i++) {
+          $('#ips-' + data[i].name).html(data[i].ips);
+          $('#totalBytes-' + data[i].name).html(data[i].totalBytes);
         }
-      });
-    }
-    setInterval(updateValues, 3000);
-  </script>
-  <a href="LXCAddContainer">
-    <input type="button" value="Add Container">
-  </a>
-  <div class="spinner"></div>
+      }
+    });
+  }
+  setInterval(updateValues, 3000);
+</script>
+<a href="LXCAddContainer">
+  <input type="button" value="Add Container">
+</a>
+<div class="spinner"></div>
 <? } ?>
 
 <?php } else { ?>
