@@ -56,7 +56,7 @@ if (isset($_POST['lxc'])) {
       $container->deleteBackup($_POST['backup']);
       break;
     case 'createCONT':
-      createContainer($_POST['name'], $_POST['distribution'], $_POST['release'], $_POST['autostart'], $_POST['mac']);
+      createContainer($_POST['name'], $_POST['distribution'], $_POST['release'], $_POST['startcont'], $_POST['autostart'], $_POST['mac']);
       break;
     case 'copyCONT':
       copyContainer($_POST['name'], $_POST['container'], $_POST['autostart'], $_POST['mac']);

@@ -115,7 +115,7 @@ function getCpus(){
   return array('allcpus' => $allCpus, 'vcpus' => $vCpus);
 }
 
-function createContainer($name, $distribution, $release, $autostart, $mac) {
+function createContainer($name, $distribution, $release, $startcont, $autostart, $mac) {
   exec("logger LXC: Creating container " . $name);
   while (@ ob_end_flush());
   exec("lxc-create --name " . $name . " --template download -- --dist " . $distribution . " --release " . $release . " --arch amd64 2>&1", $output, $retval);
@@ -125,7 +125,7 @@ function createContainer($name, $distribution, $release, $autostart, $mac) {
     exec("logger LXC: error: Failed to create Container " . $name);
     foreach ($output as $error) {
       exec('logger "LXC: ' . $error . '"');
-	  echo $error . "<br/>";
+      echo $error . "<br/>";
     }
     echo '</p>';
   } else {
@@ -138,11 +138,14 @@ function createContainer($name, $distribution, $release, $autostart, $mac) {
       $autostart = 0;
     }
     $container->setAutostart($autostart);
-	echo '<p style="color:green;">';
+    echo '<p style="color:green;">';
     foreach ($output as $message) {
-	  echo $message . "<br/>";
+      echo $message . "<br/>";
     }
-	echo '</p>';
+    echo '</p>';
+    if ($startcont == "true") {
+      $container->startContainer($name);
+    }
   }
 }
 
@@ -241,7 +244,123 @@ function prepareContainer($name, $description, $configadditions, $preinstall, $i
     file_put_contents($path . '/' . $name . '.png' , $icon);
   }
 
-  if ($startcont == "true") {
-    $container->startContainer($name);
+  file_put_contents('/var/log/lxc-ca-install.log', 'LXC CA install log for container: ' . $name . ' started: ' . date("Y-m-d H:i:s") . "\n\n");
+
+  if (!empty($preinstall) || !empty($install) || !empty($postinstall)) {
+    exec('lxc-start ' . $name . ' 2>&1', $output, $retval);
+    if ($retval !== 0) {
+      echo '<p style="color:red;">';
+      echo "ERROR, failed to execute initial start from container!<br/><br/>";
+      exec("logger LXC: error: failed to execute initial start from container " . $name);
+      file_put_contents('/var/log/lxc-ca-install.log', 'Failed to execute initial start from container ' . $name, FILE_APPEND);
+      echo '</p>'; 
+      $container->destroyContainer($name);
+      die();
+    } else {
+      file_put_contents('/var/log/lxc-ca-install.log', "Container " . $name . " started\n\n", FILE_APPEND);
+      sleep(5);
+    }
   }
+
+  if (!empty($preinstall)) {
+    file_put_contents($settings->default_path . '/' . $name . '/rootfs/preinstall.sh', preg_replace('/<br\s*\/?>/', "\n", $preinstall));
+    chmod($settings->default_path . '/' . $name . '/rootfs/preinstall.sh', 0744);
+    chown($settings->default_path . '/' . $name . '/rootfs/preinstall.sh', '0');
+    chgrp($settings->default_path . '/' . $name . '/rootfs/preinstall.sh', '0');
+    file_put_contents('/var/log/lxc-ca-install.log', "Executing preinstall script:\n\n", FILE_APPEND);
+    exec('lxc-attach ' . $name . ' -- /preinstall.sh 2>&1', $output, $retval);
+    if ($retval !== 0) {
+      echo '<p style="color:red;">';
+      echo "ERROR, failed to execute preinstall script! Container deleted!<br/><br/>";
+      echo "For more details see /var/log/lxc-ca-install.log<br/><br/>";
+      exec("logger LXC: error: failed to execute preinstall script from container " . $name);
+      foreach ($output as $error) {
+        $preinstalllog .= $error . "\n";
+      }
+      file_put_contents('/var/log/lxc-ca-install.log', $preinstalllog, FILE_APPEND);
+      echo '</p>';
+      $container->destroyContainer($name);
+      die();
+    } else {
+      foreach ($output as $line) {
+        $preinstalllog .= $line . "\n";
+      }
+      file_put_contents('/var/log/lxc-ca-install.log', $preinstalllog . "\n\n", FILE_APPEND);
+      unlink($settings->default_path . '/' . $name . '/rootfs/preinstall.sh');
+      exec("logger LXC: preinstall script from container " . $name . " finished successfull");
+      echo '<p style="color:green;">';
+      echo "Preinstall script finished successfully!<br/>";
+      echo '</p>';
+    }
+  }
+
+  if (!empty($install)) {
+    file_put_contents($settings->default_path . '/' . $name . '/rootfs/install.sh', preg_replace('/<br\s*\/?>/', "\n", $install));
+    chmod($settings->default_path . '/' . $name . '/rootfs/install.sh', 0744);
+    chown($settings->default_path . '/' . $name . '/rootfs/install.sh', '0');
+    chgrp($settings->default_path . '/' . $name . '/rootfs/install.sh', '0');
+    file_put_contents('/var/log/lxc-ca-install.log', "Executing install script:\n", FILE_APPEND);
+    exec('lxc-attach ' . $name . ' -- /install.sh 2>&1', $output, $retval);
+    if ($retval !== 0) {
+      echo '<p style="color:red;">';
+      echo "ERROR, failed to execute install script! Container deleted!<br/><br/>";
+      echo "For more details see /var/log/lxc-ca-install.log<br/><br/>";
+      exec("logger LXC: error: failed to execute install script from container " . $name);
+      foreach ($output as $error) {
+        $installlog .= $error . "\n";
+      }
+      file_put_contents('/var/log/lxc-ca-install.log', $installlog, FILE_APPEND);
+      echo '</p>';
+      $container->destroyContainer($name);
+      die();
+    } else {
+      foreach ($output as $line) {
+        $installlog .= $line . "\n";
+      }
+      file_put_contents('/var/log/lxc-ca-install.log', $installlog . "\n\n", FILE_APPEND);
+      unlink($settings->default_path . '/' . $name . '/rootfs/install.sh');
+      exec("logger LXC: install script from container " . $name . " finished successfull");
+      echo '<p style="color:green;">';
+      echo "Install script finished successfully!<br/>";
+      echo '</p>';
+    }
+  }
+
+  if (!empty($postinstall)) {
+    file_put_contents($settings->default_path . '/' . $name . '/rootfs/postinstall.sh', preg_replace('/<br\s*\/?>/', "\n", $postinstall));
+    chmod($settings->default_path . '/' . $name . '/rootfs/postinstall.sh', 0744);
+    chown($settings->default_path . '/' . $name . '/rootfs/postinstall.sh', '0');
+    chgrp($settings->default_path . '/' . $name . '/rootfs/postinstall.sh', '0');
+    file_put_contents('/var/log/lxc-ca-install.log', "Executing postinstall script:\n", FILE_APPEND);
+    exec('lxc-attach ' . $name . ' -- /postinstall.sh 2>&1', $output, $retval);
+    if ($retval !== 0) {
+      echo '<p style="color:red;">';
+      echo "ERROR, failed to execute postinstall script! Container deleted!<br/><br/>";
+      echo "For more details see /var/log/lxc-ca-install.log<br/><br/>";
+      exec("logger LXC: error: failed to execute postinstall script from container " . $name);
+      foreach ($output as $error) {
+        $postinstallogl .= $error . "\n";
+      }
+      file_put_contents('/var/log/lxc-ca-install.log', $postinstallogl, FILE_APPEND);
+      echo '</p>';
+      $container->destroyContainer($name);
+      die();
+    } else {
+      foreach ($output as $line) {
+        $postinstallogl .= $line . "\n";
+      }
+      file_put_contents('/var/log/lxc-ca-install.log', $postinstallogl . "\n\n", FILE_APPEND);
+      unlink($settings->default_path . '/' . $name . '/rootfs/postinstall.sh');
+      exec("logger LXC: postinstall script from container " . $name . " finished successfull");
+      echo '<p style="color:green;">';
+      echo "Postinstall script finished successfully!<br/>";
+      echo '</p>';
+    }
+  }
+
+  if ($startcont !== "true") {
+    $container->stopContainer($name);
+  }
+
+  file_put_contents('/var/log/lxc-ca-install.log', "Installation for container " . $name . " finished\n", FILE_APPEND);
 }
