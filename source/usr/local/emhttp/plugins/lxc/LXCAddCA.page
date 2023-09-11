@@ -9,7 +9,7 @@ Markdown="false"
 <?php
 require_once '/usr/local/emhttp/plugins/lxc/include/functions.php';
 
-$lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
+$lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
 ?>
 
 <div id="canvas">
@@ -59,6 +59,14 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
         </dl>
       </div>
       <div>
+         <dl>
+           <dt>Repository:</dt>
+          <dd>
+            <input type="text" name="contRepo" required="" style="width: 600px;" value="<? echo $lxc->Repository; ?>" disabled>
+          </dd>
+        </dl>
+      </div>
+      <div>
         <dl>
           <dt>Distribution Details:</dt>
           <details class="spoiler" close>
@@ -91,68 +99,6 @@ $lxc = simplexml_load_file("/tmp/lxc_test_template.xml");
         </dl>
         <dd>
       </div>
-      <?php if (isset($lxc->PreInstallScript)) { ?>
-	  <div>
-        <dl>
-          <dt>Pre Install Script:</dt>
-          <dd>
-            <span style="display: inline-block;">
-              <input type="text" name="contPreInstallScript" value="<? echo nl2br($lxc->PreInstallScript); ?>" hidden>
-              <details class="spoiler" close>
-                <summary data-open="Hide Pre-Install Script" data-close="Show Pre-Install Script"></summary>
-                <p><code class="boxed blue-text"><pre><? echo $lxc->PreInstallScript; ?></pre></code></p>
-              </details>
-            </span>
-          </dd>
-        </dl>
-      </div>
-	  <?php } ?>
-      <div>
-        <dl>
-          <dt>Install Script:</dt>
-          <dd>
-            <span style="display: inline-block;">
-              <input type="text" name="contInstallScript" value="<? echo nl2br($lxc->InstallScript); ?>" hidden>
-              <details class="spoiler" close>
-                <summary data-open="Hide Install Script" data-close="Show Install Script"></summary>
-                <p><code class="boxed blue-text"><pre><? echo $lxc->InstallScript; ?></pre></code></p>
-              </details>
-            </span>
-          </dd>
-        </dl>
-      </div>
-      <?php if (isset($lxc->PostInstallScript)) { ?>
-      <div>
-        <dl>
-          <dt>Post Install Script:</dt>
-          <dd>
-            <span style="display: inline-block;">
-              <input type="text" name="contPostInstallScript" value="<? echo nl2br($lxc->PostInstallScript); ?>" hidden>
-              <details class="spoiler" close>
-                <summary data-open="Hide Post-Install Script" data-close="Show Post-Install Script"></summary>
-                <p><code class="boxed blue-text"><pre><? echo $lxc->PostInstallScript; ?></pre></code></p>
-              </details>
-            </span>
-          </dd>
-        </dl>
-      </div>
-	  <?php } ?>
-	  <?php if (isset($lxc->ConfigAddition)) { ?>
-      <div>
-        <dl>
-          <dt>Configuration additions:</dt>
-          <dd>
-            <span style="display: inline-block;">
-              <input type="text" name="contConfAdditions" value="<? echo nl2br($lxc->ConfigAddition) ?>" hidden>
-              <details class="spoiler" close>
-                <summary data-open="Hide Configuration Additions" data-close="Show Configuration Additions"></summary>
-                  <p><code class="boxed blue-text"><pre><? echo $lxc->ConfigAddition; ?></pre></code></p>
-              </details>
-              </span>
-          </dd>
-        </dl>
-      </div>
-	  <?php } ?>
       <div>
         <dl>
           <dt>Advanced:</dt>
