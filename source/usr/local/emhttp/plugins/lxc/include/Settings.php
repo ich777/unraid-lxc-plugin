@@ -17,6 +17,8 @@ class Settings {
   public $backup_threads;
   public $backup_compression;
   public $backup_use_snapshot;
+  public $github_user;
+  public $github_token;
 
   function __construct() {
     $this->default_path = getVariable('/boot/config/plugins/lxc/lxc.conf', 'lxc.lxcpath');
@@ -32,6 +34,8 @@ class Settings {
     $this->backup_threads = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_BACKUP_THREADS');
     $this->backup_compression = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_BACKUP_COMPRESSION');
     $this->backup_use_snapshot = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_BACKUP_USE_SNAPSHOT');
+    $this->github_user = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_GITHUB_USER');
+    $this->github_token = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_GITHUB_TOKEN');
   }
 
   function changeConfig($started, $default_path, $service, $timeout, $startdelay, $interface, $change_net_containers, $default_cont_url, $backup_enabled, $backup_path, $backup_keep, $backup_threads, $backup_compression, $backup_use_snapshot) {

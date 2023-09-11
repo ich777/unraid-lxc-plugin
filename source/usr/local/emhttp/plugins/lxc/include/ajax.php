@@ -87,8 +87,8 @@ if (isset($_POST['lxc'])) {
       $container = new Container($_POST['container']);
       $container->delWebuiurl();
       break;
-    case 'setupCONT':
-      prepareContainer($_POST['name'], $_POST['description'], $_POST['configadditions'], $_POST['preinstall'], $_POST['install'], $_POST['postinstall'], $_POST['webui'], $_POST['iconurl'], $_POST['startcont']);
+    case 'createTEMPLATE':
+      createfromTemplate($_POST['name'], $_POST['description'], $_POST['repository'], $_POST['webui'], $_POST['icon'], $_POST['startcont'], $_POST['autostart'], $_POST['mac']);
       break;
     default:
       break;

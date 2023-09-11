@@ -28,7 +28,7 @@ function getAvailableInterfaces() {
   exec("ip -o link show | awk -F': ' '{print $2}'", $output);
   foreach ($output as $line) {
     $interfaceName = trim($line);
-	  $interfaceName = explode('@', $interfaceName)[0];
+    $interfaceName = explode('@', $interfaceName)[0];
     if (preg_match('/^(virbr|vhost|bond|eth|br)\d\S*/', $interfaceName)) {
         $interfaces[] = $interfaceName;
     }
@@ -219,9 +219,117 @@ function downloadLXCproducts($url) {
   }
 }
 
-function prepareContainer($name, $description, $configadditions, $preinstall, $install, $postinstall, $webui, $iconurl, $startcont) {
+function createfromTemplate($name, $description, $repository, $webui, $icon, $startcont, $autostart, $mac) {
   $container = new Container($name);
   $settings = new Settings();
+  $repositoryurl = parse_url($repository);
+  $repositorypath = explode('/', trim($repositoryurl['path'], '/'));
+
+  exec("logger LXC: Creating container " . $name . " from repository: " . $repository);
+
+  if (is_dir($settings->default_path . "/" . $name)) {
+    echo '<p style="color:red;">ERROR, failed to create container ' . $name . '<br/>Already exists!</p>';
+    exec("logger LXC: error: Failed to create Container " . $name . ", container already exists");
+    die();
+  } else {
+    mkdir($settings->default_path . "/" . $name, 0755, true);
+  }
+
+  if (!is_dir($settings->default_path . "/cache/template_cache")) {
+    mkdir($settings->default_path . "/cache/template_cache", 0755, true);
+  }
+
+  if (isset($settings->github_user)) {
+    $githubauth = "-u " . $settings->github_user . ":" . $settings->github_token . " ";
+  }  else {
+    $githubauth = "";
+  }
+
+  $githubjson = shell_exec("curl " . $githubauth . "-s https://api.github.com/repos/" . $repositorypath[0] . "/" . $repositorypath[1] . "/releases/latest");
+  $githubjson = json_decode($githubjson, true);
+
+  if (isset($githubjson['assets'])) {
+    $assets = $githubjson['assets'];
+    $download_assets = [];
+    foreach ($assets as $asset) {
+      if (strpos($asset['name'], '.tar.xz') !== false && strpos($asset['name'], '.md5') === false) {
+        $download_assets[] = ['filename' => $asset['name'], 'url' => $asset['browser_download_url']];
+      }
+    }
+  } else {
+    echo '<p style="color:red;">ERROR, failed to create container ' . $name . '<br/>Found no assets on GitHub, please try again later!</p>';
+    exec("logger LXC: error: Failed to create Container " . $name . ", found no assets on GitHub, please try again later");
+    rmdir($settings->default_path . "/" . $name);
+    die();
+  }
+
+  exec("logger LXC: Downloading container archive for " . $name);
+
+  exec('wget -q -O ' . $settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . ' "' . $download_assets[0]['url'] . '"', $output, $retval);
+  if ($retval == 1) {
+    echo '<p style="color:red;">ERROR, failed to create container ' . $name . '<br/>Download failed!</p>';
+    exec("logger LXC: error: Failed to create Container " . $name . ", download failed");
+    rmdir($settings->default_path . "/" . $name);
+    unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename']);
+    die();
+  } else {
+    exec('wget -q -O ' . $settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . '.md5 "' . $download_assets[0]['url'] . '.md5"', $output, $retval);
+    if ($retval == 1) {
+      echo '<p style="color:red;">ERROR, failed to create container ' . $name . '<br/>Download from md5 failed!</p>';
+      exec("logger LXC: error: Failed to create Container " . $name . ", download from md5 failed");
+      rmdir($settings->default_path . "/" . $name);
+      unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename']);
+      unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . '.md5');
+      die();
+    }
+  }
+
+  exec("logger LXC: Download from container archive for " . $name . " successful");
+
+  $md5file = exec('md5sum ' .$settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . ' | awk \'{print $1}\'');
+  $md5check = exec('cat ' . $settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . '.md5 | awk \'{print $1}\'');
+
+  if ($md5file != $md5check) {
+    echo '<p style="color:red;">ERROR, failed to create container ' . $name . '<br/>MD5 Checksum Error!</p>';
+    exec("logger LXC: error: Failed to create Container " . $name . ", checksum error");
+    rmdir($settings->default_path . "/" . $name);
+    unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename']);
+    unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . '.md5');
+    die();
+  }
+
+  echo '<p style="color:green;">Unpacking the archive<br/><br/>---</p>';
+  exec("logger LXC: Unpacking archive for container " . $name);
+
+  exec('tar -C ' . $settings->default_path . '/' . $name . ' -xf ' . $settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . ' 2>/dev/null', $output, $retval);
+  if ($retval == 1) {
+    echo '<p style="color:red;">ERROR, failed to create container ' . $name . '<br/>Extraction failed!</p>';
+    exec("logger LXC: error: Failed to create Container " . $name . ", extraction failed");
+    rmdir($settings->default_path . "/" . $name);
+    unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename']);
+    unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . '.md5');
+    die();
+  }
+
+  $lxc_config = "# Container specific configuration\n" .
+                "lxc.rootfs.path = dir:" . $settings->default_path . "/" . $name . "/rootfs\n" .
+                "lxc.uts.name = " . $name . "\n\n" .
+                "# Network configuration\n" .
+                file_get_contents('/boot/config/plugins/lxc/default.conf') . "\n" .
+                "lxc.net.0.hwaddr=00:00:00:00:00:00\n" .
+                "lxc.start.auto=0\n";
+
+  file_put_contents($settings->default_path . "/" . $name . "/config", $lxc_config, FILE_APPEND | LOCK_EX);
+
+  $container = new Container($name);
+  $container->setMac($mac);
+  if ($autostart == "true") {
+    $autostart = 1;
+  } else {
+    $autostart = 0;
+  }
+
+  $container->setAutostart($autostart);
 
   if (!empty($description)) {
     $container->setDescription($description);
@@ -231,136 +339,26 @@ function prepareContainer($name, $description, $configadditions, $preinstall, $i
     $container->setWebuiurl($webui);
   }
 
-  if (!empty($configadditions)) {
-    $container->addConfig($configadditions);
-  }
-
-  if (!empty($iconurl)) {
-    $path = $settings->default_path . '/custom-icons';
-    $icon = file_get_contents($iconurl);
-    if (!is_dir($path)) {
-      mkdir($path, 0755, true);
+  if (!empty($icon)) {
+    if (!is_dir($settings->default_path . '/custom-icons')) {
+      mkdir($settings->default_path . '/custom-icons', 0755, true);
     }
-    file_put_contents($path . '/' . $name . '.png' , $icon);
-  }
-
-  file_put_contents('/var/log/lxc-ca-install.log', 'LXC CA install log for container: ' . $name . ' started: ' . date("Y-m-d H:i:s") . "\n\n");
-
-  if (!empty($preinstall) || !empty($install) || !empty($postinstall)) {
-    exec('lxc-start ' . $name . ' 2>&1', $output, $retval);
-    if ($retval !== 0) {
-      echo '<p style="color:red;">';
-      echo "ERROR, failed to execute initial start from container!<br/><br/>";
-      exec("logger LXC: error: failed to execute initial start from container " . $name);
-      file_put_contents('/var/log/lxc-ca-install.log', 'Failed to execute initial start from container ' . $name, FILE_APPEND);
-      echo '</p>'; 
-      $container->destroyContainer($name);
-      die();
-    } else {
-      file_put_contents('/var/log/lxc-ca-install.log', "Container " . $name . " started\n\n", FILE_APPEND);
-      sleep(5);
+    exec('wget -q -O ' . $settings->default_path . '/custom-icons/' . $name . '.png "' . $icon . '"', $output, $retval);
+    if ($retval == 1) {
+      exec("logger LXC: error: download from icon for container " . $name . " failed");
+      unlink($settings->default_path . '/custom-icons/' . $name . '.png');
     }
   }
 
-  if (!empty($preinstall)) {
-    file_put_contents($settings->default_path . '/' . $name . '/rootfs/preinstall.sh', preg_replace('/<br\s*\/?>/', "\n", $preinstall));
-    chmod($settings->default_path . '/' . $name . '/rootfs/preinstall.sh', 0744);
-    chown($settings->default_path . '/' . $name . '/rootfs/preinstall.sh', '0');
-    chgrp($settings->default_path . '/' . $name . '/rootfs/preinstall.sh', '0');
-    file_put_contents('/var/log/lxc-ca-install.log', "Executing preinstall script:\n\n", FILE_APPEND);
-    exec('lxc-attach ' . $name . ' -- /preinstall.sh 2>&1', $output, $retval);
-    if ($retval !== 0) {
-      echo '<p style="color:red;">';
-      echo "ERROR, failed to execute preinstall script! Container deleted!<br/><br/>";
-      echo "For more details see /var/log/lxc-ca-install.log<br/><br/>";
-      exec("logger LXC: error: failed to execute preinstall script from container " . $name);
-      foreach ($output as $error) {
-        $preinstalllog .= $error . "\n";
-      }
-      file_put_contents('/var/log/lxc-ca-install.log', $preinstalllog, FILE_APPEND);
-      echo '</p>';
-      $container->destroyContainer($name);
-      die();
-    } else {
-      foreach ($output as $line) {
-        $preinstalllog .= $line . "\n";
-      }
-      file_put_contents('/var/log/lxc-ca-install.log', $preinstalllog . "\n\n", FILE_APPEND);
-      unlink($settings->default_path . '/' . $name . '/rootfs/preinstall.sh');
-      exec("logger LXC: preinstall script from container " . $name . " finished successfull");
-      echo '<p style="color:green;">';
-      echo "Preinstall script finished successfully!<br/>";
-      echo '</p>';
-    }
-  }
+  exec("sed -i '/lxc\.mount\.entry.*/d' " . $settings->default_path . "/" . $name . "/config"); 
 
-  if (!empty($install)) {
-    file_put_contents($settings->default_path . '/' . $name . '/rootfs/install.sh', preg_replace('/<br\s*\/?>/', "\n", $install));
-    chmod($settings->default_path . '/' . $name . '/rootfs/install.sh', 0744);
-    chown($settings->default_path . '/' . $name . '/rootfs/install.sh', '0');
-    chgrp($settings->default_path . '/' . $name . '/rootfs/install.sh', '0');
-    file_put_contents('/var/log/lxc-ca-install.log', "Executing install script:\n", FILE_APPEND);
-    exec('lxc-attach ' . $name . ' -- /install.sh 2>&1', $output, $retval);
-    if ($retval !== 0) {
-      echo '<p style="color:red;">';
-      echo "ERROR, failed to execute install script! Container deleted!<br/><br/>";
-      echo "For more details see /var/log/lxc-ca-install.log<br/><br/>";
-      exec("logger LXC: error: failed to execute install script from container " . $name);
-      foreach ($output as $error) {
-        $installlog .= $error . "\n";
-      }
-      file_put_contents('/var/log/lxc-ca-install.log', $installlog, FILE_APPEND);
-      echo '</p>';
-      $container->destroyContainer($name);
-      die();
-    } else {
-      foreach ($output as $line) {
-        $installlog .= $line . "\n";
-      }
-      file_put_contents('/var/log/lxc-ca-install.log', $installlog . "\n\n", FILE_APPEND);
-      unlink($settings->default_path . '/' . $name . '/rootfs/install.sh');
-      exec("logger LXC: install script from container " . $name . " finished successfull");
-      echo '<p style="color:green;">';
-      echo "Install script finished successfully!<br/>";
-      echo '</p>';
-    }
-  }
+  unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename']);
+  unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . '.md5');
+  
+  echo '<p style="color:green;">You just created a conatiner from the repository: ' . $repository . '<br/>Please check out the  <a href="' . $repository . '" target="_blank" rel="noopener noreferrer">README</a> from the repository for further infromation!</p>';
+  exec("logger LXC: Container " . $name . " created");
 
-  if (!empty($postinstall)) {
-    file_put_contents($settings->default_path . '/' . $name . '/rootfs/postinstall.sh', preg_replace('/<br\s*\/?>/', "\n", $postinstall));
-    chmod($settings->default_path . '/' . $name . '/rootfs/postinstall.sh', 0744);
-    chown($settings->default_path . '/' . $name . '/rootfs/postinstall.sh', '0');
-    chgrp($settings->default_path . '/' . $name . '/rootfs/postinstall.sh', '0');
-    file_put_contents('/var/log/lxc-ca-install.log', "Executing postinstall script:\n", FILE_APPEND);
-    exec('lxc-attach ' . $name . ' -- /postinstall.sh 2>&1', $output, $retval);
-    if ($retval !== 0) {
-      echo '<p style="color:red;">';
-      echo "ERROR, failed to execute postinstall script! Container deleted!<br/><br/>";
-      echo "For more details see /var/log/lxc-ca-install.log<br/><br/>";
-      exec("logger LXC: error: failed to execute postinstall script from container " . $name);
-      foreach ($output as $error) {
-        $postinstallogl .= $error . "\n";
-      }
-      file_put_contents('/var/log/lxc-ca-install.log', $postinstallogl, FILE_APPEND);
-      echo '</p>';
-      $container->destroyContainer($name);
-      die();
-    } else {
-      foreach ($output as $line) {
-        $postinstallogl .= $line . "\n";
-      }
-      file_put_contents('/var/log/lxc-ca-install.log', $postinstallogl . "\n\n", FILE_APPEND);
-      unlink($settings->default_path . '/' . $name . '/rootfs/postinstall.sh');
-      exec("logger LXC: postinstall script from container " . $name . " finished successfull");
-      echo '<p style="color:green;">';
-      echo "Postinstall script finished successfully!<br/>";
-      echo '</p>';
-    }
+  if ($startcont == "true") {
+    $container->startContainer($name);
   }
-
-  if ($startcont !== "true") {
-    $container->stopContainer($name);
-  }
-
-  file_put_contents('/var/log/lxc-ca-install.log', "Installation for container " . $name . " finished\n", FILE_APPEND);
 }
