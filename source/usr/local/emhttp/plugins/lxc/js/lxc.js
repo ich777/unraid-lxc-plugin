@@ -163,94 +163,66 @@ function createContainer(name, distribution, release, startcont, autostart, mac)
 }
 
 // Function that creates a new container from the CA App
-function createContainerCAApp(name, description, distribution, release, configadditions, preinstall, install, postinstall, webui, icon, startcont, autostart, mac) {
+function createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, mac) {
   let statusInterval;
 
   Shadowbox.open({
     content: '<div id="dialogContent" class="logLine spacing"></div>',
     player: 'html',
-    title: "Create Container from CA App",
+    title: "Create Container from Template",
     onClose: function () {
       location.href = '/LXC';
     },
     height: Math.min(screen.availHeight, 800),
     width: Math.min(screen.availWidth, 1200)
   });
-
   waitForElement("#dialogContent", function () {
     let dialogContent = $("#dialogContent");
-
     $.ajax({
       type: "POST",
       url: '/plugins/lxc/include/ajax.php',
       data: {
         'lxc': '',
-        'action': 'createCONT',
+        'action': 'createTEMPLATE',
         'name': name,
-        'distribution': distribution,
-        'release': release,
-        'startcont': '',
+        'description': description,
+        'repository': repository,
+        'webui': webui,
+        'icon': icon,
+        'startcont': startcont,
         'autostart': autostart,
         'mac': mac
       },
       xhr: function() {
+        // get the native XmlHttpRequest object
         const xhr = $.ajaxSettings.xhr();
+        // set the onprogress event handler
         xhr.onprogress = function() {
-          dialogContent.html("<p>Creating container, please wait until the DONE button is displayed!</p><p>" + xhr.responseText + "</p>");
+          // replace the '#output' element inner HTML with the received part of the response
+          dialogContent.html("<p>Creating container " + name + " from repository: " + repository + "<br/>Please wait until the DONE button is displayed, this can take a few minutes depending on the container size and connection speed...</p><p>" + xhr.responseText + "</p>");
         }
         return xhr;
       },
       beforeSend: function () {
-        dialogContent.append("Creating container, please wait until the DONE button is displayed!");
+        dialogContent.append("<p>Creating container " + name + " from repository: " + repository + "<br/>Please wait until the DONE button is displayed, this can take a few minutes depending on the container size and connection speed...</p>");
         statusInterval = setInterval(function () {
           dialogContent.append(".");
-        }, 10000);
+        }, 5000);
       },
       success: function (data) {
-        dialogContent.append("<p>Sucessfully set up container " + name + "</p>");
-        dialogContent.append("<p>Preparing container, this can take some time, please wait and do not close this window!</p>");
-
-        $.ajax({
-          type: "POST",
-          url: '/plugins/lxc/include/ajax.php',
-          data: {
-            'lxc': '',
-            'action': 'setupCONT',
-            'name': name,
-            'description': description,
-            'configadditions': configadditions,
-            'preinstall': preinstall,
-            'install': install,
-            'postinstall': postinstall,
-            'webui': webui,
-            'iconurl': icon,
-            'startcont': startcont
-          },
-          xhr: function() {
-            const xhr = $.ajaxSettings.xhr();
-            xhr.onprogress = function() {
-              clearInterval(statusInterval);
-              dialogContent.append("<p>" + xhr.responseText + "</p>");
-          }
-            return xhr;
-          },
-          success: function (data) {
-        		if (data.toLowerCase().indexOf("error, failed to execute") === -1) {
-              dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
-              dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
-              dialogContent.append("<p>lxc-attach " + name + "</p>")
-              dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
-              dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
-      		}
-            dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
-            clearInterval(statusInterval);
-          }
-        });
+		if (data.toLowerCase().indexOf("error, failed to create container") === -1) {
+          dialogContent.append("<br/><p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
+          dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
+          dialogContent.append("<p>lxc-attach " + name + "</p>")
+          dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
+          dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
+		}
+        dialogContent.append('<br/><p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
+        clearInterval(statusInterval);
       }
     });
   });
 }
-
 
 // Function that copies a container
 function createCopy(name, autostart, mac) {
@@ -690,21 +662,16 @@ $(function() {
   // Listener for add container from CA App
   $(document).on('submit','form#addContainerCAApp',function(event){
     event.preventDefault();
-	  let name = this.contName.value;
-    let description = this.contDesc.value;
-    let distribution = this.contDistribution.value;
-    let release = this.contRelease.value;
-    let configadditions = this.contConfAdditions.value;
-    let preinstall = this.contPreInstallScript.value;
-    let install = this.contInstallScript.value;
-    let postinstall = this.contPostInstallScript.value;
+	let name = this.contName.value;
+	let description = this.contDesc.value;
+    let repository = this.contRepo.value;
     let webui = this.contWebUI.value;
     let icon = this.contIcon.value;
     let startcont = this.contStart.checked;
     let autostart = this.contAutostart.checked;
     let mac = this.contMac.value;
 
-    createContainerCAApp(name, description, distribution, release, configadditions, preinstall, install, postinstall, webui, icon, startcont, autostart, mac);
+    createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, mac);
   });
 
 })
