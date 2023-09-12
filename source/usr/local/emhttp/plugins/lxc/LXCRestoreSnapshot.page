@@ -25,7 +25,7 @@ $date = $_GET['date'];
 <div class="">
 <dl>
 <dt>Container Name:</dt>
-<dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required></dd>
+<dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" class="forbidSpace" required></dd>
 </dl>
 </div>
 
@@ -47,7 +47,7 @@ $date = $_GET['date'];
 <dl>
 <dt>Mac Address:</dt>
   <dd style="display: grid;">
-    <input type="text" name="contMac" required id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>">
+    <input type="text" name="contMac" required id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>" class="forbidSpace">
     <div id="emac" class="emac">Invalid MAC address</div>
   </dd>
 </dl>

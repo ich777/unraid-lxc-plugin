@@ -12,14 +12,14 @@ require_once '/usr/local/emhttp/plugins/lxc/include/functions.php';
 $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
 ?>
 
-<div id="canvas">
+<div>
   <form id="addContainerCAApp" autocomplete="off">
     <p />
     <div>
       <dl>
         <dt>Name:</dt>
         <dd>
-          <input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Name; ?>"placeholder="Container Name">
+          <input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Name; ?>"placeholder="Container Name" class="forbidSpace">
         </dd>
       </dl>
     </div>
@@ -28,7 +28,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
         <dl>
           <dt>Container Description:</dt>
           <dd>
-            <input type="text" name="contDesc" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" placeholder="Your Description or empty">
+            <input type="text" name="contDesc" pattern="[A-Za-z0-9 \-_]{1,40}" placeholder="Your Description or empty">
           </dd>
         </dl>
       </div>
@@ -108,7 +108,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>WebUI:</dt>
                 <dd>
-                  <input type="text" name="contWebUI" required="" value="<? echo $lxc->WebUI; ?>" placeholder="Full URL to WebGUI or empty for none">
+                  <input type="text" name="contWebUI" required="" value="<? echo $lxc->WebUI; ?>" placeholder="Full URL to WebGUI or empty for none" class="forbidSpace">
                 </dd>
               </dl>
             </div>
@@ -116,7 +116,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>Icon URL:</dt>
                 <dd>
-                  <input type="text" name="contIcon" required="" value="<? echo $lxc->Icon; ?>"placeholder="Empty for default icon or URL for custom .png">
+                  <input type="text" name="contIcon" required="" value="<? echo $lxc->Icon; ?>"placeholder="Empty for default icon or URL for custom .png" class="forbidSpace">
                 </dd>
               </dl>
             </div>
@@ -144,7 +144,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
         <dl>
           <dt>Mac Address:</dt>
           <dd>
-            <input type="text" name="contMac" required="true" id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>">
+            <input type="text" name="contMac" required="true" id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>" class="forbidSpace">
             <div id="emac" class="emac">Invalid MAC address</div>
           </dd>
         </dl>

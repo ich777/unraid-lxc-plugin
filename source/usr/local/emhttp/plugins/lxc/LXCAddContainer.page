@@ -45,7 +45,7 @@ $avail_images_json = json_encode($avail_images);
     <div class="">
       <dl>
         <dt>Container Name:</dt>
-        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required value="DebianLXC">
+        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required value="DebianLXC" class="forbidSpace">
         </dd>
       </dl>
     </div>
@@ -54,7 +54,7 @@ $avail_images_json = json_encode($avail_images);
       <dl>
         <dt>Distribution:</dt>
         <dd><input type="text" name="contDistribution" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+"
-                   style="text-transform:lowercase" required="true" value="debian">
+                   style="text-transform:lowercase" required="true" value="debian" class="forbidSpace">
                    <?php if($settings->default_cont_url === 'images.linuxcontainers.org') {
                      echo 'You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></dd>';
                    } else {
@@ -66,7 +66,7 @@ $avail_images_json = json_encode($avail_images);
     <div class="">
       <dl>
         <dt>Release:</dt>
-        <dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye"></dd>
+        <dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye" class="forbidSpace"></dd>
       </dl>
     </div>
 
@@ -75,7 +75,7 @@ $avail_images_json = json_encode($avail_images);
     <div class="">
       <dl>
         <dt>Container Name:</dt>
-        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required placeholder="Container Name">
+        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required placeholder="Container Name" class="forbidSpace">
         </dd>
       </dl>
     </div>
@@ -83,7 +83,7 @@ $avail_images_json = json_encode($avail_images);
     <div class="">
       <dl>
         <dt>Distribution:</dt>
-        <dd><select id="distribution-select" name="contDistribution" required>
+        <dd><select id="distribution-select" name="contDistribution"  class="forbidSpace" required>
         <option name="contDistribution" value="">Select a Distribution</option>
         <?php foreach ($avail_images as $distribution => $releases) : ?>
         <option value="<?= $distribution ?>"><?= $distribution ?></option>
@@ -94,7 +94,7 @@ $avail_images_json = json_encode($avail_images);
     <div class="">
       <dl>
         <dt>Release:</dt>
-        <dd><select name="contRelease" id="release-select" required></select></dd>
+        <dd><select name="contRelease" id="release-select" class="forbidSpace" required></select></dd>
       </dl>
     </div>
 <?php } ?>
@@ -103,7 +103,7 @@ $avail_images_json = json_encode($avail_images);
       <dl>
         <dt>Mac Address:</dt>
         <dd style="display: grid;">
-          <input type="text" name="contMac" required="true" id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>">
+          <input type="text" name="contMac" required="true" id="mac" style="text-transform:uppercase" value="<?= getNewMacAddress(); ?>"  class="forbidSpace">
           <div id="emac" class="emac">Invalid MAC address</div>
         </dd>
 
