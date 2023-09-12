@@ -38,7 +38,7 @@ _(Enable LXC)_:
 
 
 _(Default LXC storage path)_:
-: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$" required>
+: <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$" class="forbidSpace" required>
   <?if (!$started):?><span><i class="fa fa-warning icon warning"></i> Modify with caution: unable to validate path until Array is Started</span>
   <?elseif (!is_dir($settings->default_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist</span><?endif;?>
   </br>
