@@ -19,7 +19,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
       <dl>
         <dt>Name:</dt>
         <dd>
-          <input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Name; ?>"placeholder="Container Name" class="forbidSpace">
+          <input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Name; ?>" placeholder="Container Name" class="forbidSpace">
         </dd>
       </dl>
     </div>
@@ -28,7 +28,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
         <dl>
           <dt>Container Description:</dt>
           <dd>
-            <input type="text" name="contDesc" pattern="[A-Za-z0-9 \-_]{1,40}" placeholder="Your Description or empty">
+            <input type="text" name="contDesc" pattern="[A-Za-z0-9 \-_,.]{1,50}" value="<? echo $lxc->Description; ?>" placeholder="Your Description or empty">
           </dd>
         </dl>
       </div>
@@ -36,8 +36,8 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
         <dl>
           <dt>Description:</dt>
           <dd>
-            <span id="lxcOverview" class="boxed blue-text" style="display: inline-block;">
-              <p><? echo nl2br($lxc->Overview); ?></p>
+            <span id="lxcOverview" class="boxed blue-text" style="display: inline-block; max-width: 700px; white-space: normal;">
+              <p><? echo $lxc->Overview; ?></p>
               <br>
             </span>
           </dd>
