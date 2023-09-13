@@ -615,7 +615,7 @@ $(function() {
         $.post("/plugins/lxc/include/ajax.php", postData).done(function(response){
           parent.window.location.reload();
         });
-      } else if (response != undefined && response != null && response != false && response != "" && response.length <= 40 && /^[\w.]+/.test( response )) {
+      } else if (response != undefined && response != null && response != false && response != "" && response.length <= 50 && /^[\w.]+/.test( response )) {
         let postData = {
           'lxc'   : '',
           'action'     : "setDescription",
@@ -626,7 +626,7 @@ $(function() {
           parent.window.location.reload();
         });
       }
-    }, 'Description', 'Max. 40 alphanumeric characters.\nLeave empty to delete the description.', 'Description or empty')
+    }, 'Description', 'Max. 50 alphanumeric characters.\nLeave empty to delete the description.', 'Description or empty')
   });
 
   $(".webuiCONT").on("click", function() {
