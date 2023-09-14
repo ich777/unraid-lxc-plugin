@@ -83,7 +83,7 @@ function showStatus(action, id, title, text) {
       beforeSend: function () {
         $("#dialogContent").append(text);
         statusInterval = setInterval(function () {
-          $("#dialogContent").append("<p>......</p>");
+          $("#dialogContent").append(".");
         }, 5000);
       },
       success: function (data) {
@@ -103,7 +103,7 @@ function showDropdown(contName) {
 }
 
 // Function that creates a new container
-function createContainer(name, distribution, release, startcont, autostart, mac) {
+function createContainer(name, description, distribution, release, startcont, autostart, mac) {
   let statusInterval;
 
   Shadowbox.open({
@@ -125,6 +125,7 @@ function createContainer(name, distribution, release, startcont, autostart, mac)
         'lxc': '',
         'action': 'createCONT',
         'name': name,
+        'description': description,
         'distribution': distribution,
         'release': release,
         'startcont': startcont,
@@ -142,9 +143,9 @@ function createContainer(name, distribution, release, startcont, autostart, mac)
         return xhr;
       },
       beforeSend: function () {
-        dialogContent.append("Creating container, please wait until the DONE button is displayed!");
+        dialogContent.append("<p>Creating container, please wait until the DONE button is displayed!</p>");
         statusInterval = setInterval(function () {
-          dialogContent.append("<p>......</p>");
+          dialogContent.append(".");
         }, 5000);
       },
       success: function (data) {
@@ -163,7 +164,7 @@ function createContainer(name, distribution, release, startcont, autostart, mac)
 }
 
 // Function that creates a new container from the CA App
-function createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, mac) {
+function createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, mac, supportlink, donatelink) {
   let statusInterval;
 
   Shadowbox.open({
@@ -191,7 +192,10 @@ function createContainerCAApp(name, description, repository, webui, icon, startc
         'icon': icon,
         'startcont': startcont,
         'autostart': autostart,
-        'mac': mac
+        'mac': mac,
+        'supportlink': supportlink,
+        'donatelink': donatelink
+
       },
       xhr: function() {
         // get the native XmlHttpRequest object
@@ -221,7 +225,7 @@ function createContainerCAApp(name, description, repository, webui, icon, startc
 }
 
 // Function that copies a container
-function createCopy(name, autostart, mac) {
+function createCopy(name, description, container, autostart, mac) {
   let statusInterval;
 
   Shadowbox.open({
@@ -242,8 +246,9 @@ function createCopy(name, autostart, mac) {
       data: {
         'lxc': '',
         'action': 'copyCONT',
-        'container': container,
         'name': name,
+        'description': description,
+        'container': container,
         'autostart': autostart,
         'mac': mac
       },
@@ -353,6 +358,7 @@ $(function() {
     event.preventDefault();
     let statusInterval;
     let name = this.contName.value;
+    let description = this.contDesc.value;
     let autostart = this.contAutostart.checked;
     let mac = this.contMac.value;
     Shadowbox.open({
@@ -374,6 +380,7 @@ $(function() {
           'lxc': '',
           'action': 'fromSnapshot',
           'name': name,
+          'description': description,
           'container': container,
           'snapshot': snapshot,
           'autostart': autostart,
@@ -390,12 +397,13 @@ $(function() {
           return xhr;
         },
         beforeSend: function () {
-          dialogContent.append("Creating container, please wait until the DONE button is displayed!");
+          dialogContent.append("<p>Creating container, please wait until the DONE button is displayed!</p>");
           statusInterval = setInterval(function () {
-            dialogContent.append("<p>......</p>");
+            dialogContent.append(".");
           }, 5000);
         },
         success: function (data) {
+          dialogContent.append("<p style=\"color:green;\">Restoring container " + name + " done!</p>");
           dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
           dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
           dialogContent.append("<p>lxc-attach " + name + "</p>")
@@ -413,6 +421,7 @@ $(function() {
     event.preventDefault();
     let statusInterval;
     let name = this.contName.value;
+    let description = this.contDesc.value;
     let autostart = this.contAutostart.checked;
     let mac = this.contMac.value;
     Shadowbox.open({
@@ -434,6 +443,7 @@ $(function() {
           'lxc': '',
           'action': 'fromBackup',
           'name': name,
+          'description': description,
           'container': container,
           'backup': backup,
           'autostart': autostart,
@@ -450,12 +460,13 @@ $(function() {
           return xhr;
         },
         beforeSend: function () {
-          dialogContent.append("Creating container, please wait until the DONE button is displayed!");
+          dialogContent.append("<p>Creating container, please wait until the DONE button is displayed!</p>");
           statusInterval = setInterval(function () {
-            dialogContent.append("<p>......</p>");
+            dialogContent.append(".");
           }, 5000);
         },
         success: function (data) {
+          dialogContent.append("<p style=\"color:green;\">Restoring container " + name + " done!</p>");
           dialogContent.append("<p>To connect to the console from the container, start the container and select Console from the context menu.</p>");
           dialogContent.append("<p>If you want to connect to the container console from the Unraid terminal, start the container and type in:</p>");
           dialogContent.append("<p>lxc-attach " + name + "</p>")
@@ -481,11 +492,12 @@ $(function() {
     let distribution = this.contDistribution.value;
     let release = this.contRelease.value;
     let name = this.contName.value;
+    let description = this.contDesc.value;
     let startcont = this.contStart.checked;
     let autostart = this.contAutostart.checked;
     let mac = this.contMac.value;
 
-    createContainer(name, distribution, release, startcont, autostart, mac);
+    createContainer(name, description, distribution, release, startcont, autostart, mac);
   });
 
   // Listener for copying container
@@ -498,9 +510,11 @@ $(function() {
       return false;
     }
     let name = this.contName.value;
+    let description = this.contDesc.value;
+    let container = this.contSnap.value;
     let autostart = this.contAutostart.checked;
     let mac = this.contMac.value;
-    createCopy(name, autostart, mac);
+    createCopy(name, description, container, autostart, mac);
   });
 
   // Listener for all button actions
@@ -666,8 +680,10 @@ $(function() {
     let startcont = this.contStart.checked;
     let autostart = this.contAutostart.checked;
     let mac = this.contMac.value;
+    let supportlink = this.supportLink.value;
+    let donatelink = this.donateLink.value;
 
-    createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, mac);
+    createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, mac, supportlink, donatelink);
   });
 
 })
