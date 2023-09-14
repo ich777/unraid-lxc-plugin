@@ -182,6 +182,15 @@ foreach ($allContainers as $container) {
             ?>
             <div class="divider"></div>
             <li><a href="#" class="destroyCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-trash fa-lg"></i>  Destroy</a></li>
+            <? if ($container->supportlink != "" || $container->donatelink != "") {
+            echo '<div class="divider"></div>';
+            if ($container->supportlink != "") {
+              echo "<li><a target='_blank' href='" . $container->supportlink . "'><i class='fa fa-fw fa-question fa-lg'></i> Support</a></li>";
+            }
+            if ($container->donatelink != "") {
+              echo "<li'>Kontextmenü-Inhalt><a target='_blank' href='" . $container->donatelink . "'><i class='fa fa-fw fa-external-link fa-lg'></i> Donate</a></li>";
+            }
+            } ?>
           </ul>
         </span>
       </span>

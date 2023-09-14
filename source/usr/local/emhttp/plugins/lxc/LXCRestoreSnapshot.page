@@ -25,7 +25,15 @@ $date = $_GET['date'];
 <div class="">
 <dl>
 <dt>Container Name:</dt>
-<dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" class="forbidSpace" required></dd>
+<dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" placeholder="<?= $container ?>_restored" class="forbidSpace" required></dd>
+</dl>
+</div>
+
+<div class="">
+<dl>
+<dt>Container Description:</dt>
+<dd><input type="text" name="contDesc" pattern="[A-Za-z0-9 \-_,.]{1,50}" placeholder="Your Description or empty">
+</dd>
 </dl>
 </div>
 

@@ -40,16 +40,23 @@ $avail_images_json = json_encode($avail_images);
 
 
 <div id="canvas">
-<?php if (empty($json_data)) { ?>
   <form id="addContainer" autocomplete="off">
     <div class="">
       <dl>
         <dt>Container Name:</dt>
-        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required value="DebianLXC" class="forbidSpace">
+        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required placeholder="DebianLXC" class="forbidSpace">
+        </dd>
+      </dl>
+    </div>
+    <div class="">
+      <dl>
+        <dt>Container Description:</dt>
+        <dd><input type="text" name="contDesc" pattern="[A-Za-z0-9 \-_,.]{1,50}" placeholder="Your Description or empty">
         </dd>
       </dl>
     </div>
 
+<?php if (empty($json_data)) { ?>
     <div class="">
       <dl>
         <dt>Distribution:</dt>
@@ -71,15 +78,6 @@ $avail_images_json = json_encode($avail_images);
     </div>
 
 <?php } else { ?>
-  <form id="addContainer" autocomplete="off">
-    <div class="">
-      <dl>
-        <dt>Container Name:</dt>
-        <dd><input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required placeholder="Container Name" class="forbidSpace">
-        </dd>
-      </dl>
-    </div>
-
     <div class="">
       <dl>
         <dt>Distribution:</dt>

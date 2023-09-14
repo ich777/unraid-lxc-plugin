@@ -158,6 +158,8 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
           </dd>
         </dl>
       </div>
+      <input type="text" name="supportLink" required="" value="<? echo $lxc->Support; ?>" hidden>
+      <input type="text" name="donateLink" required="" value="<? echo $lxc->DonateLink; ?>" hidden>
   </form>
 </div>
 
