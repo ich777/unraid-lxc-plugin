@@ -23,6 +23,8 @@ class Container {
   public $path;
   public $description;
   public $lxcwebui;
+  public $supportlink;
+  public $donatelink;
 
   function __construct($name) {
     $this->settings = new Settings();
@@ -47,6 +49,8 @@ class Container {
     $this->cpus = $this->getCpus();
     $this->description = getVariable($this->config, '#container_description');
     $this->lxcwebui = getVariable($this->config, '#container_webui');
+    $this->supportlink = getVariable($this->config, '#container_supportlink');
+    $this->donatelink = getVariable($this->config, '#container_donatelink');
   }
 
   private function getSnapshots() {
@@ -93,6 +97,8 @@ class Container {
       }
 	} else {
       exec('logger "LXC: Container ' . $this->name . ' started"');
+      // add sleep to wait for IP address
+      sleep(3);
     }
   }
 
@@ -200,6 +206,14 @@ class Container {
 
   function delWebuiurl(){
     setVariable($this->config, '#container_webui', '');
+  }
+
+  function setSupportlink($supporturl){
+    setVariable($this->config, '#container_supportlink', $supporturl);
+  }
+  
+  function setDonatelink($donateurl){
+    setVariable($this->config, '#container_donatelink', $donateurl);
   }
 
   function addConfig($configadditions){

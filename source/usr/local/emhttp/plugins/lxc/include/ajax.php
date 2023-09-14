@@ -56,20 +56,20 @@ if (isset($_POST['lxc'])) {
       $container->deleteBackup($_POST['backup']);
       break;
     case 'createCONT':
-      createContainer($_POST['name'], $_POST['distribution'], $_POST['release'], $_POST['startcont'], $_POST['autostart'], $_POST['mac']);
+      createContainer($_POST['name'], $_POST['description'], $_POST['distribution'], $_POST['release'], $_POST['startcont'], $_POST['autostart'], $_POST['mac']);
       break;
     case 'copyCONT':
-      copyContainer($_POST['name'], $_POST['container'], $_POST['autostart'], $_POST['mac']);
+      copyContainer($_POST['name'], $_POST['description'], $_POST['container'], $_POST['autostart'], $_POST['mac']);
       break;
     case 'showConfig':
       $container = new Container($_POST['container']);
       $container->showConfig();
       break;
     case 'fromSnapshot':
-      createFromSnapshot($_POST['name'], $_POST['container'], $_POST['snapshot'], $_POST['autostart'], $_POST['mac']);
+      createFromSnapshot($_POST['name'], $_POST['description'], $_POST['container'], $_POST['snapshot'], $_POST['autostart'], $_POST['mac']);
       break;
     case 'fromBackup':
-      createFromBackup($_POST['name'], $_POST['container'], $_POST['backup'], $_POST['autostart'], $_POST['mac']);
+      createFromBackup($_POST['name'], $_POST['description'], $_POST['container'], $_POST['backup'], $_POST['autostart'], $_POST['mac']);
       break;
     case 'setDescription':
       $container = new Container($_POST['container']);
@@ -88,7 +88,7 @@ if (isset($_POST['lxc'])) {
       $container->delWebuiurl();
       break;
     case 'createTEMPLATE':
-      createfromTemplate($_POST['name'], $_POST['description'], $_POST['repository'], $_POST['webui'], $_POST['icon'], $_POST['startcont'], $_POST['autostart'], $_POST['mac']);
+      createfromTemplate($_POST['name'], $_POST['description'], $_POST['repository'], $_POST['webui'], $_POST['icon'], $_POST['startcont'], $_POST['autostart'], $_POST['mac'], $_POST['supportlink'], $_POST['donatelink']);
       break;
     default:
       break;

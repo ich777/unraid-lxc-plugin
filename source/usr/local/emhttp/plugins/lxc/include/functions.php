@@ -115,7 +115,7 @@ function getCpus(){
   return array('allcpus' => $allCpus, 'vcpus' => $vCpus);
 }
 
-function createContainer($name, $distribution, $release, $startcont, $autostart, $mac) {
+function createContainer($name, $description, $distribution, $release, $startcont, $autostart, $mac) {
   exec("logger LXC: Creating container " . $name);
   while (@ ob_end_flush());
   exec("lxc-create --name " . $name . " --template download -- --dist " . $distribution . " --release " . $release . " --arch amd64 2>&1", $output, $retval);
@@ -147,15 +147,19 @@ function createContainer($name, $distribution, $release, $startcont, $autostart,
       $container->startContainer($name);
     }
   }
+  if (!empty($description)) {
+    $container->setDescription($description);
+  }
 }
 
-function copyContainer($name, $container, $autostart, $mac) {
+function copyContainer($name, $description, $container, $autostart, $mac) {
   $oldContainer = new Container($container);
   $running = $oldContainer->state;
   $oldContainer->stopContainer();
   exec("logger LXC: Copying container " . $container);
   exec('lxc-copy -n ' . $container . ' -N ' . $name);
   exec("logger LXC: Container " . $container . " copied to " . $name);
+  $newdescription = $description;
   $container = new Container($name);
   $container->setMac($mac);
   if ($autostart == "true") {
@@ -165,16 +169,21 @@ function copyContainer($name, $container, $autostart, $mac) {
   }
 
   $container->setAutostart($autostart);
+
+  if (!empty($newdescription)) {
+    $container->setDescription($newdescription);
+  }
 
   if ($running == "RUNNING") {
     $oldContainer->startContainer();
   }
 }
 
-function createFromSnapshot($name, $container, $snapshot, $autostart, $mac) {
+function createFromSnapshot($name, $description, $container, $snapshot, $autostart, $mac) {
   exec("logger LXC: Creating " . $name . " from container " . $container . "-" . $snapshot);
   exec('lxc-snapshot -n ' . $container . ' -r ' . $snapshot . ' -N ' . $name);
   exec("logger LXC: Container " . $name . " created from " . $container . "-" . $snapshot);
+  $newdescription = $description;
   $container = new Container($name);
   $container->setMac($mac);
   if ($autostart == "true") {
@@ -184,10 +193,15 @@ function createFromSnapshot($name, $container, $snapshot, $autostart, $mac) {
   }
 
   $container->setAutostart($autostart);
+
+  if (!empty($newdescription)) {
+    $container->setDescription($newdescription);
+  }
 }
 
-function createFromBackup($name, $container, $backup, $autostart, $mac) {
+function createFromBackup($name, $description, $container, $backup, $autostart, $mac) {
   exec('lxc-autobackup --restore --gui-restore=' . $container . '_' . $backup . ' --name=' . $container . ' --newname=' . $name);
+  $newdescription = $description;
   $container = new Container($name);
   $container->setMac($mac);
   if ($autostart == "true") {
@@ -197,6 +211,10 @@ function createFromBackup($name, $container, $backup, $autostart, $mac) {
   }
 
   $container->setAutostart($autostart);
+
+  if (!empty($newdescription)) {
+    $container->setDescription($newdescription);
+  }
 }
 
 function downloadLXCproducts($url) {
@@ -219,7 +237,7 @@ function downloadLXCproducts($url) {
   }
 }
 
-function createfromTemplate($name, $description, $repository, $webui, $icon, $startcont, $autostart, $mac) {
+function createfromTemplate($name, $description, $repository, $webui, $icon, $startcont, $autostart, $mac, $supportlink, $donatelink) {
   $container = new Container($name);
   $settings = new Settings();
   $repositoryurl = parse_url($repository);
@@ -337,6 +355,14 @@ function createfromTemplate($name, $description, $repository, $webui, $icon, $st
 
   if (!empty($webui)) {
     $container->setWebuiurl($webui);
+  }
+
+  if (!empty($supportlink)) {
+    $container->setSupportlink($supportlink);
+  }
+
+  if (!empty($donatelink)) {
+    $container->setDonatelink($donatelink);
   }
 
   if (!empty($icon)) {
