@@ -16,7 +16,7 @@
 <CHANGES>
 
 ###2023.09.21
-- Display Memory usage from Containers on LXC page
+- Display Memory usage from Containers on LXC page (experimental)
 
 ###2023.09.15
 - Fixed visual bug in context menu
