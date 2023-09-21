@@ -15,7 +15,6 @@ class Container {
   public $ips;
   public $distribution;
   public $memoryUse;
-  public $kMemUse;
   public $totalBytes;
   public $pid;
   public $settings;
@@ -40,10 +39,31 @@ class Container {
     $ipInfo = shell_exec("lxc-info " . $this->name . " -iH");
     if ($ipInfo !== null) {
       $this->ips = nl2br(trim($ipInfo));
-      }
+    }
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
-    $this->memoryUse = getContainerStats($this->name, "Memory use");
-    $this->kMemUse = getContainerStats($this->name, "KMem use");
+    $memory = shell_exec("lxc-cgroup " . $this->name . " memory.stat");
+    if ($memory !== null) {
+      $memory = explode("\n", $memory);
+      foreach ($memory as $line) {
+        $parts = preg_split('/\s+/', trim($line));
+        if (count($parts) == 2) {
+          $name = $parts[0];
+          $value = intval($parts[1]);
+          if (in_array($name, ['anon', 'kernel', 'kernel_stack', 'pagetables', 'sec_pagetables', 'percpu', 'sock', 'vmalloc', 'shmem'])) {
+              $memorybytes += $value;
+          }
+        }
+      }
+      if (empty($memorybytes) || $memorybytes == 0) {
+        $this->memoryUse = "N/A";
+      } elseif ($memorybytes >= 1024 * 1024 * 1024) {
+        $this->memoryUse = round($memorybytes / (1024 * 1024 * 1024), 2) . ' GiB';
+      } elseif ($memorybytes >= 1024 * 1024) {
+        $this->memoryUse = round($memorybytes / (1024 * 1024), 2) . ' MiB';
+      } else {
+        $this->memoryUse = $memorybytes . ' Bytes';
+      }
+    }
     $this->totalBytes = getContainerStats($this->name, "Total bytes");
     $this->pid = getContainerStats($this->name, "PID");
     $this->cpus = $this->getCpus();
@@ -90,12 +110,12 @@ class Container {
   function startContainer() {
     exec('logger "LXC: Starting container ' . $this->name . '"');
     exec('lxc-start ' . $this->name . ' 2>&1', $output, $retval);
-	if ($retval == 1) {
+  if ($retval == 1) {
       exec('logger "LXC: error: Container ' . $this->name . ' failed to start"');
       foreach ($output as $error) {
         exec('logger "LXC: ' . $error . '"');
       }
-	} else {
+  } else {
       exec('logger "LXC: Container ' . $this->name . ' started"');
       // add sleep to wait for IP address
       sleep(3);
@@ -148,9 +168,9 @@ class Container {
     exec('umount ' . $this->path . '/rootfs');
     exec('lxc-destroy -s ' . $this->name);
 // disabled removal from custom container icons for now since they won't take much space
-//	if (file_exists($this->settings->default_path . '/custom-icons/' . $this->name . '.png')) {
+//  if (file_exists($this->settings->default_path . '/custom-icons/' . $this->name . '.png')) {
 //      exec('rm ' . $this->settings->default_path . '/custom-icons/' . $this->name . '.png');
-//	}
+//  }
     exec('logger "LXC: Container ' . $this->name . ' destroyed"');
   }
 
