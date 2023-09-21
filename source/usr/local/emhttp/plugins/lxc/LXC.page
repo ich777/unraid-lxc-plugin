@@ -91,6 +91,9 @@ label+.content {
     CPUs
   </th>
   <th>
+    Memory
+  </th>
+  <th>
     Address
   </th>
   <th>
@@ -188,7 +191,7 @@ foreach ($allContainers as $container) {
               echo "<li><a target='_blank' href='" . $container->supportlink . "'><i class='fa fa-fw fa-question fa-lg'></i> Support</a></li>";
             }
             if ($container->donatelink != "") {
-              echo "<li'>Kontextmenü-Inhalt><a target='_blank' href='" . $container->donatelink . "'><i class='fa fa-fw fa-external-link fa-lg'></i> Donate</a></li>";
+              echo "<li><a target='_blank' href='" . $container->donatelink . "'><i class='fa fa-fw fa-external-link fa-lg'></i> Donate</a></li>";
             }
             } ?>
           </ul>
@@ -197,6 +200,9 @@ foreach ($allContainers as $container) {
     </td>
     <td>
       <?= $container->cpus;?>
+    </td>
+    <td id="memoryUse-<?= ($container->state == "RUNNING") ? $container->name : "";?>">
+      <?=  $container->memoryUse;?>
     </td>
     <td id="ips-<?= ($container->state == "RUNNING") ? $container->name : "";?>">
       <?=  $container->ips;?>
@@ -274,6 +280,7 @@ if (count($differences) > 0) {
       success: function(response) {
         var data = JSON.parse(response);
         for (var i = 0; i < data.length; i++) {
+          $('#memoryUse-' + data[i].name).html(data[i].memoryUse);
           $('#ips-' + data[i].name).html(data[i].ips);
           $('#totalBytes-' + data[i].name).html(data[i].totalBytes);
         }
