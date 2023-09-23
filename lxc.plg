@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.09.21">
+  <!ENTITY version   "2023.09.23">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.09.23
+- Remove wrong set symlink if found
 
 ###2023.09.21
 - Display Memory usage from Containers on LXC page (experimental)
@@ -457,6 +460,11 @@ fi
 #Create symlink for lxc-autobackup if not exists
 if [ ! -L /usr/bin/lxc-autobackup ]; then
   ln -s /usr/local/emhttp/plugins/lxc/lxc_scripts/lxc-autobackup /usr/bin/lxc-autobackup
+fi
+
+#Remove wrong set symlink if found
+if [ -d ${LXC_DATADIRECTORY}/cache/cache ]; then
+  rm -rf ${LXC_DATADIRECTORY}/cache/cache
 fi
 
 echo "---------------LXC installation complete!---------------"
