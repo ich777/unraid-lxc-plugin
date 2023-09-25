@@ -40,10 +40,13 @@ _(Enable LXC)_:
 _(Default LXC storage path)_:
 : <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$" class="forbidSpace" required>
   <?if (!$started):?><span><i class="fa fa-warning icon warning"></i> Modify with caution: unable to validate path until Array is Started</span>
-  <?elseif (!is_dir($settings->default_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist</span><?endif;?>
+  <?elseif (!is_dir($settings->default_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist, </span><span style="color: #ff0000;">this path will be created after applying the settings!</span><?endif;?>
   </br>
-  <span style="color: #ff0000;">_(ATTENTION: It is strongly recommended to not use a FUSE path like /mnt/user/lxc/ instead use the real path to the share like /mnt/cache/lxc/ or /mnt/diskX/lxc/</br>Don't share this directory via SMB or NFS or change the permissions from this directory!</br>(If this path doesn't exist it will be created when LXC is enabled for the first time))_</span>
-
+  <?php
+  if (strpos($settings->default_path, '/mnt/user/') !== false) {
+    echo "<span style=\"color: #ff0000;\">ATTENTION: It is strongly recommended to not use a FUSE path like /mnt/user/lxc/ instead use the real path to the share like /mnt/cache/lxc/ or /mnt/diskX/lxc/</br>Don't share this directory via SMB or NFS or change the permissions from this directory!</span>";
+  }
+  ?>
 
 _(Default network interface)_:
 :  <select name="INTERFACENAME">

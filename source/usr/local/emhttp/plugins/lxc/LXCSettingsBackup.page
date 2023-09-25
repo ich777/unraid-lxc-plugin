@@ -12,8 +12,8 @@ _(Enable Global Backup settings)_:
 <? if ($settings->backup_enabled === 'enabled') { ?>
 
 _(Default Backup path)_:
-: <input type="text" id="backupdir" name="BACKUPDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->backup_path)?>" placeholder="_(Click to Select)_" pattern="^[^\\]*/$" class="forbidSpace" required></br>
-  <span style="color: #ff0000;">_(ATTENTION: This path will be created if it doesn't exist.)_</span>
+: <input type="text" id="backupdir" name="BACKUPDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->backup_path)?>" placeholder="_(Click to Select)_" pattern="^[^\\]*/$" class="forbidSpace" required>
+  <? if(!is_dir($settings->backup_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist, </span><span style="color: #ff0000;">this path will be created after applying the settings!</span> <? endif;?>
 
 _(Backups to keep)_:
 :  <input type="text" id="backupstokeep" name="BACKUPS_TO_KEEP" required="true" pattern="[1-9][0-9]*" style="width: 40px" value="<?php echo $settings->backup_keep;?>" class="forbidSpace" required>

@@ -12,7 +12,7 @@ _(LXC Autostart Delay after Array is started)_:
 :  <input type="text" name="AUTOSTART_DELAY" required="true" pattern="[0-9]+" style="width: 40px" value="<?php echo $settings->default_startdelay;?>" class="forbidSpace" required> _(seconds)_
 
 _(LXC Container URL)_:
-:  <input type="text" name="LXC_CONTAINER_URL" required="true" style="width: 300px" pattern="^[a-zA-Z0-9\-_:\.]*$" value="<?php echo $settings->default_cont_url;?>" placeholder="images.linuxcontainers.org" class="forbidSpace" required><span style="color: #ff0000;">_(Only change if you know what you are doing!)_</span> 
+:  <input type="text" name="LXC_CONTAINER_URL" required="true" style="width: 300px" pattern="^[a-zA-Z0-9\-_:\.]*$" value="<?php echo $settings->default_cont_url;?>" placeholder="images.linuxcontainers.org" class="forbidSpace" required><span style="color: #ff0000;">Only change if you know what you are doing</span> 
 
 <p>&nbsp;</p>
 
