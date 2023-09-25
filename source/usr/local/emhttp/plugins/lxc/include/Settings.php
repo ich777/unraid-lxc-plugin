@@ -104,9 +104,10 @@ class Settings {
       symlink("/boot/config/plugins/lxc/lxc.conf", "/etc/lxc/lxc.conf");
     }
 
-    if (!file_exists($default_path)) {
-      mkdir($default_path);
-      mkdir($default_path . '/cache');
+    if (!is_dir($default_path)) {
+      mkdir($default_path . '/cache', 0755, true);
+	  // workaround for some systems where directory is not ready when creating symlink
+	  sleep(1);
     }
 
     symlink($default_path . "/cache", "/var/cache/lxc");
