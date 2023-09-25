@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.09.23">
+  <!ENTITY version   "2023.09.25">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "d85ca058416a5748db19e22b85c5cd52">
+  <!ENTITY md5       "41c4a31d7db2a2a795a5deca3e9091ab">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,12 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.09.25
+- Display warning text on LXC Settings page only when FUSE file path is selected
+- Few minor visual changes
+- Change in how directories are created
+- It is now possible to specify a GitHub token in the plugin.cfg file
 
 ###2023.09.23
 - Remove wrong set symlink if found
@@ -327,7 +333,9 @@ LXC_BACKUP_PATH=
 LXC_BACKUP_KEEP=
 LXC_BACKUP_THREADS=
 LXC_BACKUP_COMPRESSION=
-LXC_BACKUP_USE_SNAPSHOT=' > "&plugin;/plugin.cfg"
+LXC_BACKUP_USE_SNAPSHOT=
+LXC_GITHUB_USER=
+LXC_GITHUB_TOKEN=' > "&plugin;/plugin.cfg"
 fi
 
 #Add AUTOSTART_DELAY entry if not exists
@@ -353,6 +361,12 @@ grep -q "LXC_BACKUP_COMPRESSION=" &plugin;/plugin.cfg || echo "LXC_BACKUP_COMPRE
 
 #Add LXC_BACKUP_USE_SNAPSHOT entry if not exists
 grep -q "LXC_BACKUP_USE_SNAPSHOT=" &plugin;/plugin.cfg || echo "LXC_BACKUP_USE_SNAPSHOT=" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_GITHUB_USER entry if not exists
+grep -q "LXC_GITHUB_USER=" &plugin;/plugin.cfg || echo "LXC_GITHUB_USER=" &gt;&gt; &plugin;/plugin.cfg
+
+#Add LXC_GITHUB_TOKEN entry if not exists
+grep -q "LXC_GITHUB_TOKEN=" &plugin;/plugin.cfg || echo "LXC_GITHUB_TOKEN=" &gt;&gt; &plugin;/plugin.cfg
 
 if [ ! -f "&plugin;/lxc.conf" ]; then
   echo 'lxc.lxcpath=/mnt/user/lxc' > "&plugin;/lxc.conf"
