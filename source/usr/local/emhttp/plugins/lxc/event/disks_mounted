@@ -4,6 +4,7 @@ LXC_DATADIRECTORY="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "^lxc.lxcpa
 if [ ! -d ${LXC_DATADIRECTORY}/cache ]; then
   mkdir -p ${LXC_DATADIRECTORY}/cache
 fi
+rm -rf /var/cache/lxc
 ln -s ${LXC_DATADIRECTORY}/cache /var/cache/lxc 2>/dev/null
 
 echo "/usr/local/emhttp/plugins/lxc/lxc_scripts/lxc-startup.sh" | at now >/dev/null 2>&1
