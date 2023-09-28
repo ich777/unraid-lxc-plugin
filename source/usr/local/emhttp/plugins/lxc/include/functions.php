@@ -376,7 +376,7 @@ function createfromTemplate($name, $description, $repository, $webui, $icon, $st
     }
   }
 
-  exec("sed -i '/lxc\.mount\.entry.*/d' " . $settings->default_path . "/" . $name . "/config"); 
+//  exec("sed -i '/lxc\.mount\.entry.*/d' " . $settings->default_path . "/" . $name . "/config"); 
 
   unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename']);
   unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . '.md5');
