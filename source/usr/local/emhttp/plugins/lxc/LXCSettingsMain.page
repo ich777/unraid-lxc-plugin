@@ -48,6 +48,20 @@ _(Default LXC storage path)_:
   }
   ?>
 
+_(Default LXC backing storage type)_:
+: <select id="bdevtype" name="BDEVTYPE">
+  <?= mk_option($settings->default_bdevtype, 'dir', '_(Directory (Default))_')?>
+  <?php
+  $path_fstype = exec("df -T $settings->default_path | awk 'NR==2 {print $2}'");
+  if(!empty($path_fstype)) {
+    if($path_fstype == "zfs") {
+      echo mk_option($settings->default_bdevtype, 'zfs', '_(ZFS)_');
+    } elseif($path_fstype == "btrfs") {
+      echo mk_option($settings->default_bdevtype, 'btrfs', '_(BTRFS)_');
+    }
+  } ?>
+  </select>
+
 _(Default network interface)_:
 :  <select name="INTERFACENAME">
   <?php
@@ -102,7 +116,7 @@ _(Update configuration)_:
 
 <?php
 if(isset($_POST['changeCFG'])) {
-$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["INTERFACENAME"], $_POST["CHANGENETCONT"], $_POST["LXC_CONTAINER_URL"], $_POST["BACKUP_ENABLED"], $_POST["BACKUPDIR"], $_POST["BACKUPS_TO_KEEP"], $_POST["CPU_THREADS"], $_POST["COMPRESSION_RATIO"], $_POST["USE_SNAPSHOT"]);
+$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["BDEVTYPE"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["INTERFACENAME"], $_POST["CHANGENETCONT"], $_POST["LXC_CONTAINER_URL"], $_POST["BACKUP_ENABLED"], $_POST["BACKUPDIR"], $_POST["BACKUPS_TO_KEEP"], $_POST["CPU_THREADS"], $_POST["COMPRESSION_RATIO"], $_POST["USE_SNAPSHOT"]);
 echo '<script>parent.window.location.reload();</script>';
 }
 ?>
