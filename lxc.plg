@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.09.28">
+  <!ENTITY version   "2023.09.28a">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "d1d6bc2c289656584c8fc29f1754de89">
+  <!ENTITY md5       "6713977865659107489ce81fce84a4fb">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.09.28a
+- Initial support for ZFS and BTRFS backing storage types (experimental - defaults to directory). Already existing containers will be still using directory as backing storage type. Please visit the Settings page from LXC to change the backing storage type.
+- Overhauled creating Snapshots and Backups from container alongside with Destroy container to give more output if something went wrong.
 
 ###2023.09.28
 - Bugfix for lxc_autobackup, allow . in new container names
@@ -335,6 +339,7 @@ LXC is a well-known Linux container runtime that consists of tools, templates, a
 #Create setting files if not found
 if [ ! -f "&plugin;/plugin.cfg" ]; then
   echo 'SERVICE=disabled
+BDEVTYPE=dir
 TIMEOUT=15
 AUTOSTART_DELAY=10
 LXC_CONTAINER_URL=images.linuxcontainers.org
@@ -377,6 +382,9 @@ grep -q "LXC_GITHUB_USER=" &plugin;/plugin.cfg || echo "LXC_GITHUB_USER=" &gt;&g
 
 #Add LXC_GITHUB_TOKEN entry if not exists
 grep -q "LXC_GITHUB_TOKEN=" &plugin;/plugin.cfg || echo "LXC_GITHUB_TOKEN=" &gt;&gt; &plugin;/plugin.cfg
+
+#Add BDEVTYPE entry if not exists
+grep -q "BDEVTYPE=" &plugin;/plugin.cfg || echo "BDEVTYPE=dir" &gt;&gt; &plugin;/plugin.cfg
 
 if [ ! -f "&plugin;/lxc.conf" ]; then
   echo 'lxc.lxcpath=/mnt/user/lxc' > "&plugin;/lxc.conf"
