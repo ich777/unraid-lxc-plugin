@@ -317,8 +317,8 @@ if [ "${RESTORE}" == "true" ]; then
   fi
 
   # Check if newname includes only letters, numbers, - and _
-  if ! echo "$NEW_NAME" | grep -Eq '^[a-zA-Z0-9_-]+$' ; then
-    echo "Only Letters, numbers, - and _ are allowed for newname"
+  if ! echo "$NEW_NAME" | grep -Eq '^[a-zA-Z0-9_.\-]+$' ; then
+    echo "Only Letters, numbers, -, . and _ are allowed for newname"
     exit 1
   fi
 
