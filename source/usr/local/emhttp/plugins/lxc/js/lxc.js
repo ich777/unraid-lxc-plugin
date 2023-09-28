@@ -72,6 +72,7 @@ function showStatus(action, id, title, text) {
     width: Math.min(screen.availWidth, 1200)
   });
   waitForElement("#dialogContent", function () {
+    let dialogContent = $("#dialogContent");
     $.ajax({
       type: "POST",
       url: '/plugins/lxc/include/ajax.php',
@@ -80,15 +81,27 @@ function showStatus(action, id, title, text) {
         'action': action,
         'container': id
       },
+      xhr: function() {
+        // get the native XmlHttpRequest object
+        const xhr = $.ajaxSettings.xhr();
+        // set the onprogress event handler
+        xhr.onprogress = function() {
+          // replace the '#output' element inner HTML with the received part of the response
+          dialogContent.html("<p>" + title + " " + id + ", please wait until the DONE button is displayed!</p><p>" + xhr.responseText + "</p>");
+        }
+        return xhr;
+      },
       beforeSend: function () {
-        $("#dialogContent").append(text);
+        dialogContent.append("<p>" + title + " " + id + ", please wait until the DONE button is displayed!</p>");
         statusInterval = setInterval(function () {
-          $("#dialogContent").append(".");
+          dialogContent.append(".");
         }, 5000);
       },
       success: function (data) {
-        $("#dialogContent").append("<p>Done " + text + "</p>");
-        $("#dialogContent").append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.reload()">Done</button></p>');
+    if (data.toLowerCase().indexOf("error, failed to ") === -1) {
+          dialogContent.append("<p/>");
+    }
+        dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
         clearInterval(statusInterval);
       }
     });
