@@ -4,6 +4,7 @@ require_once 'functions.php';
 class Settings {
 
   public $default_path;
+  public $default_bdevtype;
   public $default_timeout;
   public $default_startdelay;
   public $default_interface;
@@ -22,6 +23,7 @@ class Settings {
 
   function __construct() {
     $this->default_path = getVariable('/boot/config/plugins/lxc/lxc.conf', 'lxc.lxcpath');
+    $this->default_bdevtype = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'BDEVTYPE');
     $this->default_timeout = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'TIMEOUT');
     $this->default_startdelay = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'AUTOSTART_DELAY');
     $this->default_interface = getVariable('/boot/config/plugins/lxc/default.conf', 'lxc.net.0.link');
@@ -38,7 +40,7 @@ class Settings {
     $this->github_token = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_GITHUB_TOKEN');
   }
 
-  function changeConfig($started, $default_path, $service, $timeout, $startdelay, $interface, $change_net_containers, $default_cont_url, $backup_enabled, $backup_path, $backup_keep, $backup_threads, $backup_compression, $backup_use_snapshot) {
+  function changeConfig($started, $default_path, $default_bdevtype, $service, $timeout, $startdelay, $interface, $change_net_containers, $default_cont_url, $backup_enabled, $backup_path, $backup_keep, $backup_threads, $backup_compression, $backup_use_snapshot) {
     $activeContainers = getActiveContainers();
     $availContainers = getAllContainers();
 
@@ -53,6 +55,7 @@ class Settings {
     }
 
     setVariable('/boot/config/plugins/lxc/lxc.conf', 'lxc.lxcpath', $default_path);
+    setVariable('/boot/config/plugins/lxc/plugin.cfg', 'BDEVTYPE', $default_bdevtype);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'TIMEOUT', $timeout);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'AUTOSTART_DELAY', $startdelay);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'SERVICE', $service);

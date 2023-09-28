@@ -166,12 +166,23 @@ class Container {
 
     $this->killContainer();
     exec('umount ' . $this->path . '/rootfs');
-    exec('lxc-destroy -s ' . $this->name);
+    exec('lxc-destroy -s ' . $this->name . ' 2>&1', $output, $retval);
+    if ($retval == 1) {
+      echo '<p style="color:red;">';
+      echo "ERROR, failed to destroy " . $this->name . "!<br/><br/>";
+      exec("logger LXC: error: Failed to destroy Container " . $name);
+      foreach ($output as $error) {
+        exec('logger "LXC: ' . $error . '"');
+        echo $error . "<br/>";
+      }
+    } else {
 // disabled removal from custom container icons for now since they won't take much space
-//  if (file_exists($this->settings->default_path . '/custom-icons/' . $this->name . '.png')) {
-//      exec('rm ' . $this->settings->default_path . '/custom-icons/' . $this->name . '.png');
-//  }
-    exec('logger "LXC: Container ' . $this->name . ' destroyed"');
+//    if (file_exists($this->settings->default_path . '/custom-icons/' . $this->name . '.png')) {
+//        exec('rm ' . $this->settings->default_path . '/custom-icons/' . $this->name . '.png');
+//    }
+      echo '<p>Container ' . $this->name . ' destroyed!</p>';
+      exec('logger "LXC: Container ' . $this->name . ' destroyed"');
+    }
   }
 
   function setAutostart($autostart) {
@@ -181,20 +192,51 @@ class Container {
   function deleteSnapshot($snapshot) {
     exec('logger "LXC: Deleting snapshot ' . $snapshot . ' from container ' . $this->name . '"' );
     exec('umount ' . $this->path . '/snaps/' . $snapshot . '/rootfs');
-    exec('lxc-snapshot -d ' . $snapshot . ' ' . $this->name);
-    exec('logger "LXC: Snapshot ' . $snapshot . ' from container ' . $this->name. ' deleted"');
+    exec('lxc-snapshot -d ' . $snapshot . ' ' . $this->name . ' 2>&1', $output, $retval);
+    if ($retval == 1) {
+      exec("logger LXC: error: Failed to remove Snapshot " . $snapshot . " from  Container " . $name);
+      foreach ($output as $error) {
+        exec('logger "LXC: ' . $error . '"');
+      }
+    } else {
+      exec('logger "LXC: Snapshot ' . $snapshot . ' from container ' . $this->name. ' deleted"');
+    }
   }
 
   function createSnapshot() {
     $this->stopContainer();
-    exec('lxc-snapshot ' . $this->name);
-    if ($this->state == "RUNNING") {
-      $this->startContainer();
+    exec('lxc-snapshot ' . $this->name . ' 2>&1', $output, $retval);
+    if ($retval == 1) {
+      echo '<p style="color:red;">';
+      echo "ERROR, failed to create snapshot from " . $this->name . "!<br/><br/>";
+      exec("logger LXC: error: Failed to create snapshot from Container " . $name);
+      foreach ($output as $error) {
+        exec('logger "LXC: ' . $error . '"');
+        echo $error . "<br/>";
+      }
+    } else {
+      echo '<p>Snapshot ' .$snapshot . ' from container ' . $this->name . ' created!</p>';
+      exec('logger "LXC: Snapshot ' . $snapshot . ' from container ' . $this->name. ' created"');
+      if ($this->state == "RUNNING") {
+        $this->startContainer();
+      }
     }
   }
 
   function createBackup() {
-    exec('lxc-autobackup ' . $this->name);
+    exec('lxc-autobackup ' . $this->name . ' 2>&1', $output, $retval);
+    if ($retval == 1) {
+      echo '<p style="color:red;">';
+      echo "ERROR, failed to create backup from " . $this->name . "!<br/><br/>";
+      exec("logger LXC: error: Failed to create backup from Container " . $name);
+      foreach ($output as $error) {
+        exec('logger "LXC: ' . $error . '"');
+        echo $error . "<br/>";
+      }
+    } else {
+      echo '<p>Backup from container ' . $this->name . ' created!</p>';
+      exec('logger "LXC: Backup from container ' . $this->name. ' created"');
+    }
   }
 
   function deleteBackup($backup) {

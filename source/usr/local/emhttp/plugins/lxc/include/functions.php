@@ -116,9 +116,17 @@ function getCpus(){
 }
 
 function createContainer($name, $description, $distribution, $release, $startcont, $autostart, $mac) {
+  $settings = new Settings();
+  if($settings->default_bdevtype == "zfs") {
+    $bdev = "--bdev=zfs --zfsroot=" . (explode('/', $settings->default_path)[2] ?? '') . "/zfs_lxccontainers/" . $name;
+  } elseif($settings->default_bdevtype == "btrfs") {
+    $bdev = "--bdev=btrfs";
+  } else {
+    $bdev = "--bdev=dir";
+  }
   exec("logger LXC: Creating container " . $name);
   while (@ ob_end_flush());
-  exec("lxc-create --name " . $name . " --template download -- --dist " . $distribution . " --release " . $release . " --arch amd64 2>&1", $output, $retval);
+  exec("lxc-create --name " . $name . " " . $bdev . " --template download -- --dist " . $distribution . " --release " . $release . " --arch amd64 2>&1", $output, $retval);
   if ($retval == 1) {
     echo '<p style="color:red;">';
     echo "ERROR, failed to create container " . $name . "!<br/><br/>";
