@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.10.03">
+  <!ENTITY version   "2023.10.03a">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "31beb3478190d9243abbceb955eed96d">
+  <!ENTITY md5       "d43d2817776d7f066f4874f28e159582">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.10.03a
+- Small bugfix for 'lxc-dirtozfs'
 
 ###2023.10.03
 - Reworked sorting IP addresses from containers on LXC page to display IPv4 first, IPv4 Docker (starting with 172.) second, IPv6 third
