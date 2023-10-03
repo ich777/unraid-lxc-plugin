@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.09.30">
+  <!ENTITY version   "2023.09.03">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "2f5ac4e25219ab95b28e8a3faf448f38">
+  <!ENTITY md5       "31beb3478190d9243abbceb955eed96d">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,13 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.09.03
+- Reworked sorting IP addresses from containers on LXC page to display IPv4 first, IPv4 Docker (starting with 172.) second, IPv6 third
+- Delete parent container dataset when destroying container (only applies when using ZFS backing storage type)
+- Updated Helptexts on Settings page
+- Added 'lxc-dirtobtrfs' this allows your to convert your Directory based containers to BTRFS from the command line (experimental)
+- Added 'lxc-dirtozfs' this allows your to convert your Directory based containers to ZFS from the command line (experimental)
 
 ###2023.09.30
 - Added help to Settings pages
@@ -497,6 +504,16 @@ if [ ! -L /usr/bin/lxc-autobackup ]; then
   ln -s /usr/local/emhttp/plugins/lxc/lxc_scripts/lxc-autobackup /usr/bin/lxc-autobackup
 fi
 
+#Create symlink for lxc-dirtobtrfs if not exists
+if [ ! -L /usr/bin/lxc-dirtobtrfs ]; then
+  ln -s /usr/local/emhttp/plugins/lxc/lxc_scripts/lxc-dirtobtrfs /usr/bin/lxc-dirtobtrfs
+fi
+
+#Create symlink for lxc-dirtozfs if not exists
+if [ ! -L /usr/bin/lxc-dirtozfs ]; then
+  ln -s /usr/local/emhttp/plugins/lxc/lxc_scripts/lxc-dirtozfs /usr/bin/lxc-dirtozfs
+fi
+
 #Remove wrong set symlink if found
 if [ -d ${LXC_DATADIRECTORY}/cache/cache ]; then
   rm -rf ${LXC_DATADIRECTORY}/cache/cache
@@ -516,7 +533,7 @@ echo "------------------------------"
 # Remove plugin related files
 removepkg &name;-&version;
 rm -rf &plugin;
-rm /usr/bin/lxc-autosnapshot /usr/bin/lxc-autobackup
+rm /usr/bin/lxc-autosnapshot /usr/bin/lxc-autobackup /usr/bin/lxc-dirtobtrfs /usr/bin/lxc-dirtozfs
 echo
 echo "------------------------------------------------------------------------------"
 echo "-------------LXC Package uninstalled, please reboot your server!--------------"
