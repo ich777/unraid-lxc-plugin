@@ -38,7 +38,13 @@ class Container {
     $this->backup_path = realpath($this->settings->backup_path);
     $ipInfo = shell_exec("lxc-info " . $this->name . " -iH");
     if ($ipInfo !== null) {
-      $this->ips = nl2br(trim($ipInfo));
+      $ipInfov4 = '';
+      $ipInfoDocker = '';
+      $ipInfov6 = '';
+      $ipInfov4 = shell_exec('echo "' . $ipInfo . '" | grep "\." | grep -v "172."');
+      $ipInfoDocker = shell_exec('echo "' . $ipInfo . '" | grep -E "172."');
+      $ipInfov6 = shell_exec('echo "' . $ipInfo . '" | grep "\:"');
+      $this->ips = nl2br(trim($ipInfov4 . $ipInfoDocker . $ipInfov6));
     }
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
     $memory = shell_exec("lxc-cgroup " . $this->name . " memory.stat");
@@ -180,6 +186,14 @@ class Container {
 //    if (file_exists($this->settings->default_path . '/custom-icons/' . $this->name . '.png')) {
 //        exec('rm ' . $this->settings->default_path . '/custom-icons/' . $this->name . '.png');
 //    }
+      $settings = new Settings();
+      if($settings->default_bdevtype == "zfs") {
+        $dataset = (explode('/', $this->path)[2] ?? '') . '/zfs_lxccontainers/' . $this->name;
+        $check_dataset = shell_exec('zfs list -H -o name ' . $dataset);
+        if (trim($check_dataset) == trim($dataset)) {
+          exec('zfs destroy ' . $dataset);
+        }
+      }
       echo '<p>Container ' . $this->name . ' destroyed!</p>';
       exec('logger "LXC: Container ' . $this->name . ' destroyed"');
     }
