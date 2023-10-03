@@ -61,9 +61,9 @@ fi
 ZFS_POOL=$(echo "$LXC_PATH" | cut -d '/' -f1-3)
 ZFS_DATASETS=$(zfs list -H -o name)
 CONTAINER_DATASET=$(zfs list -H -o name $(echo $LXC_PATH | awk -F/ '{print "/" $2 "/" $3}'))/zfs_lxccontainers/${CONT_NAME}
-if echo "${ZFS_DATASETS}" | grep -w "${CONTAINER_DATASET}" ; then
+if echo "${ZFS_DATASETS}" | grep -wq "${CONTAINER_DATASET}" ; then
   echo "ZFS dataset ${CONTAINER_DATASET} for container ${CONT_NAME} already found, abort!"
-  #exit 1
+  exit 1
 fi
 
 # Check if mountpoint is ZFS
