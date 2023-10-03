@@ -1,0 +1,184 @@
+#!/bin/bash
+QUIET=false
+LXC_PATH=$(grep "lxc.lxcpath=" /boot/config/plugins/lxc/lxc.conf | cut -d '=' -f2 | sed 's/"//g')
+LXC_TIMEOUT=$(grep "TIMEOUT=" /boot/config/plugins/lxc/plugin.cfg | cut -d '=' -f2 | sed 's/"//g')
+
+# Help function
+function show_help {
+  echo "Usage: lxc-dirtobtrfs <LXC_CONT_NAME>"
+  echo "       lxc-dirtobtrfs -n <LXC_CONT_NAME>"
+  echo
+  echo "  -n, --name   LXC Container name which you want to convert"
+  echo "  -q, --quiet  Quiet mode - no questions asked, be careful with that!"
+  echo "  -h, --help   Display this help message"
+  echo
+  echo "lxc-dirtobtrfs by Christoph Hummer v2023.10.03"
+}
+
+# Check if correct arguments are passed over and if container name is provided
+if [ "$#" -eq 0 ] || [ "$1" = "-q" ] || [ "$1" = "--quiet" ]; then
+  if [ "$#" -le 1 ]; then
+    show_help
+    exit 1
+  fi
+fi
+
+ALLARGS=$@
+# Process arguments and functions
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -q | --quiet)
+      QUIET=true
+      ;;
+    -h | --help)
+      show_help
+      exit 0 ;;
+    -n | --name | -n=* | --name=*)
+      if [[ $1 == *=* ]]; then
+        CONT_NAME="${1#*=}"
+      else
+        CONT_NAME="$2"
+        shift
+      fi ;;
+    -*)
+      show_help
+      exit 1 ;;
+    *)
+      if [ -z "${CONT_NAME}" ]; then
+        CONT_NAME="$1"
+      fi;;
+  esac
+  shift
+done
+
+# Check if container exists
+if [ -z "$(lxc-ls --filter=^${CONT_NAME}$)" ] ; then
+  echo "Container ${CONT_NAME} not found!"
+  exit 1
+fi
+
+# Check if subvolume already exists:
+BTRFS_VOLUME=$(echo "$LXC_PATH" | cut -d '/' -f1-3)
+BTRFS_SUBVOLUMES=$(btrfs subvolume list $(echo "$LXC_PATH" | awk -F/ '{print "/" $2 "/" $3}'))
+CONTAINER_SUBVOLUME=$(echo "$LXC_PATH" | cut -d '/' -f4-)/${CONT_NAME}/rootfs
+if echo "${BTRFS_SUBVOLUMES}" | grep -wq "${CONTAINER_SUBVOLUME}" ; then
+  echo "BTRFS subvolume ${CONTAINER_SUBVOLUME} for container ${CONT_NAME} already found, abort!"
+  exit 1
+fi
+
+# Check if mountpoint is BTRFS
+if [ "$(df -T ${BTRFS_VOLUME} | awk 'NR==2 {print $2}')" != "btrfs" ]; then
+  echo "Mount point ${BTRFS_VOLUME} is not BTRFS, abort!"
+  exit 1
+fi
+
+if [ "${QUIET}" != true ]; then
+  echo "This will convert the backing storage type from your container: ${CONT_NAME}"
+  echo "from Directory to BTRFS."
+  echo
+  echo "This is IRREVERSIBLE and will NOT contain your Snaphots, it is strongly"
+  echo "recommended that you create a Backup from the container before doing this!"
+  echo
+  echo "ATTENTION: Don't interrupt this process, if you do interrupt it, it will most"
+  echo "           certainly destroy your container! Depending on the size of your"
+  echo "           Container this process can take up to 10 minutes!"
+  echo
+  echo -n "Start conversion (y/N)? "
+  read -n 1 answer
+  echo
+
+  if [[ ${answer,,} =~ ^[Yy]$ ]]; then
+    echo "Starting conversion, please wait and don't interrupt this process..."
+  else
+    echo "Abort!"
+    exit 1
+  fi
+fi
+
+# Check for enough free space
+AVAIL_SPACE=$(df -P ${LXC_PATH} | awk 'NR==2 {print $4}')
+CONT_SIZE=$(du -s ${LXC_PATH}/${CONT_NAME}/rootfs | awk '{print $1}')
+REQU_SPACE=$((${CONT_SIZE} * 2 + 100*1024))
+
+if [ "${AVAIL_SPACE}" -le "${REQU_SPACE}" ]; then
+  echo "Not enough free space on ${BTRFS_VOLUME}, abort!"
+  exit 1
+fi
+
+# Check if container is running
+if lxc-info -n ${CONT_NAME} | grep -q "RUNNING" ; then
+  CONT_STATE=RUNNING
+  lxc-stop -t ${LXC_TIMEOUT} -n ${CONT_NAME}
+  if [ $? != 0 ]; then
+    echo "Failed to stop container, please check your configuration!"
+    exit 1
+  fi
+fi
+
+# Create temporary directory for container
+mkdir -p ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}
+
+# Unmount rootfs and all snapshots
+echo "Unmounting rootfs from ${CONT_NAME}..."
+umount ${LXC_PATH}/${CONT_NAME}/rootfs 2>/dev/null
+CONT_SNAPS=$(ls -1 ${LXC_PATH}/${CONT_NAME}/snaps/ 2>/dev/null)
+IFS=$'\n'
+for snapshot in $CONT_SNAPS; do
+  umount ${LXC_PATH}/${CONT_NAME}/snaps/$snapshot/rootfs 2>/dev/null
+done
+unset IFS
+
+# Copy container over to temporary directory
+echo "Moving container to temporary directory, please wait..."
+rsync -a ${LXC_PATH}/${CONT_NAME}/config ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}/config
+if [ $? != 0 ]; then
+  echo "Failed to move config, abort!"
+  rm -rf ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}
+  exit 1
+fi
+rsync -a ${LXC_PATH}/${CONT_NAME}/rootfs ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}/
+if [ $? != 0 ]; then
+  echo "Failed to move rootfs, abort!"
+  rm -rf ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}
+  exit 1
+fi
+
+# Remove original container directory
+rm -rf ${LXC_PATH}/${CONT_NAME}
+
+# Create BTRFS subvolume
+echo "Creating BTRFS subvolume..."
+cd ${BTRFS_VOLUME}
+mkdir -p ${LXC_PATH}/${CONT_NAME}
+btrfs subvolume create ${CONTAINER_SUBVOLUME%/*}/rootfs
+if [ $? != 0 ]; then
+  echo "Failed to create BTRFS subvolume!"
+  rm -rf ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}
+  exit 1
+fi
+
+# Copy container back from temporary directory to new BTRFS subvolume
+echo "Moving container files back to new BTRFS subvolume..."
+rsync -a ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}/config ${LXC_PATH}/${CONT_NAME}/config 
+rsync -a ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}/rootfs/ ${LXC_PATH}/${CONT_NAME}/rootfs/
+
+# Change container config to support btrfs
+sed -i "s/^lxc\.rootfs\.path.*/lxc\.rootfs\.path = btrfs:${LXC_PATH//\//\\/}\/${CONT_NAME//./\\.}\/rootfs/" ${LXC_PATH}/${CONT_NAME}/config
+
+# Remove temporary directory
+echo "Cleaning up..."
+rm -rf ${LXC_PATH}/cache/dirtobtrfs/${CONT_NAME}
+
+# Remove temporary dirtobtrfs directory if empty
+if [ -z "$(ls -A ${LXC_PATH}/cache/dirtobtrfs)" ]; then
+  rm -rf ${LXC_PATH}/cache/dirtobtrfs
+fi
+
+# Start container if it was running before
+if [ "${CONT_STATE}" == "RUNNING" ]; then
+  echo "Starting container..."
+  lxc-start -n ${CONT_NAME}
+fi
+
+# Display done message
+echo "All done!"
