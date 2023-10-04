@@ -292,7 +292,21 @@ if (count($differences) > 0) {
 <a href="LXCAddContainer">
   <input type="button" value="Add Container">
 </a>
+<a href="#" class="startALLCONT" >
+  <input type="button" value="Start All">
+</a>
+<a href="#" class="stopALLCONT">
+  <input type="button" value="Stop All">
+</a>
+<a href="#" class="freezeALLCONT">
+  <input type="button" value="Freeze All">
+</a>
+<a href="#" class="unfreezeALLCONT">
+  <input type="button" value="Unfreeze All">
+</a>
 <div class="spinner"></div>
+
+
 <? } ?>
 
 <?php } else { ?>
