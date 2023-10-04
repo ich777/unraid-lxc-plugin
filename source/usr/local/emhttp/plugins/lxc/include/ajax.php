@@ -11,6 +11,24 @@ if (isset($_POST['lxc'])) {
       $container = new Container($_POST['container']);
       $container->stopContainer();
       break;
+    case 'startALLCONT':
+      $allContainers = getAllContainers();
+      foreach ($allContainers as $cont) {
+        if($cont->state == "STOPPED" || $cont->state == "FROZEN") {
+          $container = new Container($cont->name);
+          $container->startContainer();
+        }
+      }
+      break;
+    case 'stopALLCONT':
+      $allContainers = getAllContainers();
+      foreach ($allContainers as $cont) {
+        if($cont->state == "RUNNING" || $cont->state == "FROZEN") {
+          $container = new Container($cont->name);
+          $container->stopContainer();
+        }
+      }
+      break;
     case 'restartCONT':
       $container = new Container($_POST['container']);
       $container->restartContainer();
@@ -19,9 +37,27 @@ if (isset($_POST['lxc'])) {
       $container = new Container($_POST['container']);
       $container->freezeContainer();
       break;
+    case 'freezeALLCONT':
+      $allContainers = getAllContainers();
+      foreach ($allContainers as $cont) {
+        if($cont->state == "RUNNING") {
+          $container = new Container($cont->name);
+          $container->freezeContainer();
+        }
+      }
+      break;
     case 'unfreezeCONT':
       $container = new Container($_POST['container']);
       $container->unfreezeContainer();
+      break;
+    case 'unfreezeALLCONT':
+      $allContainers = getAllContainers();
+      foreach ($allContainers as $cont) {
+        if($cont->state == "FROZEN") {
+          $container = new Container($cont->name);
+          $container->unfreezeContainer();
+        }
+      }
       break;
     case 'killCONT':
       $container = new Container($_POST['container']);

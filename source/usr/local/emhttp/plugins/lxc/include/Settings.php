@@ -107,13 +107,15 @@ class Settings {
       symlink("/boot/config/plugins/lxc/lxc.conf", "/etc/lxc/lxc.conf");
     }
 
-    if (!is_dir($default_path)) {
-      mkdir($default_path . '/cache', 0755, true);
-	  // workaround for some systems where directory is not ready when creating symlink
-	  sleep(1);
-    }
+    if (getVariable('/boot/config/plugins/lxc/plugin.cfg', 'SERVICE') == 'enabled') {
+      if (!is_dir($default_path)) {
+        mkdir($default_path . '/cache', 0755, true);
+  	    // workaround for some systems where directory is not ready when creating symlink
+  	    sleep(1);
+      }
 
-    symlink($default_path . "/cache", "/var/cache/lxc");
+      symlink($default_path . "/cache", "/var/cache/lxc");
+    }
 
     $service_status = parse_ini_file('/boot/config/plugins/lxc/plugin.cfg')['SERVICE'];
     if ($started == "enabled" && $service_status == "enabled") {
