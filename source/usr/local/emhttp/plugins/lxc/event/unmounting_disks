@@ -1,31 +1,39 @@
 #!/bin/bash
-CONTAINERS="$(lxc-ls --active)"
-LXC_CONT_PATH="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "^lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
-TIMEOUT="$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "^TIMEOUT=" | cut -d '=' -f2 | sed 's/\"//g')"
+if [ "$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "^SERVICE=" | cut -d '=' -f2 | sed 's/\"//g')" == "enabled" ]; then
+  CONTAINERS_ACTIVE="$(lxc-ls --active)"
+  LXC_CONT_PATH="$(cat /boot/config/plugins/lxc/lxc.conf | grep -n "^lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
+  TIMEOUT="$(cat /boot/config/plugins/lxc/plugin.cfg | grep -n "^TIMEOUT=" | cut -d '=' -f2 | sed 's/\"//g')"
 
+  if [ ! -z "${CONTAINERS_ACTIVE}" ]; then
+    for container in $CONTAINERS_ACTIVE; do
+      logger "LXC: Stopping container '$container'"
+      lxc-stop --timeout=${TIMEOUT:=15} $container & 2>/dev/null
+    done
 
-for container in $CONTAINERS; do
-  logger "LXC: Stopping container '$container'"
-  lxc-stop --timeout=${TIMEOUT:=15} $container & 2>/dev/null
-done
+    wait
+  fi
 
-wait
+  logger "LXC: unmounting rootfs from container(s)"
+  ROOTFS_CONT="$(find ${LXC_CONT_PATH} -maxdepth 2 -type d -name "rootfs" 2>/dev/null)"
+  ROOTFS_SNAPS="$(find ${LXC_CONT_PATH}/*/snaps -maxdepth 2 -type d -name "rootfs" 2>/dev/null)"
+  if [ ! -z "${ROOTFS_CONT}" ]; then
+    for rootfscont in $ROOTFS_CONT; do
+      logger "LXC: umount $rootfscont"
+      umount $rootfscont 2>/dev/null
+    done
+  fi
 
-logger "LXC: unmounting rootfs from container(s)"
-ROOTFS_CONT="$(find ${LXC_CONT_PATH} -maxdepth 2 -type d -name "rootfs" 2>/dev/null)"
-ROOTFS_SNAPS="$(find ${LXC_CONT_PATH}/*/snaps -maxdepth 2 -type d -name "rootfs" 2>/dev/null)"
-for rootfscont in $ROOTFS_CONT; do
-  logger "LXC: umount $rootfscont"
-  umount $rootfscont 2>/dev/null
-done
+  if [ ! -z "${ROOTFS_SNAPS}" ]; then
+    for rootfssnaps in $ROOTFS_SNAPS; do
+      logger "LXC: umount $rootfssnaps"
+      umount $rootfssnaps 2>/dev/null
+    done
+  fi
+  logger "LXC: rootfs unmounting from container(s) done"
 
-if [ ! -z "${ROOTFS_SNAPS}" ]; then
-  for rootfssnaps in $ROOTFS_SNAPS; do
-    logger "LXC: umount $rootfssnaps"
-    umount $rootfssnaps 2>/dev/null
-  done
+  sleep 1
 fi
-logger "LXC: rootfs unmounting from container(s) done"
 
-sleep 1
-rm -rf /var/cache/lxc
+if [ -d /var/cache/lxc ]; then
+  rm -rf /var/cache/lxc
+fi
