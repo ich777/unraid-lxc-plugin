@@ -531,7 +531,7 @@ $(function() {
   });
 
   // Listener for all button actions
-  $(".stopCONT, .restartCONT, .freezeCONT, .killCONT, .unfreezeCONT, .startCONT").on("click", function(e) {
+  $(".stopCONT, .restartCONT, .freezeCONT, .killCONT, .unfreezeCONT, .startCONT, .startALLCONT, .stopALLCONT, .freezeALLCONT, .unfreezeALLCONT").on("click", function(e) {
     e.stopImmediatePropagation();
     showSpinner();
     postAction($(this).attr("class"), this.id);
