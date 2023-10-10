@@ -1,9 +1,9 @@
 Menu="LXCSettings:3"
-Title="_(Backup)_"
+Title="Backup"
 Tag="archive"
 ---
 <form markdown="1" id="changebackupcfg" method="post" >
-_(Enable Global Backup settings)_:
+Enable Global Backup settings:
 : <select id="backup_enabled" name="BACKUP_ENABLED">
   <?= mk_option($settings->backup_enabled, 'disabled', '_(No)_')?>
   <?= mk_option($settings->backup_enabled, 'enabled', '_(Yes)_')?>
@@ -17,22 +17,22 @@ _(Enable Global Backup settings)_:
 
 <? if ($settings->backup_enabled === 'enabled') { ?>
 
-_(Default Backup path)_:
-: <input type="text" id="backupdir" name="BACKUPDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->backup_path)?>" placeholder="_(Click to Select)_" pattern="^[^\\]*/$" class="forbidSpace" required>
+Default Backup path:
+: <input type="text" id="backupdir" name="BACKUPDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->backup_path)?>" placeholder="Click to Select" pattern="^[^\\]*/$" class="forbidSpace" required>
   <? if(!is_dir($settings->backup_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist, </span><span style="color: #ff0000;">this path will be created after applying the settings!</span> <? endif;?>
 
 <blockquote class="inline_help">
 <p>The path where you want to store your LXC container backups (this path should not be in the Default LXC path!).</p>
 </blockquote>
 
-_(Backups to keep)_:
+Backups to keep:
 :  <input type="text" id="backupstokeep" name="BACKUPS_TO_KEEP" required="true" pattern="[1-9][0-9]*" style="width: 40px" value="<?php echo $settings->backup_keep;?>" class="forbidSpace" required>
 
 <blockquote class="inline_help">
 <p>Specify how many backups you want to keep (must be an integer and greater than 0).</p>
 </blockquote>
 
-_(Compression Ratio)_:
+Compression Ratio:
 <?php $selectedRatio = (isset($settings->backup_compression) && trim($settings->backup_compression !== '')) ? $settings->backup_compression : "6"; ?>
 : <select id="compression_ratio" name="COMPRESSION_RATIO">
   <?php
@@ -46,7 +46,7 @@ _(Compression Ratio)_:
 <p><b style="color: #ff0000;">ATTENTION:</b> Values between 7 and 9 will require at least 12GB of free RAM during the compression!</p>
 </blockquote>
 
-_(CPU Threads)_:
+CPU Threads:
 <?php
   $cpu_threads = shell_exec('nproc');
   $selectedThreads = (isset($settings->backup_threads) && trim($settings->backup_threads !== '')) ? $settings->backup_threads : intdiv($cpu_threads, 2);
@@ -63,7 +63,7 @@ _(CPU Threads)_:
 <p><b style="color: #ff0000;">ATTENTION:</b> If you are selecting all threads this can have a serious impact on your system and maybe also slow down the GUI!</p>
 </blockquote>
 
-_(Use Snapshot)_:
+Use Snapshot:
 : <select id="use_snapshot" name="USE_SNAPSHOT">
   <?= mk_option($settings->backup_use_snapshot, 'disabled', '_(No)_')?>
   <?= mk_option($settings->backup_use_snapshot, 'enabled', '_(Yes)_')?>
@@ -85,7 +85,7 @@ _(Use Snapshot)_:
 
 <p>&nbsp;</p>
 
-_(Update configuration)_:
+Update configuration:
 :  <input type="submit" name="changeBACKUP" value="_(Apply)_">
 
 <blockquote class="inline_help">

@@ -1,5 +1,5 @@
 Menu="LXCSettings:1"
-Title="_(General)_"
+Title="General"
 Tag="wrench"
 ---
 <script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
@@ -40,7 +40,7 @@ _(Enable LXC)_:
 <p>Enable or Disable the LXC service</p>
 </blockquote>
 
-_(Default LXC storage path)_:
+Default LXC storage path:
 : <input type="text" id="defaultdir" name="DEFAULTDIR" autocomplete="off" spellcheck="false" data-pickfolders="true" data-pickfilter="HIDE_FILES_FILTER" data-pickroot="<?=is_dir('/mnt/')?'/mnt/':'/mnt'?>" value="<?=htmlspecialchars($settings->default_path)?>/" placeholder="Click to Select" pattern="^[^\\]*/$" class="forbidSpace" required>
   <?if (!$started):?><span><i class="fa fa-warning icon warning"></i> Modify with caution: unable to validate path until Array is Started</span>
   <?elseif (!is_dir($settings->default_path)):?><span><i class="fa fa-warning icon warning"></i> Path does not exist, </span><span style="color: #ff0000;">this path will be created after applying the settings!</span><?endif;?>
@@ -58,16 +58,16 @@ _(Default LXC storage path)_:
 <p>Please note that the path requires a trailing / at the end.</p>
 </blockquote>
 
-_(Default LXC backing storage type)_:
+Default LXC backing storage type:
 : <select id="bdevtype" name="BDEVTYPE">
-  <?= mk_option($settings->default_bdevtype, 'dir', '_(Directory (Default))_')?>
+  <?= mk_option($settings->default_bdevtype, 'dir', 'Directory (Default)')?>
   <?php
   $path_fstype = exec("df -T $settings->default_path | awk 'NR==2 {print $2}'");
   if(!empty($path_fstype)) {
     if($path_fstype == "zfs") {
-      echo mk_option($settings->default_bdevtype, 'zfs', '_(ZFS)_');
+      echo mk_option($settings->default_bdevtype, 'zfs', 'ZFS');
     } elseif($path_fstype == "btrfs") {
-      echo mk_option($settings->default_bdevtype, 'btrfs', '_(BTRFS)_');
+      echo mk_option($settings->default_bdevtype, 'btrfs', 'BTRFS');
     }
   } ?>
   </select>
@@ -81,7 +81,7 @@ _(Default LXC backing storage type)_:
 <p><b style="color: #ff0000;">ATTENTION:</b> When using ZFS please only use the built in Snapshot function from the LXC plugin or <code>lxc-autosnapshot</code> from the command line otherwise you will most likely destroy your container!</p>
 </blockquote>
 
-_(Default network interface)_:
+Default network interface:
 :  <select name="INTERFACENAME">
   <?php
   foreach($settings->available_interfaces as $item){
@@ -117,7 +117,7 @@ If a ethX or vhostX interface is selected the net type will be changed to maclva
 
 <p>&nbsp;</p>
 
-_(Update configuration)_:
+Update configuration:
 :  <input type="submit" name="changeCFG" value="_(Apply)_">
 
 <blockquote class="inline_help">
