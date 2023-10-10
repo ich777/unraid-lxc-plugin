@@ -176,8 +176,8 @@ function createContainer(name, description, distribution, release, startcont, au
   });
 }
 
-// Function that creates a new container from the CA App
-function createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, mac, supportlink, donatelink) {
+// Function that creates a new container from the Template
+function createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, convertbdev, mac, supportlink, donatelink) {
   let statusInterval;
 
   Shadowbox.open({
@@ -205,6 +205,7 @@ function createContainerCAApp(name, description, repository, webui, icon, startc
         'icon': icon,
         'startcont': startcont,
         'autostart': autostart,
+        'convertbdev': convertbdev,
         'mac': mac,
         'supportlink': supportlink,
         'donatelink': donatelink
@@ -692,11 +693,12 @@ $(function() {
     let icon = this.contIcon.value;
     let startcont = this.contStart.checked;
     let autostart = this.contAutostart.checked;
+    let convertbdev = this.contConvBDEV.checked;
     let mac = this.contMac.value;
     let supportlink = this.supportLink.value;
     let donatelink = this.donateLink.value;
 
-    createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, mac, supportlink, donatelink);
+    createContainerCAApp(name, description, repository, webui, icon, startcont, autostart, convertbdev, mac, supportlink, donatelink);
   });
 
 })
