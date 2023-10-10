@@ -124,7 +124,7 @@ if (isset($_POST['lxc'])) {
       $container->delWebuiurl();
       break;
     case 'createTEMPLATE':
-      createfromTemplate($_POST['name'], $_POST['description'], $_POST['repository'], $_POST['webui'], $_POST['icon'], $_POST['startcont'], $_POST['autostart'], $_POST['mac'], $_POST['supportlink'], $_POST['donatelink']);
+      createfromTemplate($_POST['name'], $_POST['description'], $_POST['repository'], $_POST['webui'], $_POST['icon'], $_POST['startcont'], $_POST['autostart'], $_POST['convertbdev'], $_POST['mac'], $_POST['supportlink'], $_POST['donatelink']);
       break;
     default:
       break;

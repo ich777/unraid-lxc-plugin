@@ -245,7 +245,7 @@ function downloadLXCproducts($url) {
   }
 }
 
-function createfromTemplate($name, $description, $repository, $webui, $icon, $startcont, $autostart, $mac, $supportlink, $donatelink) {
+function createfromTemplate($name, $description, $repository, $webui, $icon, $startcont, $autostart, $convertbdev, $mac, $supportlink, $donatelink) {
   $container = new Container($name);
   $settings = new Settings();
   $repositoryurl = parse_url($repository);
@@ -384,11 +384,34 @@ function createfromTemplate($name, $description, $repository, $webui, $icon, $st
     }
   }
 
-//  exec("sed -i '/lxc\.mount\.entry.*/d' " . $settings->default_path . "/" . $name . "/config"); 
+  exec("sed -i '/lxc\.mount\.entry.*/d' " . $settings->default_path . "/" . $name . "/config"); 
 
   unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename']);
   unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename'] . '.md5');
-  
+
+  if ($convertbdev == "true") {
+    if (preg_match('/\b(zfs)\b/', $settings->default_bdevtype)) {
+      exec('lxc-dirtozfs -q ' . $name, $output, $retval);
+      $bdevtype = "ZFS";
+    } elseif (preg_match('/\b(btrfs)\b/', $settings->default_bdevtype)) {
+      exec('lxc-dirtobtrfs -q ' . $name, $output, $retval);
+      $bdevtype = "BTRFS";
+    }
+
+    echo '<p style="color:green;">Converting container ' . $name . ' to ' . $bdevtype . '</p>';
+    exec("logger LXC: Converting Container " . $name . " to " . $bdevtype);
+
+    if ($retval == 1) {
+      echo '<p style="color:red;">ERROR, Conversion from container ' . $name . '<br/> to ' . $bdevtype . ' failed!<br/><br/>---</p>';
+      exec("logger LXC: error: Converstion from Container " . $name . " to " . $bdevtype . " failed");
+      rmdir($settings->default_path . "/" . $name);
+      unlink($settings->default_path . '/cache/template_cache/' . $download_assets[0]['filename']);
+    } else {
+      echo '<p style="color:green;">Conversion to ' . $bdevtype . ' from container ' . $name . ' done<br/><br/>---</p>';
+      exec("logger LXC: Conversion to " . $bdevtype . " from Container " . $name . " done");
+    }
+  }
+
   echo '<p style="color:green;">You just created a conatiner from the repository: ' . $repository . '<br/>Please check out the  <a href="' . $repository . '" target="_blank" rel="noopener noreferrer">README</a> from the repository for further infromation!</p>';
   exec("logger LXC: Container " . $name . " created");
 
