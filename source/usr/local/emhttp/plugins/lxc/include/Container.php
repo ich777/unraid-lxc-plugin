@@ -182,10 +182,9 @@ class Container {
         echo $error . "<br/>";
       }
     } else {
-// disabled removal from custom container icons for now since they won't take much space
-//    if (file_exists($this->settings->default_path . '/custom-icons/' . $this->name . '.png')) {
-//        exec('rm ' . $this->settings->default_path . '/custom-icons/' . $this->name . '.png');
-//    }
+    if (file_exists($this->settings->default_path . '/custom-icons/' . $this->name . '.png')) {
+        exec('rm ' . $this->settings->default_path . '/custom-icons/' . $this->name . '.png');
+    }
       $settings = new Settings();
       if($settings->default_bdevtype == "zfs") {
         $dataset = (explode('/', $this->path)[2] ?? '') . '/zfs_lxccontainers/' . $this->name;
