@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.10.10">
+  <!ENTITY version   "2023.10.23">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "48cff90d960ed70e9e49cce627e86eb9">
+  <!ENTITY md5       "7000ff07252bd42b007f2669d256398b">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,11 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.10.23
+- Ensure plugin compatibility with unRAID 6.13
+- Remove custom icons on container removal
+- Minor improvements to first start from LXC
 
 ###2023.10.10
 - Add checkbox for conversion to correct storage backing type to container creation from template
@@ -423,11 +428,21 @@ if [ ! -d &plugin;/packages ]; then
   mkdir -p &plugin;/packages
 fi
 
+#Version check, set build index depending on unRAID version
+TARGET_V="6.12.99"
+COMPARE="$(cat /etc/unraid-version | cut -d '=' -f2 | cut -d '"' -f2)
+$TARGET_V"
+if [ "$TARGET_V" != "$(echo "$COMPARE" | sort -V | tail -1)" ]; then
+  BUILD_IDX="2"
+else
+  BUILD_IDX="1"
+fi
+
 #Set variables and get version numbers
 LXC_DATADIRECTORY="$(cat &plugin;/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
 LXC_SERVICE="$(cat &plugin;/plugin.cfg | grep -n "SERVICE" | cut -d '=' -f2 | sed 's/\"//g')"
 LAT_V="$(wget -qO- https://api.github.com/repos/ich777/unraid-lxc-plugin/releases/latest | jq -r '.tag_name')"
-CUR_V="$(ls &plugin;/packages/LXC-*-1.txz | sort -V | tail -1 | cut -d '-' -f2)"
+CUR_V="$(ls &plugin;/packages/LXC-*-${BUILD_IDX}.txz | sort -V | tail -1 | cut -d '-' -f2)"
 DL_URL="https://github.com/ich777/unraid-lxc-plugin/releases/download/$LAT_V"
 
 if [ -z "${LAT_V}" ]; then
@@ -442,12 +457,13 @@ if [ -z "${LAT_V}" ]; then
 fi
 
 #Check for old packages
-rm -f $(ls &plugin;/packages/LXC-*-1.txz 2>/dev/null | grep -v "$LAT_V")
+rm -f $(ls &plugin;/packages/LXC-*.txz 2>/dev/null | grep -v "$LAT_V")
+rm -f $(ls &plugin;/packages/LXC-*.txz 2>/dev/null | grep -v "\-$BUILD_IDX")
 
 download() {
 #Download LXC package
-if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packages/LXC-${LAT_V}-1.txz" "${DL_URL}/LXC-${LAT_V}-1.txz" ; then
-  if [ "$(md5sum "&plugin;/packages/LXC-${LAT_V}-1.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/LXC-${LAT_V}-1.txz.md5" | cut -d ' ' -f1)" ]; then
+if wget -q -nc --show-progress --progress=bar:force:noscroll -O "&plugin;/packages/LXC-${LAT_V}-${BUILD_IDX}.txz" "${DL_URL}/LXC-${LAT_V}-${BUILD_IDX}.txz" ; then
+  if [ "$(md5sum "&plugin;/packages/LXC-${LAT_V}-${BUILD_IDX}.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/LXC-${LAT_V}-${BUILD_IDX}.txz.md5" | cut -d ' ' -f1)" ]; then
     echo
     echo "---CHECKSUM ERROR!---"
     removepkg &name;-&version;.txz
@@ -464,7 +480,7 @@ fi
 }
 
 check() {
-if [ ! -f "&plugin;/packages/LXC-${LAT_V}-1.txz" ]; then
+if [ ! -f "&plugin;/packages/LXC-${LAT_V}-${BUILD_IDX}.txz" ]; then
   echo
   echo "---------------Downloading LXC Package!-----------------"
   echo "------------Please don't close this window!-------------"
@@ -477,7 +493,7 @@ fi
 
 install() {
 #Install LXC Package
-/sbin/installpkg "&plugin;/packages/LXC-${LAT_V}-1.txz"
+/sbin/installpkg "&plugin;/packages/LXC-${LAT_V}-${BUILD_IDX}.txz"
 ln -s &plugin;/default.conf /etc/lxc/default.conf
 ln -s &plugin;/lxc.conf /etc/lxc/lxc.conf
 }
