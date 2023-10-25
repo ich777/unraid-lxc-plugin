@@ -1,8 +1,8 @@
-Menu="Tasks:71"
+Menu="Tasks:65"
 Type="xmenu"
-Title="LXC"
+Title="LXC Containers"
 Tabs="true"
-Tag="list"
+Tag="fa-cubes"
 Code="f1b3"
 Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/dev/null\")"
 ---
@@ -25,7 +25,7 @@ $container_check = explode("\n", $container_check);
 
 <style>
 label+.content {
-    margin-top:50px !important;
+    margin-top:43px !important;
 }
 </style>
 
@@ -74,11 +74,6 @@ label+.content {
   </a>
 <? } else { ?>
 
-<div id="title" style="margin-top: 0px !important;">
-  <span class="left">
-    <i class="fa fa-cubes title"></i>LXC Containers
-  </span>
-</div>
 <table id="lxc_table" class="tablesorter shift" style="margin-top: 0px !important;">
 <thead>
 <tr>
@@ -104,6 +99,9 @@ label+.content {
   </th>
   <th>
     Autostart
+  </th>
+  <th>
+    Uptime
   </th>
 </tr>
 </thead>
@@ -222,6 +220,9 @@ foreach ($allContainers as $container) {
       }
       ?>
       <input class='lxc autostart' type='checkbox' id="<?= $container->name ?>" title="<?= _('Toggle container autostart') ?>" <?= $checked ?>>
+    </td>
+    <td>
+      <?= $container->uptime;?>
     </td>
   </tr>
   <? } ?>
