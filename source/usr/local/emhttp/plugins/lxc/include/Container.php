@@ -17,6 +17,7 @@ class Container {
   public $memoryUse;
   public $totalBytes;
   public $pid;
+  public $uptime;
   public $settings;
   public $config;
   public $path;
@@ -72,6 +73,29 @@ class Container {
     }
     $this->totalBytes = getContainerStats($this->name, "Total bytes");
     $this->pid = getContainerStats($this->name, "PID");
+    $starttime = shell_exec("ps -p " . $this->pid . " -o lstart --no-headers");
+    if ($starttime !== null){
+      $timenow = time();
+      $starttime = strtotime($starttime);
+      $seconds_elapsed = $timenow - $starttime;
+      $days = floor($seconds_elapsed / 86400);
+      $hours = floor(($seconds_elapsed % 86400) / 3600);
+      $minutes = floor(($seconds_elapsed % 3600) / 60);
+      $seconds = $seconds_elapsed % 60;
+
+      if ($days > 0) {
+        $this->uptime = "$days day" . ($days > 1 ? "s" : "");
+      } elseif ($hours > 0) {
+        $this->uptime = "$hours hour" . ($hours > 1 ? "s" : "");
+      } elseif ($minutes > 0) {
+        $this->uptime = "$minutes minute" . ($minutes > 1 ? "s" : "");
+      } else {
+        $this->uptime = "$seconds second" . ($seconds > 1 ? "s" : "");
+      }
+    } else {
+      $this->uptime = "";
+    }
+    $start_timestamp = strtotime($start_time);
     $this->cpus = $this->getCpus();
     $this->description = getVariable($this->config, '#container_description');
     $this->lxcwebui = getVariable($this->config, '#container_webui');
