@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.10.25">
+  <!ENTITY version   "2023.10.26">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "10840cf45f5c2b5facb29bac4250770b">
+  <!ENTITY md5       "d92d725f8959dcf92767b5a01413ae77">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -15,7 +15,10 @@
 
 <CHANGES>
 
-###2023.10.23
+###2023.10.26
+- Assign fixed width to dynamic updated colums on LXC page to prevent constant resizing
+
+###2023.10.25
 - Add Uptime indicator to LXC page
 - Few minor visual changes to LXC page
 
