@@ -82,25 +82,25 @@ label+.content {
       <i class="fa fa-th-list"></i>
     </a>Name/Status
   </th>
-  <th>
+  <th width="35">
     CPUs
   </th>
-  <th>
+  <th width="90">
     Memory
   </th>
   <th>
     Address
   </th>
-  <th>
+  <th width="90">
     Total RX/TX
   </th>
-  <th>
+  <th width="50">
     PID
   </th>
-  <th>
+  <th width="80">
     Autostart
   </th>
-  <th>
+  <th width="80">
     Uptime
   </th>
 </tr>
