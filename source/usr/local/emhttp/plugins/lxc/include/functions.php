@@ -137,6 +137,10 @@ function createContainer($name, $description, $distribution, $release, $startcon
     }
     echo '</p>';
   } else {
+    if($settings->default_bdevtype == "zfs") {
+      exec("zfs set canmount=on " . (explode('/', $settings->default_path)[2] ?? '') . "/zfs_lxccontainers/" . $name . "/" . $name);
+      exec("zfs mount " . (explode('/', $settings->default_path)[2] ?? '') . "/zfs_lxccontainers/" . $name . "/" . $name);
+    }
     exec("logger LXC: Container " . $name . " created");
     $container = new Container($name);
     $container->setMac($mac);
