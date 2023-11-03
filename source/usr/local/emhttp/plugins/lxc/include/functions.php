@@ -416,7 +416,7 @@ function createfromTemplate($name, $description, $repository, $webui, $icon, $st
     }
   }
 
-  echo '<p style="color:green;">You just created a conatiner from the repository: ' . $repository . '<br/>Please check out the  <a href="' . $repository . '" target="_blank" rel="noopener noreferrer">README</a> from the repository for further infromation!</p>';
+  echo '<p style="color:green;">You just created a container from the repository: ' . $repository . '<br/>Please check out the  <a href="' . $repository . '" target="_blank" rel="noopener noreferrer">README</a> from the repository for further infromation!</p>';
   exec("logger LXC: Container " . $name . " created");
 
   if ($startcont == "true") {

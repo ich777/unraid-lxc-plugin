@@ -241,6 +241,7 @@ class Container {
   }
 
   function createSnapshot() {
+    $settings = new Settings();
     $this->stopContainer();
     exec('lxc-snapshot ' . $this->name . ' 2>&1', $output, $retval);
     if ($retval == 1) {
@@ -252,6 +253,16 @@ class Container {
         echo $error . "<br/>";
       }
     } else {
+      if($settings->default_bdevtype == "zfs") {
+        $datasets = shell_exec("zfs list -r -H -o name " . (explode('/', $settings->default_path)[2] ?? '') . "/zfs_lxccontainers/" . $this->name);
+        foreach (explode("\n", trim($datasets)) as $dataset) {
+          $dataset_name = str_replace((explode('/', $settings->default_path)[2] ?? '') . "/zfs_lxccontainers/" . $this->name . "/", '', $dataset);
+          if (preg_match('/snap\d+/', $dataset_name)) {
+            shell_exec("zfs set canmount=on " . (explode('/', $settings->default_path)[2] ?? '') . "/zfs_lxccontainers/" . $this->name . "/" . $dataset_name);
+            shell_exec("zfs mount " . (explode('/', $settings->default_path)[2] ?? '') . "/zfs_lxccontainers/" . $this->name . "/" . $dataset_name);
+          }
+        }
+      }
       echo '<p>Snapshot ' .$snapshot . ' from container ' . $this->name . ' created!</p>';
       exec('logger "LXC: Snapshot ' . $snapshot . ' from container ' . $this->name. ' created"');
       if ($this->state == "RUNNING") {
