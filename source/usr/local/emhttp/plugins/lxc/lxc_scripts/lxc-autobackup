@@ -147,6 +147,7 @@ backup_lxc_container() {
     mkdir -p ${BACKUP_PATH}/${CONT_NAME}
   fi
   if [ "${FROM_SNAPSHOT}" == "true" ]; then
+    BDEVTYPE=$(cat /boot/config/plugins/lxc/plugin.cfg | grep "BDEVTYPE" | cut -d '=' -f2 | sed "s/[\"']//g" | head -1)
     echo "Creating temporary snapshot from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
     CUR_SNAPS=$(lxc-snapshot -n ${CONT_NAME} -L | awk '{print $1}' | sort)
     lxc-snapshot -n ${CONT_NAME} 2>/dev/null
@@ -159,7 +160,12 @@ backup_lxc_container() {
     fi
     TEMP_SNAP=$(diff <(echo "$CUR_SNAPS") <(echo "$NEW_SNAPS") | grep '^>' | cut -c 3-)
     echo "Creating backup from temporary snaphot ${TEMP_SNAP} from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    if [ "${BDEVTYPE}" == "zfs" ]; then
+      ZFS_POOL=$(echo $LXC_PATH | cut -d '/' -f3)
+      zfs mount ${ZFS_POOL}/zfs_lxccontainers/${CONT_NAME}/${TEMP_SNAP} 2>/dev/null
+    fi
     cd ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}
+    rm -f ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}/ts
     tar -cf - . | xz -${COMPRESSION} --threads=${THREADS} > ${BACKUP_PATH}/${CONT_NAME}/${CONT_NAME}_${DATE}.tar.xz
     echo "Taking backup from temporary snapshot ${TEMP_SNAP} from container ${CONT_NAME} finished" | tee >(logger -t "LXC: lxc-autobackup")
     echo "Deleting temporary snapshot ${TEMP_SNAP} from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")

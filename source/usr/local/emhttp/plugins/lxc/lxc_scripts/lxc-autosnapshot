@@ -42,6 +42,7 @@ fi
 # Get LXC variables
 LXC_PATH=$(cat /boot/config/plugins/lxc/lxc.conf | grep "lxc.lxcpath=" | cut -d '=' -f2-)
 TIMEOUT=$(cat /boot/config/plugins/lxc/plugin.cfg | grep "TIMEOUT=" | cut -d '=' -f2- | head -1)
+BDEVTYPE=$(cat /boot/config/plugins/lxc/plugin.cfg | grep "BDEVTYPE" | cut -d '=' -f2 | sed "s/[\"']//g" | head -1)
 
 # Determine if container is running or not
 if [ "$(lxc-info -n $1 2>/dev/null | grep "State:" | awk '{print $2}')" == "RUNNING" ]; then
@@ -60,7 +61,15 @@ if [ "${START_AFTER_SNAPSHOT}" == "true" ]; then
   echo "Container $1 stopped" | tee >(logger -t "LXC: lxc-autosnapshot")
 fi
 echo "Creating snapshot from container $1" | tee >(logger -t "LXC: lxc-autosnapshot")
+CUR_SNAPS=$(lxc-snapshot -n $1 -L | awk '{print $1}' | sort)
 lxc-snapshot -n $1 2>/dev/null
+if [ "${BDEVTYPE}" == "zfs" ]; then
+  NEW_SNAPS=$(lxc-snapshot -n $1 -L | awk '{print $1}' | sort)
+  NEW_SNAP=$(diff <(echo "$CUR_SNAPS") <(echo "$NEW_SNAPS") | grep '^>' | cut -c 3-)
+  ZFS_POOL=$(echo $LXC_PATH | cut -d '/' -f3)
+  zfs set canmount=on ${ZFS_POOL}/zfs_lxccontainers/$1/${NEW_SNAP} 2>/dev/null
+  zfs mount ${ZFS_POOL}/zfs_lxccontainers/$1/${NEW_SNAP} 2>/dev/null
+fi
 echo "Taking snapshot from container $1 finished" | tee >(logger -t "LXC: lxc-autosnapshot")
 
 # Start container if it was running before
