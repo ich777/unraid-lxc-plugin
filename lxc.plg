@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.10.29">
+  <!ENTITY version   "2023.11.03">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "016d1f673d7c822f9e46eb3653433ade">
+  <!ENTITY md5       "d07500563b6710a90b40b4eb4574849f">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,12 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.11.03
+- Bugfix for taking snapshots from the GUI to mount datasets if ZFS backing storage type is used
+- Bugfix for lxc-autsnapshot to mount datasets if ZFS backing storage type is used
+- Bugfix for lxc-autobackup where backups are not properly created if ZFS backing storage type in combination with From Snapshot enabled is used
+- Fix typo
 
 ###2023.10.29
 - Fix for ZFS backing storage type not displaying files in rootfs folder from container (this applies only to newly created containers, existing containers will be not changed)
