@@ -533,10 +533,13 @@ if [ "$(lxc-start --version 2>/dev/null)" != "${LAT_V}" ]; then
     if [ ! -z "$(pidof emhttpd)" ]; then
       enable_lxc
     fi
-    chmod 755 "&emhttp;/system/LXC usage"
-  else 
-    chmod 644 "&emhttp;/system/LXC usage"
   fi
+fi
+
+if [ "${LXC_SERVICE}" == "enabled" ]; then
+  chmod 755 "&emhttp;/system/LXC usage"
+else 
+  chmod 644 "&emhttp;/system/LXC usage"
 fi
 
 #Change download URL based on settings file entry
