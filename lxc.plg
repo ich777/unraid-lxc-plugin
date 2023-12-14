@@ -459,7 +459,7 @@ fi
 
 #Set variables and get version numbers
 LXC_DATADIRECTORY="$(cat &plugin;/lxc.conf | grep -n "lxc.lxcpath" | cut -d '=' -f2 | sed 's/\"//g')"
-LXC_SERVICE="$(cat &plugin;/plugin.cfg | grep -n "SERVICE" | cut -d '=' -f2 | sed 's/\"//g')"
+LXC_SERVICE="$(cat &plugin;/plugin.cfg | grep -nw "SERVICE" | cut -d '=' -f2 | sed 's/\"//g')"
 LAT_V="$(wget -qO- https://api.github.com/repos/ich777/unraid-lxc-plugin/releases/latest | jq -r '.tag_name')"
 CUR_V="$(ls &plugin;/packages/LXC-*-${BUILD_IDX}.txz | sort -V | tail -1 | cut -d '-' -f2)"
 DL_URL="https://github.com/ich777/unraid-lxc-plugin/releases/download/$LAT_V"
