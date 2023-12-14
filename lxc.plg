@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.11.03">
+  <!ENTITY version   "2023.12.14">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "d07500563b6710a90b40b4eb4574849f">
+  <!ENTITY md5       "a68dfcdf6a45e4e13ab063b53bef52eb">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.12.14
+- Add LXC RAM usage
 
 ###2023.11.03
 - Bugfix for taking snapshots from the GUI to mount datasets if ZFS backing storage type is used
@@ -530,6 +533,9 @@ if [ "$(lxc-start --version 2>/dev/null)" != "${LAT_V}" ]; then
     if [ ! -z "$(pidof emhttpd)" ]; then
       enable_lxc
     fi
+    chmod 755 "&emhttp;/system/LXC usage"
+  else 
+    chmod 644 "&emhttp;/system/LXC usage"
   fi
 fi
 
