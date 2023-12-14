@@ -536,6 +536,7 @@ if [ "$(lxc-start --version 2>/dev/null)" != "${LAT_V}" ]; then
   fi
 fi
 
+#Make LXC RAM usage script executable when service is enabled
 if [ "${LXC_SERVICE}" == "enabled" ]; then
   chmod 755 "&emhttp;/system/LXC usage"
 else 
