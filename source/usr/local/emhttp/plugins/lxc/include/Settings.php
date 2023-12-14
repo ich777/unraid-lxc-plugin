@@ -118,6 +118,12 @@ class Settings {
       exec('lxc-autostart');
     }
 
+    if ($service_status == "enabled") {
+      chmod("/usr/local/emhttp/plugins/lxc/system/LXC usage", 0755);
+    } else {
+      chmod("/usr/local/emhttp/plugins/lxc/system/LXC usage", 0644);
+    }
+
     exec("sed -i '/^DOWNLOAD_SERVER=\"*/c\DOWNLOAD_SERVER=\"" . escapeshellarg($default_cont_url) . "\"' /usr/share/lxc/templates/lxc-download");
   }
 
