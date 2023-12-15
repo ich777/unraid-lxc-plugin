@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.12.14">
+  <!ENTITY version   "2023.12.15">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "a68dfcdf6a45e4e13ab063b53bef52eb">
+  <!ENTITY md5       "73f6e9792adf7dd56a78baae1482c2ae">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2023.12.15
+- Compatibility update for LXC RAM usage
 
 ###2023.12.14
 - Add LXC RAM usage
@@ -538,9 +541,9 @@ fi
 
 #Make LXC RAM usage script executable when service is enabled
 if [ "${LXC_SERVICE}" == "enabled" ]; then
-  chmod 755 "&emhttp;/system/LXC usage"
+  chmod 755 &emhttp;/system/LXC_usage
 else 
-  chmod 644 "&emhttp;/system/LXC usage"
+  chmod 644 &emhttp;/system/LXC_usage
 fi
 
 #Change download URL based on settings file entry
