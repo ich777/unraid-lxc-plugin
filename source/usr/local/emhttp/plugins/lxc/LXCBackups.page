@@ -31,7 +31,7 @@ foreach ($allContainers as $container) { ?>
               <td>
                 <?= $backup->date ?> <?= $backup->time ?>
               </td>
-              <td style='display: flex;'>
+              <td>
                 <a href='LXCRestoreBackup?cont=<?= $container->name?>&backup=<?= $backup->time ?>_<?= $backup->date ?>.tar.xz' class='button'>
                   Create Container From Backup
                 </a>
