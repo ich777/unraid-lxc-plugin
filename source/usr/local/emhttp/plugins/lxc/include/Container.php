@@ -51,6 +51,7 @@ class Container {
     $memory = shell_exec("lxc-cgroup " . $this->name . " memory.stat");
     if ($memory !== null) {
       $memory = explode("\n", $memory);
+      $memorybytes = 0;
       foreach ($memory as $line) {
         $parts = preg_split('/\s+/', trim($line));
         if (count($parts) == 2) {
@@ -61,7 +62,7 @@ class Container {
           }
         }
       }
-      if (empty($memorybytes) || $memorybytes == 0) {
+      if ($memorybytes == 0) {
         $this->memoryUse = "N/A";
       } elseif ($memorybytes >= 1024 * 1024 * 1024) {
         $this->memoryUse = round($memorybytes / (1024 * 1024 * 1024), 2) . ' GiB';
@@ -95,7 +96,6 @@ class Container {
     } else {
       $this->uptime = "";
     }
-    $start_timestamp = strtotime($start_time);
     $this->cpus = $this->getCpus();
     $this->description = getVariable($this->config, '#container_description');
     $this->lxcwebui = getVariable($this->config, '#container_webui');
@@ -263,8 +263,8 @@ class Container {
           }
         }
       }
-      echo '<p>Snapshot ' .$snapshot . ' from container ' . $this->name . ' created!</p>';
-      exec('logger "LXC: Snapshot ' . $snapshot . ' from container ' . $this->name. ' created"');
+      echo '<p>Snapshot  from container ' . $this->name . ' created!</p>';
+      exec('logger "LXC: Snapshot from container ' . $this->name. ' created"');
       if ($this->state == "RUNNING") {
         $this->startContainer();
       }
