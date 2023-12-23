@@ -38,7 +38,7 @@ foreach ($allContainers as $container) { ?>
               <td>
                 <?= $snapshot->date ?> <?= $snapshot->time ?>
               </td>
-              <td style='display: flex;'>
+              <td>
                 <a href='LXCRestoreSnapshot?cont=<?= $container->name?>&snap=<?= $snapshot->name ?>&date=<?= $snapshot->date ?>_<?= $snapshot->time ?>' class='button'>
                   Create Container From Snapshot
                 </a>
