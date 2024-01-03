@@ -29,8 +29,8 @@
 }
 
 /* Table spacing */
-tr {
-    margin-bottom: 5px;
+table tbody td {
+    line-height:normal
 }
 
 /* Terminal button */
