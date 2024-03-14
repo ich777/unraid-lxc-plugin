@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.01.03">
+  <!ENTITY version   "2024.03.14">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "f078bac47464a1866bec2f50e7ea131a">
+  <!ENTITY md5       "6e67e0cbb0e265a60e80b1d431a7705a">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.03.14
+- Bugfix for restoring a Backup through lxc-autobackup where the paths where not correctly populated when using BTRFS or ZFS as Backing Storage type in the config file
 
 ###2024.01.03
 - Fix CSS issue for line-height
