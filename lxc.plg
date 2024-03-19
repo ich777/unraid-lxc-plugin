@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.03.19">
+  <!ENTITY version   "2024.03.19a">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "1ec3730e0a302d4d6f0f5b39bce83a0b">
+  <!ENTITY md5       "1ddf72ae0de43b252d6c7e83e7c2374d">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.03.19a
+- Workaround for destroying NixOS based containers in combination with Directory Backing Storage Type because of immutable bit set on a directory
 
 ###2024.03.19
 - Bugfix for LXC not working properly after first start
