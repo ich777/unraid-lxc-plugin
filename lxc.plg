@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.03.14">
+  <!ENTITY version   "2024.03.19">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "6e67e0cbb0e265a60e80b1d431a7705a">
+  <!ENTITY md5       "1ec3730e0a302d4d6f0f5b39bce83a0b">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.03.19
+- Bugfix for LXC not working properly after first start
+- Bugfix for Dashboard page
 
 ###2024.03.14
 - Bugfix for restoring a Backup through lxc-autobackup where the paths where not correctly populated when using BTRFS or ZFS as Backing Storage type in the config file
@@ -531,11 +535,11 @@ ln -s &plugin;/lxc.conf /etc/lxc/lxc.conf
 }
 
 enable_lxc() {
+rm -rf /var/cache/lxc
 if [ ! -d ${LXC_DATADIRECTORY}/cache ]; then
   mkdir -p ${LXC_DATADIRECTORY}/cache
 fi
-rm -rf /var/cache/lxc 
-ln -s ${LXC_DATADIRECTORY}/cache /var/cache/lxc
+ln -s ${LXC_DATADIRECTORY}/cache/ /var/cache/lxc
 }
 
 #Check if LXC Package is already downloaded
