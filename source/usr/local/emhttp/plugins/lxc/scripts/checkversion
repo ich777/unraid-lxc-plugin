@@ -1,0 +1,65 @@
+#!/bin/bash
+# get versions
+CUR_V="$(lxc-info --version)"
+LAT_V="$(wget -qO- https://api.github.com/repos/ich777/unraid-lxc-plugin/releases/latest | jq -r '.tag_name')"
+
+upgrade() {
+  # set build index depending on unRAID version
+  TARGET_V="6.12.99"
+  COMPARE="$(cat /etc/unraid-version | cut -d '=' -f2 | cut -d '"' -f2)
+$TARGET_V"
+  if [ "$TARGET_V" != "$(echo "$COMPARE" | sort -V | tail -1)" ]; then
+    BUILD_IDX="2"
+  else
+    BUILD_IDX="1"
+  fi
+  
+  # set download url
+  DL_URL="https://github.com/ich777/unraid-lxc-plugin/releases/download/$LAT_V"
+  
+  # download LXC package
+  if wget -q -nc --show-progress --progress=bar:force:noscroll -O "/boot/config/plugins/lxc/packages/LXC-${LAT_V}-${BUILD_IDX}.txz" "${DL_URL}/LXC-${LAT_V}-${BUILD_IDX}.txz" ; then
+    echo "Checksum validation..."
+    if [ "$(md5sum "/boot/config/plugins/lxc/packages/LXC-${LAT_V}-${BUILD_IDX}.txz" | cut -d ' ' -f1)" != "$(wget -qO- "${DL_URL}/LXC-${LAT_V}-${BUILD_IDX}.txz.md5" | cut -d ' ' -f1)" ]; then
+      echo
+      echo "ERROR: CHECKSUM VALIDATION FAILED!"
+      rm -rf /boot/config/plugins/lxc/packages/LXC-${LAT_V}-${BUILD_IDX}.txz
+      exit 1
+    fi
+    echo "Checksum validation passed!"
+    echo "Successfully downloaded LXC Package, installing please wait..."
+  else
+    echo
+    echo "ERROR: Can't download LXC Package!"
+    rm -rf /boot/config/plugins/lxc/packages/LXC-${LAT_V}-${BUILD_IDX}.txz
+    exit 1
+  fi
+
+  # install package
+  upgradepkg --install-new /boot/config/plugins/lxc/packages/LXC-${LAT_V}-${BUILD_IDX}.txz 2&>1 > /dev/null
+  
+  # remove old package
+  rm -f $(ls /boot/config/plugins/lxc/packages/LXC-*.txz 2>/dev/null | grep -v "$LAT_V")
+  rm -f $(ls /boot/config/plugins/lxc/packages/LXC-*.txz 2>/dev/null | grep -v "\-$BUILD_IDX")
+  echo
+  echo "Installation done!"
+  echo
+  echo "ATTENTION: It is strongly recommended to reboot after the update!"
+  exit 0
+}
+
+# version check
+if [ -z "${LAT_V}" ]; then
+  echo "---Something went wrong, can't get latest version from LXC!---"
+  exit 1
+elif [ "${CUR_V}" == "${LAT_V}" ]; then
+  echo "Nothing to do..."
+  echo
+  echo "LXC version $CUR_V up-to-date!"
+  exit 0
+else
+  echo "Found new LXC version $LAT_V"
+  echo
+  echo "Please wait, downloading and installing new version!"
+  upgrade
+fi
