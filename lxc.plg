@@ -6,7 +6,7 @@
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "ee4a847ae84bab8916942fda6614a404">
+  <!ENTITY md5       "6a23ca207a304e86d6f6c49826445f54">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -16,7 +16,8 @@
 <CHANGES>
 
 ###2024.04.07
-- LXC Settings Update page added. Allows to check manually for LXC package updates from within the WebGUI.
+- Added Installed LXC Version to main settings page
+- LXC Settings Update page added. Allows to check manually for LXC package updates from within the WebGUI
 
 ###2024.03.19a
 - Workaround for destroying NixOS based containers in combination with Directory Backing Storage Type because of immutable bit set on a directory
