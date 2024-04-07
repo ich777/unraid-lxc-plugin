@@ -1,0 +1,23 @@
+Menu="LXCSettings:4"
+Title="Update"
+Tag="arrow-circle-o-up "
+---
+
+<b style="color: red">It is recommended to first stop all containers and close all open LXC pages to avoid issues during the update!</b>
+You can stop all running container with this button:
+:  <a class="stopALLCONT"><input type="button" value="Stop All LXC Containers"></a>
+
+<blockquote class="inline_help">
+<p>Don't forget to start your LXC containers again after doing the manual update check!</p>
+</blockquote>
+
+<br/>
+
+Check for new LXC version:
+:  <input type="button" id="updatecheck" value="Check" onclick="openBox('/usr/local/emhttp/plugins/lxc/scripts/checkversion','LXC Update Check',600,800,false)">
+
+<blockquote class="inline_help">
+<p>This button will start a update check and update the LXC package if a newer version than installed is available.<br/>It is recommended to reboot after the update but not strictly necessary!<br/><br/><b>Note:</b> A automatic update check is done on every reboot from your unRAID Server (requires a active Internet connection on boot).</p>
+</blockquote>
+
+<div class="spinner"></div>
