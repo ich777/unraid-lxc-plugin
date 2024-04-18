@@ -16,6 +16,7 @@ $containerNames = [];
 $compareNames = [];
 $container_check = shell_exec('cd ' . $settings->default_path . ' && find . -maxdepth 2 -type f -name "config" -exec dirname {} \; | sed "s/^\.\///"');
 $container_check = explode("\n", $container_check);
+$cpu_count = shell_exec('nproc --all');
 ?>
 
 <link rel="stylesheet" href="<?autov('/plugins/lxc/css/lxc.css')?>">
@@ -84,6 +85,9 @@ label+.content {
   </th>
   <th width="35">
     CPUs
+  </th>
+  <th width="45">
+    CPU Load
   </th>
   <th width="90">
     Memory
@@ -199,13 +203,16 @@ foreach ($allContainers as $container) {
     <td>
       <?= $container->cpus;?>
     </td>
-    <td id="memoryUse-<?= ($container->state == "RUNNING") ? $container->name : "";?>">
+    <td style="text-align: right;" id="<?= ($container->state == "RUNNING") ? "cpu_usage-" . $container->name : "";?>">
+      <?=  ($container->state == "RUNNING") ? ($container->cpu_usage == "na") ? "N/A" : round($container->cpu_usage / $cpu_count, 0) . "%" : "";?>
+    </td>
+    <td id="<?= ($container->state == "RUNNING") ? "memoryUse-" . $container->name : "";?>">
       <?=  $container->memoryUse;?>
     </td>
-    <td id="ips-<?= ($container->state == "RUNNING") ? $container->name : "";?>">
+    <td id="<?= ($container->state == "RUNNING") ? "ips-" . $container->name : "";?>">
       <?=  $container->ips;?>
     </td>
-    <td id="totalBytes-<?= ($container->state == "RUNNING") ? $container->name : "";?>">
+    <td id="<?= ($container->state == "RUNNING") ? "totalBytes-" . $container->name : "";?>">
       <?= $container->totalBytes;?>
     </td>
     <td>
@@ -270,7 +277,6 @@ if (count($differences) > 0) {
 }
 ?>
 
-
 <script>
   var containerNames = <?= json_encode($containerNames); ?>;
   function updateValues() {
@@ -281,6 +287,12 @@ if (count($differences) > 0) {
       success: function(response) {
         var data = JSON.parse(response);
         for (var i = 0; i < data.length; i++) {
+          if ((data[i].cpu_usage) === "na") {
+            $('#cpu_usage-' + data[i].name).html("N/A");
+          } else {
+            var cpuUsageWithCpuCount = ((data[i].cpu_usage) / <?= $cpu_count ?>);
+            $('#cpu_usage-' + data[i].name).html(cpuUsageWithCpuCount.toFixed(0) + "%");
+          }
           $('#memoryUse-' + data[i].name).html(data[i].memoryUse);
           $('#ips-' + data[i].name).html(data[i].ips);
           $('#totalBytes-' + data[i].name).html(data[i].totalBytes);
@@ -313,4 +325,3 @@ if (count($differences) > 0) {
 <?php } else { ?>
 <h3 style="text-align: center;">Please start the Array!</h3>
 <?php } ?>
-
