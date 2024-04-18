@@ -137,10 +137,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'updateValues') {
     $data = [];
     foreach ($containerNames as $name) {
         $container = new Container($name);
+        $cpu_usage = $container->cpu_usage;
         $memoryUse = $container->memoryUse;
         $ips = $container->ips;
         $totalBytes = $container->totalBytes;
-        $data[] = ['name' => $name, 'memoryUse' => $memoryUse, 'ips' => $ips, 'totalBytes' => $totalBytes];
+        $data[] = ['name' => $name, 'cpu_usage' => $cpu_usage, 'memoryUse' => $memoryUse, 'ips' => $ips, 'totalBytes' => $totalBytes];
     }
     echo json_encode($data);
 }

@@ -12,6 +12,7 @@ class Container {
   public $snapshots;
   public $backups;
   public $backup_path;
+  public $cpu_usage;
   public $ips;
   public $distribution;
   public $memoryUse;
@@ -37,6 +38,16 @@ class Container {
     $this->snapshots = $this->getSnapshots();
     $this->backups = $this->getBackups();
     $this->backup_path = realpath($this->settings->backup_path);
+    if ($this->state === "RUNNING") {
+      $cpu_usage = trim(shell_exec("lxc-attach -n " . $this->name . " -- ps -eo pcpu | awk 'NR>1 {sum+=$1} END {print sum}'"));
+      if (is_numeric($cpu_usage)) {
+        $this->cpu_usage = $cpu_usage;
+      } else {
+        $this->cpu_usage = "na";
+      }
+    } else {
+      $this->cpu_usage = "na";
+    }
     $ipInfo = shell_exec("lxc-info " . $this->name . " -iH");
     if ($ipInfo !== null) {
       $ipInfov4 = '';
@@ -196,6 +207,9 @@ class Container {
 
     $this->killContainer();
     exec('umount ' . $this->path . '/rootfs');
+    if (is_dir($this->path . '/rootfs/var/empty')) {
+      exec('find '. $this->path . '/rootfs/var/empty -exec chattr -i {} \;');
+    }
     exec('lxc-destroy -s ' . $this->name . ' 2>&1', $output, $retval);
     if ($retval == 1) {
       echo '<p style="color:red;">';
