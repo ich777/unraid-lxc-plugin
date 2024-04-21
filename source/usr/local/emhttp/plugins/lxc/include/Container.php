@@ -39,50 +39,21 @@ class Container {
     $this->backups = $this->getBackups();
     $this->backup_path = realpath($this->settings->backup_path);
     if ($this->state === "RUNNING") {
-      $cpu_usage = trim(shell_exec("lxc-attach -n " . $this->name . " -- ps -eo pcpu | awk 'NR>1 {sum+=$1} END {print sum}'"));
-      if (is_numeric($cpu_usage)) {
-        $this->cpu_usage = $cpu_usage;
+      file_put_contents('/tmp/lxc/containers/active', time());
+      $container_stats = parse_ini_file('/tmp/lxc/containers/' . $this->name);
+      if ($container_stats === null) {
+        $container_stats = array("CPU" => "na", "MEMORY" => "", "IPS" => "");
       } else {
-        $this->cpu_usage = "na";
+        $this->cpu_usage = $container_stats['CPU'];
+        $this->memoryUse = $container_stats['MEMORY'];
+        $this->ips = $container_stats['IPS'];
       }
     } else {
-      $this->cpu_usage = "na";
-    }
-    $ipInfo = shell_exec("lxc-info " . $this->name . " -iH");
-    if ($ipInfo !== null) {
-      $ipInfov4 = '';
-      $ipInfoDocker = '';
-      $ipInfov6 = '';
-      $ipInfov4 = shell_exec('echo "' . $ipInfo . '" | grep "\." | grep -v "172."');
-      $ipInfoDocker = shell_exec('echo "' . $ipInfo . '" | grep -E "172."');
-      $ipInfov6 = shell_exec('echo "' . $ipInfo . '" | grep "\:"');
-      $this->ips = nl2br(trim($ipInfov4 . $ipInfoDocker . $ipInfov6));
+      $this->cpu_usage = "";
+      $this->memoryUse = "";
+      $this->ips = "";
     }
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
-    $memory = shell_exec("lxc-cgroup " . $this->name . " memory.stat");
-    if ($memory !== null) {
-      $memory = explode("\n", $memory);
-      $memorybytes = 0;
-      foreach ($memory as $line) {
-        $parts = preg_split('/\s+/', trim($line));
-        if (count($parts) == 2) {
-          $name = $parts[0];
-          $value = intval($parts[1]);
-          if (in_array($name, ['anon', 'kernel', 'kernel_stack', 'pagetables', 'sec_pagetables', 'percpu', 'sock', 'vmalloc', 'shmem'])) {
-              $memorybytes += $value;
-          }
-        }
-      }
-      if ($memorybytes == 0) {
-        $this->memoryUse = "N/A";
-      } elseif ($memorybytes >= 1024 * 1024 * 1024) {
-        $this->memoryUse = round($memorybytes / (1024 * 1024 * 1024), 2) . ' GiB';
-      } elseif ($memorybytes >= 1024 * 1024) {
-        $this->memoryUse = round($memorybytes / (1024 * 1024), 2) . ' MiB';
-      } else {
-        $this->memoryUse = $memorybytes . ' Bytes';
-      }
-    }
     $this->totalBytes = getContainerStats($this->name, "Total bytes");
     $this->pid = getContainerStats($this->name, "PID");
     $starttime = shell_exec("ps -p " . $this->pid . " -o lstart --no-headers");
