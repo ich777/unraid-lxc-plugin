@@ -1,0 +1,37 @@
+#!/bin/bash
+while true
+do
+  TIMESTAMP=$(cat /tmp/lxc/containers/active)
+  if [ $(($(date +%s) -$TIMESTAMP)) -gt 15 ]; then
+    break
+  else
+    USAGE1=$(awk '/usage_usec/ {print $2}' /sys/fs/cgroup/lxc.payload.${1}/cpu.stat 2>/dev/null)
+    sleep 1
+    USAGE2=$(awk '/usage_usec/ {print $2}' /sys/fs/cgroup/lxc.payload.${1}/cpu.stat 2>/dev/null)
+    USAGE=$((($USAGE2 - $USAGE1) / 10000))
+    BYTES=$(grep -Ew "anon|kernel|kernel_stack|pagetables|sec_pagetables|percpu|sock|vmalloc|shmem" <<< $(lxc-cgroup -n ${1} memory.stat 2>/dev/null) | awk '{sum += $2} END {print sum}')
+    if [ -z "${BYTES}" ] || [ ${BYTES} == 0 ]; then
+      MEM=0
+    elif [ ${BYTES} -gt 1073741824 ]; then
+      MEM="$(awk '{printf "%.2f", $1 / 1073741824}' <<< ${BYTES}) GiB"
+    elif [ ${BYTES} -gt 1048576 ]; then
+      MEM="$(awk '{printf "%.2f", $1 / 1048576}' <<< ${BYTES}) MiB"
+    else
+      MEM="${BYTES} Bytes"
+    fi
+    IPINFO=$(lxc-info ${1} -iH 2>/dev/null)
+    if [ -z "${IPINFO}" ]; then
+      IPs=""
+    else
+      IPv4="$(grep '\.' <<< ${IPINFO} | grep -v '172\.')"
+      IPDocker="$(grep -E "172." <<< ${IPINFO})"
+      IPv6="$(grep ':' <<< ${IPINFO})"
+      IPs="$(echo -e "${IPv4}\n${IPDocker}\n${IPv6}" | grep -v '^$')"
+    fi
+    echo "CPU = ${USAGE}
+MEMORY = ${MEM}
+IPS = \"${IPs//$'\n'/<br/>}\"" > /tmp/lxc/containers/.${1}
+    mv /tmp/lxc/containers/.${1} /tmp/lxc/containers/${1}
+  fi
+done
+rm /tmp/lxc/containers/${1} /tmp/lxc/containers/.${1}
