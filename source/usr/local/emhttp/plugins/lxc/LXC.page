@@ -17,6 +17,10 @@ $compareNames = [];
 $container_check = shell_exec('cd ' . $settings->default_path . ' && find . -maxdepth 2 -type f -name "config" -exec dirname {} \; | sed "s/^\.\///"');
 $container_check = explode("\n", $container_check);
 $cpu_count = shell_exec('nproc --all');
+
+if (!file_exists('/tmp/lxc/containers')) {
+  mkdir('/tmp/lxc/containers', 0777, true);
+}
 ?>
 
 <link rel="stylesheet" href="<?autov('/plugins/lxc/css/lxc.css')?>">
@@ -204,16 +208,23 @@ foreach ($allContainers as $container) {
       <?= $container->cpus;?>
     </td>
     <td style="text-align: right;" id="<?= ($container->state == "RUNNING") ? "cpu_usage-" . $container->name : "";?>">
-      <?=  ($container->state == "RUNNING") ? ($container->cpu_usage == "na") ? "N/A" : round($container->cpu_usage / $cpu_count, 0) . "%" : "";?>
+      <?php 
+      if ($container->state == "RUNNING") {
+        echo "<i class='fa fa-refresh'>";
+        if (!shell_exec('pgrep -f "/usr/local/emhttp/plugins/lxc/scripts/lxc_stats_worker ' . $container->name . '"')) {
+          shell_exec('/usr/local/emhttp/plugins/lxc/scripts/lxc_stats_worker "' . $container->name . '" > /dev/null 2>/dev/null &');
+        }
+      }
+      ?>
     </td>
     <td id="<?= ($container->state == "RUNNING") ? "memoryUse-" . $container->name : "";?>">
-      <?=  $container->memoryUse;?>
+      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh'>" : "";?>
     </td>
     <td id="<?= ($container->state == "RUNNING") ? "ips-" . $container->name : "";?>">
-      <?=  $container->ips;?>
+      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh'>" : "";?>
     </td>
     <td id="<?= ($container->state == "RUNNING") ? "totalBytes-" . $container->name : "";?>">
-      <?= $container->totalBytes;?>
+      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh'>" : "";?>
     </td>
     <td>
       <?= $container->pid;?>
@@ -300,7 +311,7 @@ if (count($differences) > 0) {
       }
     });
   }
-  setInterval(updateValues, 3000);
+  setInterval(updateValues, 2000);
 </script>
 <a href="LXCAddContainer">
   <input type="button" value="Add Container">
