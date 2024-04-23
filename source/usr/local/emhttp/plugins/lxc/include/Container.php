@@ -16,6 +16,7 @@ class Container {
   public $ips;
   public $distribution;
   public $memoryUse;
+  public $setmemory;
   public $totalBytes;
   public $pid;
   public $uptime;
@@ -54,6 +55,17 @@ class Container {
       $this->ips = "";
     }
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
+    $setmembytes = trim(shell_exec("grep 'lxc.cgroup.memory.limit_in_bytes' " . $this->config . " | awk -F= '{ print $2 }'"));
+    if (empty($setmembytes)) {
+      $setmembytes = trim(shell_exec('awk \'/MemTotal/ { printf "%.0f\n", $2 * 1024 }\' /proc/meminfo'));
+    }
+    if ($setmembytes >= 1024 * 1024 * 1024) {
+      $this->setmemory = round($setmembytes / (1024 * 1024 * 1024), 2) . 'GiB';
+    } elseif ($setmembytes >= 1024 * 1024) {
+      $this->setmemory = round($setmembytes / (1024 * 1024), 2) . 'MiB';
+    } else {
+      $this->setmemory = $setmembytes . 'Bytes';
+    }
     $this->totalBytes = getContainerStats($this->name, "Total bytes");
     $this->pid = getContainerStats($this->name, "PID");
     $starttime = shell_exec("ps -p " . $this->pid . " -o lstart --no-headers");
