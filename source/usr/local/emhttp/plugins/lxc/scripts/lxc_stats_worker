@@ -13,11 +13,11 @@ do
     if [ -z "${BYTES}" ] || [ ${BYTES} == 0 ]; then
       MEM=0
     elif [ ${BYTES} -gt 1073741824 ]; then
-      MEM="$(awk '{printf "%.2f", $1 / 1073741824}' <<< ${BYTES}) GiB"
+      MEM="$(awk '{printf "%.2f", $1 / 1073741824}' <<< ${BYTES})GiB"
     elif [ ${BYTES} -gt 1048576 ]; then
-      MEM="$(awk '{printf "%.2f", $1 / 1048576}' <<< ${BYTES}) MiB"
+      MEM="$(awk '{printf "%.2f", $1 / 1048576}' <<< ${BYTES})MiB"
     else
-      MEM="${BYTES} Bytes"
+      MEM="${BYTES}Bytes"
     fi
     IPINFO=$(lxc-info ${1} -iH 2>/dev/null)
     if [ -z "${IPINFO}" ]; then
