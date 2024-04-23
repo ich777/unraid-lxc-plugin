@@ -17,7 +17,6 @@ $compareNames = [];
 $container_check = shell_exec('cd ' . $settings->default_path . ' && find . -maxdepth 2 -type f -name "config" -exec dirname {} \; | sed "s/^\.\///"');
 $container_check = explode("\n", $container_check);
 $cpu_count = shell_exec('nproc --all');
-
 if (!file_exists('/tmp/lxc/containers')) {
   mkdir('/tmp/lxc/containers', 0777, true);
 }
@@ -93,8 +92,8 @@ label+.content {
   <th width="45">
     CPU Load
   </th>
-  <th width="90">
-    Memory
+  <th width="140">
+    Memory Usage
   </th>
   <th>
     Address
@@ -121,6 +120,7 @@ foreach ($allContainers as $container) {
   $disableAutoButton = '<input type="submit" class="disableAUTOSTART" value="Disable" id="' . $container->name .'">';
   $enableAutoButton = '<input type="submit" class="enableAUTOSTART" value="Enable" id="' . $container->name .'">';
   $containerNames[] = $container->name;
+  $setcontainerMem[$container->name] = $container->setmemory;
   ?>
   <tr>
     <td class="ct-name">
@@ -290,6 +290,7 @@ if (count($differences) > 0) {
 
 <script>
   var containerNames = <?= json_encode($containerNames); ?>;
+  var setMemory = <?= json_encode($setcontainerMem); ?>;
   function updateValues() {
     $.ajax({
       url: '/plugins/lxc/include/ajax.php',
@@ -304,7 +305,7 @@ if (count($differences) > 0) {
             var cpuUsageWithCpuCount = ((data[i].cpu_usage) / <?= $cpu_count ?>);
             $('#cpu_usage-' + data[i].name).html(cpuUsageWithCpuCount.toFixed(0) + "%");
           }
-          $('#memoryUse-' + data[i].name).html(data[i].memoryUse);
+          $('#memoryUse-' + data[i].name).html(data[i].memoryUse + ' / ' + setMemory[data[i].name]);
           $('#ips-' + data[i].name).html(data[i].ips);
           $('#totalBytes-' + data[i].name).html(data[i].totalBytes);
         }
