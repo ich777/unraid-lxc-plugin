@@ -17,6 +17,7 @@
 
 ###2024.04.23
 - Display system memory or set system memory if limited with lxc.cgroup.memory.limit_in_bytes on LXC page
+- Minor visual changes and tweaks
 
 ###2024.04.21
 - Revamped how CPU Load and other dynamic statistics are gathered on LXC page
