@@ -230,21 +230,19 @@ function createFromBackup($name, $description, $container, $backup, $autostart, 
 }
 
 function downloadLXCproducts($url) {
-  $urlparse = parse_url($url);
   $filename = "lxcimages";
   $path = '/tmp/lxc';
+  $url = escapeshellarg($url);
   if (!is_dir($path)) {
     mkdir($path, 0755, true);
   }
   if (!file_exists($path . '/' . $filename . '.json')) {
-      $json = file_get_contents($url);
-      file_put_contents($path . '/' . $filename . '.json', $json);
+      shell_exec("wget -q -O " . $path . '/' . $filename . '.json' . " " . $url);
   } else {
     $fileage =  time() - filemtime($path . '/' . $filename . '.json');
     if ($fileage > 3600) {
       unlink($path . '/' . $filename . '.json');
-      $json = file_get_contents($url);
-      file_put_contents($path . '/' . $filename . '.json', $json);
+      shell_exec("wget -q -O " . $path . '/' . $filename . 'lxcimages.json' . " " . $url);
     }
   }
 }
