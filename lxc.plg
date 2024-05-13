@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.04.23">
+  <!ENTITY version   "2024.05.13">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "3785e3208a0776b7ef932636689b77db">
+  <!ENTITY md5       "efd8e3ada4ff580d5fe2ce3cb2be95d5">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.05.13
+- Make sure that LXC Container Images index is going through Proxy if a Proxy is used/enabled
 
 ###2024.04.23
 - Display system memory or set system memory if limited with lxc.cgroup.memory.limit_in_bytes on LXC page
