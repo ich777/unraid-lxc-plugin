@@ -235,6 +235,7 @@ function downloadLXCproducts($url) {
   $url = escapeshellarg($url);
   if (!is_dir($path)) {
     mkdir($path, 0755, true);
+    sleep(1);
   }
   if (!file_exists($path . '/' . $filename . '.json')) {
       shell_exec("wget -q -O " . $path . '/' . $filename . '.json' . " " . $url);
