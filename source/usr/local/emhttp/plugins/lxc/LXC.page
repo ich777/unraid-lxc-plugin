@@ -148,16 +148,24 @@ foreach ($allContainers as $container) {
           <span style="font-size:9pt"><i class='<?php if($container->state == "RUNNING") { echo "fa fa-play started green-text"; } elseif($container->state == "FROZEN") { echo "fa fa-pause paused orange-text"; } else { echo "fa fa-square stopped red-text"; } ?>'></i> <?php if($container->state == "RUNNING") { echo "started"; } elseif($container->state == "FROZEN") { echo "paused"; } else { echo "stopped"; } ?></span>
           <ul id="dropdown_<?= $container->name;?>" class="dropdown-menu dropdown-context fa-ul">
             <?php if ($container->state == "RUNNING") { ?>
-              <?php if (!empty($container->lxcwebui)) {
-                      if (strpos($container->lxcwebui, "[IP]") !== false) {
-                        $IPfromCont = str_replace("[IP]", strtok($container->ips, "<br/>"), $container->lxcwebui);
-                        if (!empty($container->ips)) {
-                          echo "<li><a target='_blank' href='" . $IPfromCont . "'><i class='fa fa-fw fa-globe fa-lg'></i> WebUI</a></li>";
-                        }
-                      } else {
-                        echo "<li><a target='_blank' href='" . $container->lxcwebui . "'><i class='fa fa-fw fa-globe fa-lg'></i> WebUI</a></li>";
-                      }
-                    } ?> 
+              <?php if ($container->lxcwebui !== null) {
+                  if (strpos($container->lxcwebui, "[IP]") !== false) {
+                    $ipInfo = shell_exec("lxc-info " . $container->name . " -iH");
+                    $ipInfov4 = '';
+                    $ipInfoDocker = '';
+                    $ipInfov6 = '';
+                    $ipInfov4 = shell_exec('echo "' . $ipInfo . '" | grep "\." | grep -v "172."');
+                    $ipInfoDocker = shell_exec('echo "' . $ipInfo . '" | grep -E "172."');
+                    $ipInfov6 = shell_exec('echo "' . $ipInfo . '" | grep "\:"');
+                    $ips = nl2br(trim($ipInfov4 . $ipInfoDocker . $ipInfov6));
+                    $IPfromCont = str_replace("[IP]", strtok($ips, "<br/>"), $container->lxcwebui);
+                    if (!empty($ips)) {
+                      echo "<li><a target='_blank' href='" . $IPfromCont . "'><i class='fa fa-fw fa-globe fa-lg'></i> WebUI</a></li>";
+                    }
+                  } else {
+                    echo "<li><a target='_blank' href='" . $container->lxcwebui . "'><i class='fa fa-fw fa-globe fa-lg'></i> WebUI</a></li>";
+                  }
+                } ?> 
               <li><a href="#" title="Terminal" onclick="startConsole('<?= $container->name ?>')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>
               <div class="divider"></div>
               <li><a href="#" class="stopCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>
@@ -330,7 +338,6 @@ if (count($differences) > 0) {
   <input type="button" value="Unfreeze All">
 </a>
 <div class="spinner"></div>
-
 
 <? } ?>
 

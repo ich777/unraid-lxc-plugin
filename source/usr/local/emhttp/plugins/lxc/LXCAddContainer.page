@@ -25,17 +25,14 @@ $json_data = json_decode($json_data, true);
 $json_data = json_encode($json_data['index']['images']['products']);
 $json_data = json_decode($json_data, true);
 
-
 $avail_images = [];
 
 foreach ($json_data as $item) {
-    list($distribution, $release, $architecture, $type) = explode(':', $item);
-    
-    $avail_images[$distribution][$release][$architecture][$type] = true;
+  list($distribution, $release, $architecture, $type) = explode(':', $item);  
+  $avail_images[$distribution][$release][$architecture][$type] = true;
 }
 
 $avail_images_json = json_encode($avail_images);
-
 ?>
 
 
@@ -60,20 +57,19 @@ $avail_images_json = json_encode($avail_images);
     <div class="">
       <dl>
         <dt>Distribution:</dt>
-        <dd><input type="text" name="contDistribution" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+"
-                   style="text-transform:lowercase" required="true" value="debian" class="forbidSpace">
-                   <?php if($settings->default_cont_url === 'images.linuxcontainers.org') {
-                     echo 'You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></dd>';
-                   } else {
-                     echo 'To go to your custom set mirror click <a href="https://' . $settings->default_cont_url . '" target="_blank">HERE</a></dd>';
-                   } ?>              
+        <dd><input type="text" name="contDistribution" pattern="[a-zA-Z0-9\.]+" style="text-transform:lowercase" required="true" value="debian" class="forbidSpace">
+          <?php if($settings->default_cont_url === 'images.linuxcontainers.org') {
+            echo 'You can get a full list of available container images <a title=" Linux Containers - Image server" href="https://uk.lxd.images.canonical.com/" target="_blank">HERE</a></dd>';
+          } else {
+            echo 'To go to your custom set mirror click <a href="https://' . $settings->default_cont_url . '" target="_blank">HERE</a></dd>';
+          } ?>              
       </dl>
     </div>
 
     <div class="">
       <dl>
         <dt>Release:</dt>
-        <dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9_.-]+" style="text-transform:lowercase" required="true" value="bullseye" class="forbidSpace"></dd>
+        <dd><input type="text" name="contRelease" pattern="[a-zA-Z0-9\.]+" style="text-transform:lowercase" required="true" value="bullseye" class="forbidSpace"></dd>
       </dl>
     </div>
 
@@ -95,6 +91,39 @@ $avail_images_json = json_encode($avail_images);
         <dd><select name="contRelease" id="release-select" class="forbidSpace" required></select></dd>
       </dl>
     </div>
+
+    <script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
+    <script>
+      var avail_images = <?= $avail_images_json ?>;
+      var distributionSelect = document.getElementById("distribution-select");
+      var releaseSelect = document.getElementById("release-select");
+
+      var defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.text = "Select a Release";
+      releaseSelect.add(defaultOption);
+      releaseSelect.disabled = true;
+
+      distributionSelect.addEventListener("change", function() {
+        var distribution = this.value;
+        releaseSelect.disabled = false;
+
+        while (releaseSelect.firstChild) {
+          releaseSelect.removeChild(releaseSelect.firstChild);
+        }
+
+        if (distribution !== "") {
+          var releases = Object.keys(avail_images[distribution]);
+          releases.forEach(function(release) {
+            var option = document.createElement("option");
+            option.value = release;
+            option.text = release;
+            releaseSelect.add(option);
+          });
+        }
+      });
+    </script>
+
 <?php } ?>
 
     <div class="">
@@ -133,34 +162,5 @@ $avail_images_json = json_encode($avail_images);
   <span class="left"></span>
 </div>
 
-<script src="<?autov('/plugins/lxc/js/lxc.js')?>"></script>
-<script>
-var avail_images = <?= $avail_images_json ?>;
-var distributionSelect = document.getElementById("distribution-select");
-var releaseSelect = document.getElementById("release-select");
 
-var defaultOption = document.createElement("option");
-defaultOption.value = "";
-defaultOption.text = "Select a Release";
-releaseSelect.add(defaultOption);
-releaseSelect.disabled = true;
 
-distributionSelect.addEventListener("change", function() {
-  var distribution = this.value;
-  releaseSelect.disabled = false;
-
-  while (releaseSelect.firstChild) {
-    releaseSelect.removeChild(releaseSelect.firstChild);
-  }
-
-  if (distribution !== "") {
-    var releases = Object.keys(avail_images[distribution]);
-    releases.forEach(function(release) {
-      var option = document.createElement("option");
-      option.value = release;
-      option.text = release;
-      releaseSelect.add(option);
-    });
-  }
-});
-</script>
