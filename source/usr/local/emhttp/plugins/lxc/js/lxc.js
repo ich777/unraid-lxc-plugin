@@ -565,7 +565,7 @@ $(function() {
           },
           success: function (data) {
             $("#dialogContent").append(data);
-            $("#dialogContent").append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.reload()">Done</button></p>');
+            $("#dialogContent").append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); ">Done</button></p>');
             clearInterval(statusInterval);
           }
         });
