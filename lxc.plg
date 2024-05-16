@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.05.14">
+  <!ENTITY version   "2024.05.16">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "480e5635e16fc38076fbcac03c2f8923">
+  <!ENTITY md5       "01bc06c25d1d33d1626648790cba0bef">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,12 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.05.16
+- Fix Container Index drop downs only showing up every second page reload from Add Container page
+- Fix for entry WebUI in Container drop down not showing up when visiting the LXC page
+- Don't reload LXC page after closing Container configuration with the Done button
+- Minor Bugfixes for Add Container page
 
 ###2024.05.14
 - Minor change in LXC Container Images index download function
