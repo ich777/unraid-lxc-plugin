@@ -243,7 +243,7 @@ function downloadLXCproducts($url) {
     $fileage =  time() - filemtime($path . '/' . $filename . '.json');
     if ($fileage > 3600) {
       unlink($path . '/' . $filename . '.json');
-      shell_exec("wget -q -O " . $path . '/' . $filename . 'lxcimages.json' . " " . $url);
+      shell_exec("wget -q -O " . $path . '/' . $filename . '.json' . " " . $url);
     }
   }
 }

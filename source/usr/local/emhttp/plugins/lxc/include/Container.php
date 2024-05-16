@@ -92,7 +92,12 @@ class Container {
     }
     $this->cpus = $this->getCpus();
     $this->description = getVariable($this->config, '#container_description');
-    $this->lxcwebui = getVariable($this->config, '#container_webui');
+    $webui = getVariable($this->config, '#container_webui');
+    if (empty($webui)) {
+      $this->lxcwebui = null;
+    } else {
+      $this->lxcwebui = $webui;
+    }
     $this->supportlink = getVariable($this->config, '#container_supportlink');
     $this->donatelink = getVariable($this->config, '#container_donatelink');
   }
