@@ -26,7 +26,7 @@ LXC Dynamic Container Stats:
   </select>
 
 <blockquote class="inline_help">
-<p>Enable dynamic container stats update (CPU/Memory utilisazion, IP Addresses and RX/TX) on LXC page.<br/><b>Note:</b> When disabled CPU/Memory utilisazion and RX/TX won't show on the LXC page.</p>
+<p>Enable dynamic container stat updates (CPU/Memory utilisation, IP Address and Network RX/TX) on LXC page.<br/><b>Note:</b> When disabled IP Address and Network RX/TX will be shown static with the value from loading the page (a manual refresh from the page will update the values).</p>
 </blockquote>
 
 LXC Container URL:
