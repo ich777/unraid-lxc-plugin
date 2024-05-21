@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.05.16">
+  <!ENTITY version   "2024.05.21">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "01bc06c25d1d33d1626648790cba0bef">
+  <!ENTITY md5       "02cc3e91a12d730fa8e7beb37a983401">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,12 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.05.21
+- Added settings entry to enable/disable dynamic stats updates from LXC Containers on LXC page
+- Minor bugfix for LXC Stats Workers
+- Changed how LXC Stats Workers are started and kept alive
+- Added TiB readouts as the maximum value for Memory usage and Network RX/TX on LXC page
 
 ###2024.05.16
 - Fix Container Index drop downs only showing up every second page reload from Add Container page
@@ -437,6 +443,7 @@ if [ ! -f "&plugin;/plugin.cfg" ]; then
 BDEVTYPE=dir
 TIMEOUT=15
 AUTOSTART_DELAY=10
+DYNAMIC_STATS=enabled
 LXC_CONTAINER_URL=images.linuxcontainers.org
 LXC_BACKUP_SERVICE=disabled
 LXC_BACKUP_PATH=
@@ -480,6 +487,9 @@ grep -q "LXC_GITHUB_TOKEN=" &plugin;/plugin.cfg || echo "LXC_GITHUB_TOKEN=" &gt;
 
 #Add BDEVTYPE entry if not exists
 grep -q "BDEVTYPE=" &plugin;/plugin.cfg || echo "BDEVTYPE=dir" &gt;&gt; &plugin;/plugin.cfg
+
+#Add DYNAMIC_STATS entry if not exists
+grep -q "DYNAMIC_STATS=" &plugin;/plugin.cfg || echo "DYNAMIC_STATS=enabled" &gt;&gt; &plugin;/plugin.cfg
 
 if [ ! -f "&plugin;/lxc.conf" ]; then
   echo 'lxc.lxcpath=/mnt/user/lxc' > "&plugin;/lxc.conf"
