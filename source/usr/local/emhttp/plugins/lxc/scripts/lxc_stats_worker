@@ -12,9 +12,11 @@ do
     BYTES=$(grep -Ew "anon|kernel|kernel_stack|pagetables|sec_pagetables|percpu|sock|vmalloc|shmem" <<< $(lxc-cgroup -n ${1} memory.stat 2>/dev/null) | awk '{sum += $2} END {print sum}')
     if [ -z "${BYTES}" ] || [ ${BYTES} == 0 ]; then
       MEM=0
-    elif [ ${BYTES} -gt 1073741824 ]; then
+    elif [ ${BYTES} -ge 1099511627776 ]; then
+      MEM="$(awk '{printf "%.2f", $1 / 1099511627776}' <<< ${BYTES})TiB"
+    elif [ ${BYTES} -ge 1073741824 ]; then
       MEM="$(awk '{printf "%.2f", $1 / 1073741824}' <<< ${BYTES})GiB"
-    elif [ ${BYTES} -gt 1048576 ]; then
+    elif [ ${BYTES} -ge 1048576 ]; then
       MEM="$(awk '{printf "%.2f", $1 / 1048576}' <<< ${BYTES})MiB"
     else
       MEM="${BYTES}Bytes"
