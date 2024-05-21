@@ -322,6 +322,7 @@ if (count($differences) > 0) {
   }
   setInterval(updateValues, 2000);
 </script>
+
 <a href="LXCAddContainer">
   <input type="button" value="Add Container">
 </a>
