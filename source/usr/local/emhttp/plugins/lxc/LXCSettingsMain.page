@@ -151,7 +151,7 @@ echo "<div style=\"text-align: right;\"><span>Installed LXC Version: " . $lxc_ve
 
 <?php
 if(isset($_POST['changeCFG'])) {
-$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["BDEVTYPE"], $_POST["SERVICE"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["INTERFACENAME"], $_POST["CHANGENETCONT"], $_POST["LXC_CONTAINER_URL"], $_POST["BACKUP_ENABLED"], $_POST["BACKUPDIR"], $_POST["BACKUPS_TO_KEEP"], $_POST["CPU_THREADS"], $_POST["COMPRESSION_RATIO"], $_POST["USE_SNAPSHOT"]);
+$settings->changeConfig($started, $_POST["DEFAULTDIR"], $_POST["BDEVTYPE"], $_POST["SERVICE"], $_POST["DYNAMIC_STATS"], $_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["INTERFACENAME"], $_POST["CHANGENETCONT"], $_POST["LXC_CONTAINER_URL"], $_POST["BACKUP_ENABLED"], $_POST["BACKUPDIR"], $_POST["BACKUPS_TO_KEEP"], $_POST["CPU_THREADS"], $_POST["COMPRESSION_RATIO"], $_POST["USE_SNAPSHOT"]);
 echo '<script>parent.window.location.reload();</script>';
 }
 ?>

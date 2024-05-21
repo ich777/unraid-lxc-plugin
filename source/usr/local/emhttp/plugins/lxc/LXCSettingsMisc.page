@@ -19,6 +19,16 @@ LXC Autostart Delay after Array is started:
 <p>Set the delay in seconds to trigger the Autostart from LXC containers after the Array is started (value must be greater than 0)</p>
 </blockquote>
 
+LXC Dynamic Container Stats:
+: <select id="dynamic_stats" name="DYNAMIC_STATS">
+  <?= mk_option($settings->dynamic_stats, 'disabled', '_(No)_')?>
+  <?= mk_option($settings->dynamic_stats, 'enabled', '_(Yes)_')?>
+  </select>
+
+<blockquote class="inline_help">
+<p>Enable dynamic container stats update (CPU/Memory utilisazion, IP Addresses and RX/TX) on LXC page.<br/><b>Note:</b> When disabled CPU/Memory utilisazion and RX/TX won't show on the LXC page.</p>
+</blockquote>
+
 LXC Container URL:
 :  <input type="text" name="LXC_CONTAINER_URL" required="true" style="width: 300px" pattern="^[a-zA-Z0-9\-_:\.]*$" value="<?php echo $settings->default_cont_url;?>" placeholder="images.linuxcontainers.org" class="forbidSpace" required>
 
@@ -41,7 +51,7 @@ Update configuration:
 
 <?php
 if(isset($_POST['changeMISC'])) {
-$settings->changeMisc($_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["LXC_CONTAINER_URL"]);
+$settings->changeMisc($_POST["TIMEOUT"], $_POST["AUTOSTART_DELAY"], $_POST["DYNAMIC_STATS"], $_POST["LXC_CONTAINER_URL"]);
 echo '<script>parent.window.location.reload();</script>';
 }
 ?>
