@@ -108,6 +108,7 @@ If a ethX or vhostX interface is selected the net type will be changed to maclva
 
   <input type="hidden" name="TIMEOUT" value="<?php echo $settings->default_timeout;?>">
   <input type="hidden" name="AUTOSTART_DELAY" value="<?php echo $settings->default_startdelay;?>">
+  <input type="hidden" name="DYNAMIC_STATS" value="<?php echo $settings->dynamic_stats;?>">
   <input type="hidden" name="LXC_CONTAINER_URL" value="<?php echo $settings->default_cont_url;?>">
   <input type="hidden" name="BACKUP_ENABLED" value="<?php echo $settings->backup_enabled;?>">
   <input type="hidden" name="BACKUPDIR" value="<?php echo $settings->backup_path;?>">
