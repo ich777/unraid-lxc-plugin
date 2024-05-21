@@ -20,6 +20,7 @@ $cpu_count = shell_exec('nproc --all');
 if (!file_exists('/tmp/lxc/containers')) {
   mkdir('/tmp/lxc/containers', 0777, true);
 }
+file_put_contents('/tmp/lxc/containers/active', time());
 ?>
 
 <link rel="stylesheet" href="<?autov('/plugins/lxc/css/lxc.css')?>">
@@ -89,6 +90,7 @@ label+.content {
   <th width="35">
     CPUs
   </th>
+  <?php if($settings->dynamic_stats === "enabled") { ?>
   <th width="45">
     CPU Load
   </th>
@@ -101,6 +103,14 @@ label+.content {
   <th width="90">
     Total RX/TX
   </th>
+  <?php } else { ?>
+  <th>
+    Address
+  </th>
+  <th width="90">
+    Total RX/TX
+  </th>
+  <?php } ?>
   <th width="50">
     PID
   </th>
@@ -215,6 +225,7 @@ foreach ($allContainers as $container) {
     <td>
       <?= $container->cpus;?>
     </td>
+    <?php if($settings->dynamic_stats === "enabled") { ?>
     <td style="text-align: right;" id="<?= ($container->state == "RUNNING") ? "cpu_usage-" . $container->name : "";?>">
       <?php 
       if ($container->state == "RUNNING") {
@@ -234,6 +245,27 @@ foreach ($allContainers as $container) {
     <td id="<?= ($container->state == "RUNNING") ? "totalBytes-" . $container->name : "";?>">
       <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh'>" : "";?>
     </td>
+    <?php } else {
+      echo "<td>";
+      if($container->state == "RUNNING") {
+        $ipInfo = shell_exec("lxc-info " . $container->name . " -iH");
+        if ($ipInfo !== null) {
+          $ipInfov4 = '';
+          $ipInfoDocker = '';
+          $ipInfov6 = '';
+          $ipInfov4 = shell_exec('echo "' . $ipInfo . '" | grep "\." | grep -v "172."');
+          $ipInfoDocker = shell_exec('echo "' . $ipInfo . '" | grep -E "172."');
+          $ipInfov6 = shell_exec('echo "' . $ipInfo . '" | grep "\:"');
+          echo nl2br(trim($ipInfov4 . $ipInfoDocker . $ipInfov6));
+          }
+        }
+      echo "</td>";
+      echo "<td>";
+      if($container->state == "RUNNING") {
+        echo $container->totalBytes;
+        }
+      echo "</td>";
+      } ?>
     <td>
       <?= $container->pid;?>
     </td>
@@ -296,6 +328,7 @@ if (count($differences) > 0) {
 }
 ?>
 
+<?php if($settings->dynamic_stats === "enabled") { ?>
 <script>
   var containerNames = <?= json_encode($containerNames); ?>;
   var setMemory = <?= json_encode($setcontainerMem); ?>;
@@ -322,6 +355,7 @@ if (count($differences) > 0) {
   }
   setInterval(updateValues, 2000);
 </script>
+<?php } ?>
 
 <a href="LXCAddContainer">
   <input type="button" value="Add Container">
