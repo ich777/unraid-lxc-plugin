@@ -59,7 +59,9 @@ class Container {
     if (empty($setmembytes)) {
       $setmembytes = trim(shell_exec('awk \'/MemTotal/ { printf "%.0f\n", $2 * 1024 }\' /proc/meminfo'));
     }
-    if ($setmembytes >= 1024 * 1024 * 1024) {
+    if ($setmembytes >= 1024 * 1024 * 1024 * 1024) {
+      $this->setmemory = round($setmembytes / (1024 * 1024 * 1024 * 1024), 2) . 'TiB';
+    } elseif ($setmembytes >= 1024 * 1024 * 1024) {
       $this->setmemory = round($setmembytes / (1024 * 1024 * 1024), 2) . 'GiB';
     } elseif ($setmembytes >= 1024 * 1024) {
       $this->setmemory = round($setmembytes / (1024 * 1024), 2) . 'MiB';
