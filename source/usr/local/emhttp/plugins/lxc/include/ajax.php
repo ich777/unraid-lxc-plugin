@@ -133,6 +133,7 @@ if (isset($_POST['lxc'])) {
 
 require_once 'Container.php';
 if (isset($_POST['action']) && $_POST['action'] == 'updateValues') {
+    file_put_contents('/tmp/lxc/containers/active', time());
     $containerNames = json_decode($_POST['containerNames']);
     $data = [];
     foreach ($containerNames as $name) {

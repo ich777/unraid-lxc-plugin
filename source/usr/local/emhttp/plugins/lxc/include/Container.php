@@ -40,7 +40,6 @@ class Container {
     $this->backups = $this->getBackups();
     $this->backup_path = realpath($this->settings->backup_path);
     if ($this->state === "RUNNING") {
-      file_put_contents('/tmp/lxc/containers/active', time());
       $container_stats = parse_ini_file('/tmp/lxc/containers/' . $this->name);
       if ($container_stats === null) {
         $container_stats = array("CPU" => "na", "MEMORY" => "", "IPS" => "");

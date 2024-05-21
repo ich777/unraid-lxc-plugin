@@ -11,6 +11,7 @@ class Settings {
   public $available_interfaces;
   public $change_net_containers;
   public $status;
+  public $dynamic_stats;
   public $default_cont_url;
   public $backup_enabled;
   public $backup_path;
@@ -29,6 +30,7 @@ class Settings {
     $this->default_interface = getVariable('/boot/config/plugins/lxc/default.conf', 'lxc.net.0.link');
     $this->available_interfaces = getAvailableInterfaces();
     $this->status = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'SERVICE');
+    $this->dynamic_stats = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'DYNAMIC_STATS');
     $this->default_cont_url = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_CONTAINER_URL');
     $this->backup_enabled = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_BACKUP_SERVICE');
     $this->backup_path = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_BACKUP_PATH');
@@ -40,7 +42,7 @@ class Settings {
     $this->github_token = getVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_GITHUB_TOKEN');
   }
 
-  function changeConfig($started, $default_path, $default_bdevtype, $service, $timeout, $startdelay, $interface, $change_net_containers, $default_cont_url, $backup_enabled, $backup_path, $backup_keep, $backup_threads, $backup_compression, $backup_use_snapshot) {
+  function changeConfig($started, $default_path, $default_bdevtype, $service, $dynamic_stats, $timeout, $startdelay, $interface, $change_net_containers, $default_cont_url, $backup_enabled, $backup_path, $backup_keep, $backup_threads, $backup_compression, $backup_use_snapshot) {
     $activeContainers = getActiveContainers();
     $availContainers = getAllContainers();
 
@@ -59,6 +61,7 @@ class Settings {
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'TIMEOUT', $timeout);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'AUTOSTART_DELAY', $startdelay);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'SERVICE', $service);
+    setVariable('/boot/config/plugins/lxc/plugin.cfg', 'DYNAMIC_STATS', $dynamic_stats);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_CONTAINER_URL', $default_cont_url);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_BACKUP_SERVICE', $backup_enabled);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_BACKUP_PATH', $backup_path);
@@ -127,9 +130,10 @@ class Settings {
     exec("sed -i '/^DOWNLOAD_SERVER=\"*/c\DOWNLOAD_SERVER=\"" . escapeshellarg($default_cont_url) . "\"' /usr/share/lxc/templates/lxc-download");
   }
 
-  function changeMisc($timeout, $startdelay ,$default_cont_url) {
+  function changeMisc($timeout, $startdelay, $dynamic_stats, $default_cont_url) {
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'TIMEOUT', $timeout);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'AUTOSTART_DELAY', $startdelay);
+    setVariable('/boot/config/plugins/lxc/plugin.cfg', 'DYNAMIC_STATS', $dynamic_stats);
     setVariable('/boot/config/plugins/lxc/plugin.cfg', 'LXC_CONTAINER_URL', $default_cont_url);
 
     exec("sed -i '/^DOWNLOAD_SERVER=\"*/c\DOWNLOAD_SERVER=\"" . escapeshellarg($default_cont_url) . "\"' /usr/share/lxc/templates/lxc-download");
