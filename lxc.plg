@@ -6,7 +6,7 @@
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "02cc3e91a12d730fa8e7beb37a983401">
+  <!ENTITY md5       "6d0ed750ff0be6207cdf1b5fd46fd8fe">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
