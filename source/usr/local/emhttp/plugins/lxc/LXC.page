@@ -229,7 +229,7 @@ foreach ($allContainers as $container) {
     <td style="text-align: right;" id="<?= ($container->state == "RUNNING") ? "cpu_usage-" . $container->name : "";?>">
       <?php 
       if ($container->state == "RUNNING") {
-        echo "<i class='fa fa-refresh'>";
+        echo "<i class='fa fa-refresh fa-spin'>";
         if (!shell_exec('pgrep -f "/usr/local/emhttp/plugins/lxc/scripts/lxc_stats_worker ' . $container->name . '"')) {
           shell_exec('/usr/local/emhttp/plugins/lxc/scripts/lxc_stats_worker "' . $container->name . '" > /dev/null 2>/dev/null &');
         }
@@ -237,13 +237,13 @@ foreach ($allContainers as $container) {
       ?>
     </td>
     <td id="<?= ($container->state == "RUNNING") ? "memoryUse-" . $container->name : "";?>">
-      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh'>" : "";?>
+      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh fa-spin'>" : "";?>
     </td>
     <td id="<?= ($container->state == "RUNNING") ? "ips-" . $container->name : "";?>">
-      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh'>" : "";?>
+      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh fa-spin'>" : "";?>
     </td>
     <td id="<?= ($container->state == "RUNNING") ? "totalBytes-" . $container->name : "";?>">
-      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh'>" : "";?>
+      <?= ($container->state == "RUNNING") ? "<i class='fa fa-refresh fa-spin'>" : "";?>
     </td>
     <?php } else {
       echo "<td>";
