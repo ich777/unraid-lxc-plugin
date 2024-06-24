@@ -21,7 +21,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
       <dl>
         <dt>Name:</dt>
         <dd>
-          <input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Name; ?>" placeholder="Container Name" class="forbidSpace">
+          <input type="text" name="contName" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="true" value="<? echo $lxc->Name; ?>" placeholder="Container Name" class="forbidSpace">
         </dd>
       </dl>
     </div>
@@ -64,7 +64,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
          <dl>
            <dt>Repository:</dt>
           <dd>
-            <input type="text" name="contRepo" required="" style="width: 600px;" value="<? echo $lxc->Repository; ?>" disabled>
+            <input type="text" name="contRepo" style="width: 600px;" value="<? echo $lxc->Repository; ?>" disabled>
           </dd>
         </dl>
       </div>
@@ -77,7 +77,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>Distribution:</dt>
                 <dd>
-                  <input type="text" name="contDistribution" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Distribution; ?>" disabled>
+                  <input type="text" name="contDistribution" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" value="<? echo $lxc->Distribution; ?>" disabled>
                 </dd>
               </dl>
             </div>
@@ -85,7 +85,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>Release:</dt>
                 <dd>
-                  <input type="text" name="contRelease" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Release; ?>" disabled>
+                  <input type="text" name="contRelease" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" value="<? echo $lxc->Release; ?>" disabled>
                 </dd>
               </dl>
             </div>
@@ -93,7 +93,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>Architecture:</dt>
                 <dd>
-                  <input type="text" name="contArchitecture" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" required="" value="<? echo $lxc->Architecture; ?>" disabled>
+                  <input type="text" name="contArchitecture" pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]+" value="<? echo $lxc->Architecture; ?>" disabled>
                 </dd>
               </dl>
             </div>
@@ -110,7 +110,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>WebUI:</dt>
                 <dd>
-                  <input type="text" name="contWebUI" required="" value="<? echo $lxc->WebUI; ?>" placeholder="Full URL to WebGUI or empty for none" class="forbidSpace">
+                  <input type="text" name="contWebUI" value="<? echo $lxc->WebUI; ?>" placeholder="Full URL to WebGUI or empty for none" class="forbidSpace">
                 </dd>
               </dl>
             </div>
@@ -118,7 +118,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>Icon URL:</dt>
                 <dd>
-                  <input type="text" name="contIcon" required="" value="<? echo $lxc->Icon; ?>"placeholder="Empty for default icon or URL for custom .png" class="forbidSpace">
+                  <input type="text" name="contIcon" value="<? echo $lxc->Icon; ?>" placeholder="Empty for default icon or URL for custom .png" class="forbidSpace">
                 </dd>
               </dl>
             </div>
@@ -126,7 +126,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>Requires:</dt>
                 <dd>
-                  <input type="text" name="contRequires" required="" value="<? echo $lxc->Requires; ?>" disabled>
+                  <input type="text" name="contRequires" value="<? echo $lxc->Requires; ?>" disabled>
                 </dd>
               </dl>
             </div>
@@ -168,8 +168,8 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
           </dd>
         </dl>
       </div>
-      <input type="text" name="supportLink" required="" value="<? echo $lxc->Support; ?>" hidden>
-      <input type="text" name="donateLink" required="" value="<? echo $lxc->DonateLink; ?>" hidden>
+      <input type="text" name="supportLink" value="<? echo $lxc->Support; ?>" hidden>
+      <input type="text" name="donateLink" value="<? echo $lxc->DonateLink; ?>" hidden>
   </form>
 </div>
 
