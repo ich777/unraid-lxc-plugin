@@ -9,8 +9,8 @@ function getNewMacAddress() {
 
 function getVariable($path, $option) {
   $content = file_get_contents($path);
-  if (preg_match('/^' . $option . '[^\r\n]*/m', $content, $line) && isset($line[0])) {
-    return trim(explode('=', $line[0])[1]);
+  if (preg_match('/^' . preg_quote($option, '/') . '\s*=\s*(.*)$/m', $content, $matches)) {
+    return trim($matches[1]);
   }
   return null;
 }
