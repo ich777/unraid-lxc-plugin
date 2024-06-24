@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.06.05">
+  <!ENTITY version   "2024.06.24">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "8ed0260f610e57e9bbba2cdaa6248ced">
+  <!ENTITY md5       "6515cbbd4b78d6e4da4e38aa5a0ca2df">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.06.24
+- Fix bug in function getVariables where a second equal sign in the variable causes a parsing issue
+- Fix bug in LXCAddTemplate where some entries where not correctly marked as required
 
 ###2024.06.05
 - Minor visual improvement to LXC page
