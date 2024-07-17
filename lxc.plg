@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.06.24">
+  <!ENTITY version   "2024.07.17">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "6515cbbd4b78d6e4da4e38aa5a0ca2df">
+  <!ENTITY md5       "aec55c39e391a89ee95ecfd57c2ab0d6">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.07.17
+- Change name in Legend on Dashboard to LXC (unRAID 7.0.0+)
 
 ###2024.06.24
 - Fix bug in function getVariables where a second equal sign in the variable causes a parsing issue
@@ -234,11 +237,11 @@
 - Bugfix in 'lxc-autobackup' for certain parameters not working if a mix of them is used
 
 ###2023.07.30
-- Added 'lxc-autobackup' to easily create scheduled tar.xz backups with User Scripts plugin, for more information issue: 'lxc-autobackup from a Unraid terminal
+- Added 'lxc-autobackup' to easily create scheduled tar.xz backups with User Scripts plugin, for more information issue: 'lxc-autobackup from a unRAID terminal
 - Display messages when taking a snapshot with 'lxc-autosnapshot'
 
 ###2023.07.29
-- Added 'lxc-autosnapshot' to easily create scheduled snapshots with User Scripts plugin, for more information issue: 'lxc-autosnapshot' from a Unraid terminal
+- Added 'lxc-autosnapshot' to easily create scheduled snapshots with User Scripts plugin, for more information issue: 'lxc-autosnapshot' from a unRAID terminal
 - Removed Create VNC container
 - Bugfix for Address and Total RX/TX indicators on LXC page
 
@@ -269,7 +272,7 @@
 ###2023.04.20
 - Bugfix for flickering context menu
 - Added spinner to Start, Stop, Restart, Freeze and Kill operations
-- Changed desription alert box to Unraid default
+- Changed desription alert box to unRAID default
 - Minor style changes
 
 ###2023.04.18
@@ -293,21 +296,21 @@
 - Added class to Autostart switches
 
 ###2023.03.08
-- Fixed issue where notification bell was not shown on LXC and Dashboard page - Unraid 6.12+
-- Fixed issue where switches on Dashboard stopped working - Unraid 6.12+
+- Fixed issue where notification bell was not shown on LXC and Dashboard page - unRAID 6.12+
+- Fixed issue where switches on Dashboard stopped working - unRAID 6.12+
 
 ###2023.03.04
 - Bugfix for function Delete Description
 
 ###2023.03.03a
-- changed naming from container states to be conform with Unraid
+- changed naming from container states to be conform with unRAID
 
 ###2023.03.03
 - Added status icon for pause to Dashboard
 - Added icons to status on LXC page and adjusted size
 
 ###2023.03.02
-- Added Dashboard tile for Unraid 6.12+ - huge shout out to s3ppo from the Unraid Forums
+- Added Dashboard tile for unRAID 6.12+ - huge shout out to s3ppo from the unRAID Forums
 - Removed unnecessary text from LXC page if no container is installed
 
 ###2023.02.22
@@ -330,7 +333,7 @@
 - Added delay option on settings page for when the Array is started - defaults to 10 seconds
 
 ###2022.08.29
-- Visual improvements on LXC page - thank you S3ppo from the Unraid Forums
+- Visual improvements on LXC page - thank you S3ppo from the unRAID Forums
 
 ###2022.08.28b
 - Visual improvements on LXC page
@@ -341,11 +344,11 @@
 - Visual improvements
 
 ###2022.08.28
-- Added Drop-Down and Autostart switch - huge shout out to jmztaylor from the Unraid Forums
+- Added Drop-Down and Autostart switch - huge shout out to jmztaylor from the unRAID Forums
 - Visual improvements
 
 ###2022.08.27
-- Complete overhaul from the codebase - huge shout out to jmztaylor from the Unraid Forums
+- Complete overhaul from the codebase - huge shout out to jmztaylor from the unRAID Forums
 
 ###2022.07.23
 - Bugfix when using dark theme filetree wasn't visible on settings page - thank you SimonF
@@ -354,8 +357,8 @@
 - Bugfix that prevented Array from starting when using /mnt/user/... as data directory (it is recommended to use the real file path like /mnt/cache/... or /mnt/diskX/...!)
 
 ###2022.07.12
-- Added Copy feature to the plugin - huge shout out to jmztaylor from the Unraid forums
-- Added Dialogue to prevent php timeout while creating Snapshots from big containers - huge shout out to jmztaylor from the Unraid forums
+- Added Copy feature to the plugin - huge shout out to jmztaylor from the unRAID forums
+- Added Dialogue to prevent php timeout while creating Snapshots from big containers - huge shout out to jmztaylor from the unRAID forums
 - Added and unified LXC messages in syslog
 - Bugfix that prevented Array from stopping at certain conditions
 - Fixed few typos
