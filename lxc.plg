@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.07.17">
+  <!ENTITY version   "2024.07.17a">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.07.17a
+- Minor bugfix for LXC plugin file
 
 ###2024.07.17
 - Change name in Legend on Dashboard to LXC (unRAID 7.0.0+)
@@ -608,9 +611,9 @@ fi
 
 #Make LXC RAM usage script executable when service is enabled
 if [ "${LXC_SERVICE}" == "enabled" ]; then
-  chmod 755 &emhttp;/system/LXC_usage
+  chmod 755 &emhttp;/system/LXC
 else 
-  chmod 644 &emhttp;/system/LXC_usage
+  chmod 644 &emhttp;/system/LXC
 fi
 
 #Change download URL based on settings file entry
