@@ -40,21 +40,21 @@ class Container {
     $this->backups = $this->getBackups();
     $this->backup_path = realpath($this->settings->backup_path);
     if ($this->state === "RUNNING") {
-      $container_stats = parse_ini_file('/tmp/lxc/containers/' . $this->name);
-      if ($container_stats === null) {
-        $container_stats = array("CPU" => "na", "MEMORY" => "", "IPS" => "");
+      if (file_exists('/tmp/lxc/containers/' . $this->name)) {
+        $container_stats = parse_ini_file('/tmp/lxc/containers/' . $this->name);
       } else {
-        $this->cpu_usage = $container_stats['CPU'];
-        $this->memoryUse = $container_stats['MEMORY'];
-        $this->ips = $container_stats['IPS'];
+        $container_stats = array("CPU" => "na", "MEMORY" => "", "IPS" => "");
       }
+      $this->cpu_usage = $container_stats['CPU'];
+      $this->memoryUse = $container_stats['MEMORY'];
+      $this->ips = $container_stats['IPS'];
     } else {
       $this->cpu_usage = "";
       $this->memoryUse = "";
       $this->ips = "";
     }
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
-    $setmembytes = trim(shell_exec("grep 'lxc.cgroup.memory.limit_in_bytes' " . $this->config . " | awk -F= '{ print $2 }'"));
+    $setmembytes = trim(shell_exec("grep 'lxc.cgroup.memory.limit_in_bytes' " . $this->config . " | awk -F= '{ print $2 }'") ?? '');
     if (empty($setmembytes)) {
       $setmembytes = trim(shell_exec('awk \'/MemTotal/ { printf "%.0f\n", $2 * 1024 }\' /proc/meminfo'));
     }
