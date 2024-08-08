@@ -106,7 +106,7 @@ class Container {
   private function getSnapshots() {
     $snapshots = array();
     exec("lxc-snapshot -L " . $this->name, $snapshotList);
-    if ($snapshotList[0] != "No snapshots") {
+    if (!empty($snapshotList) && $snapshotList[0] != "No snapshots") {
       foreach ($snapshotList as $snapshot){
         $sorted = explode(" ", $snapshot);
         $snapshots[] = new Snapshot($sorted[0], str_replace(":", "_", $sorted[2]), $sorted[3]);
