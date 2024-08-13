@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2024.08.08">
+  <!ENTITY version   "2024.08.13">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "78f001be25ca311cc585cb09ad3b8545">
+  <!ENTITY md5       "80bf36e6c4b372962dc324d3550b38bc">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2024.08.13
+- Fix for Dashboard tile not showing up on Unraid version 6.12.11
 
 ###2024.08.08
 - Fix PHP warnings when creating containers from a template
