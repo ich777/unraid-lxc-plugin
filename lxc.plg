@@ -459,7 +459,7 @@ rm -f $(ls &plugin;/&name;*.txz 2>/dev/null|grep -v '&version;')
 **LXC**
 
 LXC is a well-known Linux container runtime that consists of tools, templates, and library and language bindings. It's pretty low level, very flexible and covers just about every containment feature supported by the upstream kernel.
-LXC is similar to Docker but with a key difference while Docker abstracts away much of the system maintenance, LXC gives users greater control and responsibility over managing their environments. This allows for more customization and fine-tuning, making it ideal for users who prefer a hands-on approach.</Description>
+LXC is similar to Docker but with a key difference: while Docker abstracts away much of the system maintenance, LXC gives users greater control and responsibility over managing their environments. This allows for more customization and fine-tuning, making it ideal for users who prefer a hands-on approach.
 </INLINE>
 </FILE>
 
