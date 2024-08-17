@@ -633,7 +633,7 @@ else
 fi
 
 #Execute lxc startup check
-/usr/bin/lxc-check 2>/dev/null
+/usr/bin/lxc-check 2&gt;/dev/null
 
 #Change download URL based on settings file entry
 LXC_CONT_URL=$(cat &plugin;/plugin.cfg | grep "LXC_CONTAINER_URL" | cut -d '=' -f2 | sed 's/\"//g')
