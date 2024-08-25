@@ -82,42 +82,42 @@ label+.content {
 <table id="lxc_table" class="tablesorter shift" style="margin-top: 0px !important;">
 <thead>
 <tr>
-  <th>
+  <th style='width: 700px; min-width: 320px;'>
     <a href="#" id="sorting">
       <i class="fa fa-th-list"></i>
     </a>Name/Status
   </th>
-  <th width="35">
+  <th style='width: 40px; min-width: 40px;'>
     CPUs
   </th>
   <?php if($settings->dynamic_stats === "enabled") { ?>
-  <th width="45">
+  <th style='width: 40px; min-width: 40px;'>
     CPU Load
   </th>
-  <th width="140">
+  <th style='width: 150px; min-width: 150px;'>
     Memory Usage
   </th>
-  <th>
+  <th style='min-width: 140px;'>
     Address
   </th>
-  <th width="90">
+  <th style='width: 100px;'>
     Total RX/TX
   </th>
   <?php } else { ?>
-  <th>
+  <th style='min-width: 140px;'>
     Address
   </th>
-  <th width="90">
+  <th style='width: 100px;'>
     Total RX/TX
   </th>
   <?php } ?>
-  <th width="50">
+  <th style='width: 70px;'>
     PID
   </th>
-  <th width="80">
+  <th style='width: 90px;'>
     Autostart
   </th>
-  <th width="80">
+  <th style='width: 100px;'>
     Uptime
   </th>
 </tr>
@@ -133,7 +133,7 @@ foreach ($allContainers as $container) {
   $setcontainerMem[$container->name] = $container->setmemory;
   ?>
   <tr>
-    <td class="ct-name">
+    <td style='height: 60px;' class="ct-name">
       <span class="outer">
         <span class="hand">
           <?php
