@@ -20,9 +20,9 @@ foreach ($allContainers as $container) { ?>
         <table id="snapshot_table" class="tablesorter two shift">
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Date/Time</th>
-                <th>Actions</th>
+                <th style='width: 300px;'>Name</th>
+                <th style='width: 400px; min-width: 150px; max-width: 150px;'>Date/Time</th>
+                <th style='min-width: 500px;'>Actions</th>
             </tr>
             </thead>
             <tbody align="left">
@@ -50,7 +50,7 @@ foreach ($allContainers as $container) { ?>
 <?php
           }
         } else {
-          echo "<tr><td>No snapshots</td><tr>";
+          echo "<tr style='height: 50px;'><td>No Snapshots</td><td>&nbsp;</td><td>&nbsp;</td><tr>";
         }
           echo "</tbody></table>";
 }
