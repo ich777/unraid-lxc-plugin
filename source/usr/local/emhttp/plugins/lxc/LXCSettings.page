@@ -1,5 +1,5 @@
 Menu="OtherSettings"
 Type="xmenu"
 Title="LXC"
-Icon="cubes"
+Icon="lxc_bw.png"
 Tabs="true"

@@ -2,8 +2,8 @@ Menu="Tasks:65"
 Type="xmenu"
 Title="LXC Containers"
 Tabs="true"
-Tag="fa-cubes"
-Code="f1b3"
+Tag="lxc_bw.png"
+Code="f1b2"
 Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/dev/null\")"
 ---
 <?php
