@@ -48,7 +48,6 @@ $layout
 EOT;
 
 function LXCLayout() {
-  $started = $var['fsState']=='Started';
   $settings = new Settings();
   $allContainers = getAllContainers();
 
