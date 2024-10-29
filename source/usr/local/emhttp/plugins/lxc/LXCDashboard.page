@@ -85,8 +85,24 @@ function LXCLayout() {
     $page_render .= '<span style="position: relative !important; right: 190px">';
     $page_render .= '<ul id="dropdown_' . $container->name .'" class="dropdown-menu dropdown-context fa-ul" style="z-index: 1;">';
     if($container->state == "RUNNING") {
-      if ($container->lxcwebui != "")
-        $page_render .= '<li><a target="_blank" href="' . $container->lxcwebui . '"><i class="fa fa-fw fa-globe fa-lg"></i> WebUI</a></li>';
+      if ($container->lxcwebui != "") {
+        if (strpos($container->lxcwebui, "[IP]") !== false) {
+          $ipInfo = shell_exec("lxc-info " . $container->name . " -iH");
+          $ipInfov4 = '';
+          $ipInfoDocker = '';
+          $ipInfov6 = '';
+          $ipInfov4 = shell_exec('echo "' . $ipInfo . '" | grep "\." | grep -v "172."');
+          $ipInfoDocker = shell_exec('echo "' . $ipInfo . '" | grep -E "172."');
+          $ipInfov6 = shell_exec('echo "' . $ipInfo . '" | grep "\:"');
+          $ips = nl2br(trim($ipInfov4 . $ipInfoDocker . $ipInfov6));
+          $IPfromCont = str_replace("[IP]", strtok($ips, "<br/>"), $container->lxcwebui);
+          if (!empty($ips)) {
+            $page_render .= "<li><a target='_blank' href='" . $IPfromCont . "'><i class='fa fa-fw fa-globe fa-lg'></i> WebUI</a></li>";
+          }
+        } else {
+          $page_render .= '<li><a target="_blank" href="' . $container->lxcwebui . '"><i class="fa fa-fw fa-globe fa-lg"></i> WebUI</a></li>';
+        }
+      }
       $page_render .= '<li><a href="#" title="Terminal" onclick="startConsole(\'' . $container->name .'\')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>';
       $page_render .= '<div class="divider"></div>';
       $page_render .= '<li><a href="#" class="stopCONT" id="' . $container->name .'"><i class="fa fa-fw fa-stop fa-lg"></i>  Stop</a></li>';
