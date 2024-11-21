@@ -97,10 +97,10 @@ function LXCLayout() {
           $ips = nl2br(trim($ipInfov4 . $ipInfoDocker . $ipInfov6));
           $IPfromCont = str_replace("[IP]", strtok($ips, "<br/>"), $container->lxcwebui);
           if (!empty($ips)) {
-            $page_render .= "<li><a target='_blank' href='" . $IPfromCont . "'><i class='fa fa-fw fa-globe fa-lg'></i> WebUI</a></li>";
+            $page_render .= "<li><a class='localURL' target='_blank' href='" . $IPfromCont . "'><i class='fa fa-fw fa-globe fa-lg'></i> WebUI</a></li>";
           }
         } else {
-          $page_render .= '<li><a target="_blank" href="' . $container->lxcwebui . '"><i class="fa fa-fw fa-globe fa-lg"></i> WebUI</a></li>';
+          $page_render .= '<li><a class="localURL" target="_blank" href="' . $container->lxcwebui . '"><i class="fa fa-fw fa-globe fa-lg"></i> WebUI</a></li>';
         }
       }
       $page_render .= '<li><a href="#" title="Terminal" onclick="startConsole(\'' . $container->name .'\')"><i class="fa fa-fw fa-terminal fa-lg"></i>  Terminal</a></li>';
