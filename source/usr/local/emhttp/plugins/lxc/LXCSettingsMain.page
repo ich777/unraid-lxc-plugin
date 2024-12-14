@@ -100,7 +100,7 @@ Default network interface:
 <p>Select your default network interface</p>
 <p>If a brX interface is selected the default net type will be changed to veth and the link interface to the selected bridge interface (should be selected if you are using the bridge and IPVLAN).<br/>
 If a ethX or vhostX interface is selected the net type will be changed to maclvan, the macvlan mode will be set to bridge and the link interface will be changed to bridge (should be selected if you are not using the bridge in your network settings).<br/>
-<b>Note:</b> If you are using ethX or vhostX you have to enable <b>Host access to custom networks</b> in your <a href="Settings/DockerSettings" target="_blank">Docker Settings</a></p>
+<b>Note:</b> If you are using ethX or vhostX you have to enable <b>Host access to custom networks</b> in your <a href="/Settings/DockerSettings" target="_blank">Docker Settings</a></p>
 <p><b style="color: #ff0000;">ATTENTION:</b> If you are changing the interfaces from brX to ethX/vhostX or vice versa the network configurations from the existing containers will not be changed! To change the network configurations from the existing containers tick the checkbox "Change network from existing containers".</p>
 </blockquote>
 

@@ -39,7 +39,7 @@ foreach ($allContainers as $container) { ?>
                 <?= $snapshot->date ?> <?= $snapshot->time ?>
               </td>
               <td>
-                <a href='LXCRestoreSnapshot?cont=<?= $container->name?>&snap=<?= $snapshot->name ?>&date=<?= $snapshot->date ?>_<?= $snapshot->time ?>' class='button'>
+                <a href='/LXCRestoreSnapshot?cont=<?= $container->name?>&snap=<?= $snapshot->name ?>&date=<?= $snapshot->date ?>_<?= $snapshot->time ?>' class='button'>
                   Create Container From Snapshot
                 </a>
                 <a href="#" class="button deleteSNAP" id="<?= $container->name ?> <?= $snapshot->name ?>">
