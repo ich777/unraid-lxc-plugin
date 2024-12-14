@@ -40,7 +40,7 @@ $mytiles[$pluginname]['column2'] =
 <<<EOT
 <tbody id="lxc" title="$pluginname">
 <tr><td><i class='fa fa-cubes f32'></i><div class='section'>$pluginname<span><br>Container count: $container_count with $active_count running</span><br></div>
-<a href="Dashboard/Settings/LXCSettings" title="_(Go to LXC settings)_"><i class="fa fa-fw fa-cog control"></i></a></td></tr></td></tr>
+<a href="/Dashboard/Settings/LXCSettings" title="_(Go to LXC settings)_"><i class="fa fa-fw fa-cog control"></i></a></td></tr></td></tr>
 <tr><td>
 $layout
 </td></tr>
@@ -118,7 +118,7 @@ function LXCLayout() {
     $page_render .= '<div class="divider"></div>';
     $page_render .= '<li><a href="#" class="' . $container->name .'" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>';
     $page_render .= '<li><a href="#" class="snapshotCONT" id="' . $container->name .'"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>';
-    $page_render .= '<li><a href="LXCCopyContainer?cont=' . $container->name .'" id="' . $container->name .'"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>';
+    $page_render .= '<li><a href="/LXCCopyContainer?cont=' . $container->name .'" id="' . $container->name .'"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>';
     if ($container->description == "") {
       $page_render .= '<li><a href="#" class="descCONT" id="' . $container->name .'"><i class="fa fa-fw fa-comment fa-lg"></i>  Set Description</a></li>';
     } else {

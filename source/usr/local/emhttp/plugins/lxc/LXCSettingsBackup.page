@@ -11,7 +11,7 @@ Enable Global Backup settings:
 
 <blockquote class="inline_help">
 <p>Enable or Disable Global Backup settings</p>
-<p>If enabled a additional Backups tab on the <a href="LXC" target="_blank">LXC</a> page will show up.</p>
+<p>If enabled a additional Backups tab on the <a href="/LXC" target="_blank">LXC</a> page will show up.</p>
 <p>This also allows you to more easily create backups with <code>lxc-autobackup</code> from the command line eg: <code>lxc-autobackup lxccontainername</code></p>
 </blockquote>
 

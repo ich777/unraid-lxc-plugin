@@ -74,7 +74,7 @@ label+.content {
   } else { ?>
   <h2 style="text-align: center;">No LXC containers installed, please go to the plugin page to configure the plugin first!</h2>
   <?php } ?>
-  <a href="LXCAddContainer">
+  <a href="/LXCAddContainer">
     <input type="button" value="Add Container">
   </a>
 <? } else { ?>
@@ -194,7 +194,7 @@ foreach ($allContainers as $container) {
             <?php if($settings->backup_enabled == "enabled") {
               echo '<li><a href="#" class="backupCONT" id="' . $container->name . '"><i class="fa fa-fw fa-archive fa-lg"></i>  Create Backup</a></li>';
               } ?>
-            <li><a href="LXCCopyContainer?cont=<?= $container->name ?>" id="<?= $container->name ?>"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>
+            <li><a href="/LXCCopyContainer?cont=<?= $container->name ?>" id="<?= $container->name ?>"><i class="fa fa-fw fa-clone fa-lg"></i>  Copy Container</a></li>
             <?
             if ($container->description == "") {
             echo "<li><a href=\"#\" class=\"descCONT\" id=\"$container->name\"><i class=\"fa fa-fw fa-comment fa-lg\"></i>  Set Description</a></li>";
@@ -357,7 +357,7 @@ if (count($differences) > 0) {
 </script>
 <?php } ?>
 
-<a href="LXCAddContainer">
+<a href="/LXCAddContainer">
   <input type="button" value="Add Container">
 </a>
 <a href="#" class="startALLCONT" >

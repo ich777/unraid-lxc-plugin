@@ -164,7 +164,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
           <dt><br/></dt>
           <dd>
             <input type="submit" value="Create">
-            <a href="LXC" class="button">Done</a>
+            <a href="/LXC" class="button">Done</a>
           </dd>
         </dl>
       </div>

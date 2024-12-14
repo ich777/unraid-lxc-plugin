@@ -32,7 +32,7 @@ foreach ($allContainers as $container) { ?>
                 <?= $backup->date ?> <?= $backup->time ?>
               </td>
               <td>
-                <a href='LXCRestoreBackup?cont=<?= $container->name?>&backup=<?= $backup->time ?>_<?= $backup->date ?>.tar.xz' class='button'>
+                <a href='/LXCRestoreBackup?cont=<?= $container->name?>&backup=<?= $backup->time ?>_<?= $backup->date ?>.tar.xz' class='button'>
                   Create Container From Backup
                 </a>
                 <a href="#" class="button deleteBACKUP" id="<?= $container->name ?> <?= $backup->name ?>_<?= $backup->time ?>_<?= $backup->date ?>">

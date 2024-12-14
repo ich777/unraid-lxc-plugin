@@ -57,7 +57,7 @@ $container = $_GET['cont'];
 </div>
 
 <input type="submit" value="_(Create)_">
-<a href="LXC" class="button">Done</a>
+<a href="/LXC" class="button">Done</a>
 
 </form>
 </div>
