@@ -11,11 +11,15 @@ function getVariable($path, $option) {
   if (!file_exists($path)) {
     return null;
   }
-  $content = file_get_contents($path);
-  if (preg_match('/^' . preg_quote($option, '/') . '\s*=\s*(.*)$/m', $content, $matches)) {
-    return trim($matches[1]);
-  }
-  return null;
+  $contents = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+  foreach ($contents as $line) {
+   $line = trim($line);
+   if (strpos($line, $option . '=') === 0) {
+     $parts = explode('=', $line, 2);
+     return isset($parts[1]) ? trim($parts[1]) : '';
+   }
+ }
+ return null;
 }
 
 function getContainerStats($container, $option) {
