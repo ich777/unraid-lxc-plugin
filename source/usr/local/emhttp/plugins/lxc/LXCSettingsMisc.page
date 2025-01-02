@@ -30,7 +30,7 @@ LXC Dynamic Container Stats:
 </blockquote>
 
 LXC Container URL:
-:  <input type="text" name="LXC_CONTAINER_URL" required="true" style="width: 300px" pattern="^[a-zA-Z0-9\-_:\./]*$" value="<?php echo $settings->default_cont_url;?>" placeholder="images.linuxcontainers.org" class="forbidSpace" required>
+:  <input type="text" name="LXC_CONTAINER_URL" required="true" style="width: 300px" pattern="^[a-zA-Z0-9\-_:.\/]*$" value="<?php echo $settings->default_cont_url;?>" placeholder="images.linuxcontainers.org" class="forbidSpace" required>
 
 <blockquote class="inline_help">
 <p>If you have a mirror that follows the linuxcontainers.org standards you can specify it here (without https://)</p>
