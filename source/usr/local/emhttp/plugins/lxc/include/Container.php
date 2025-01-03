@@ -56,6 +56,27 @@ class Container {
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
     $setmembytes = trim(shell_exec("grep 'lxc.cgroup.memory.limit_in_bytes' " . $this->config . " | awk -F= '{ print $2 }'") ?? '');
     if (empty($setmembytes)) {
+      $setmaxmem = trim(shell_exec("grep 'lxc.cgroup2.memory.max' " . $this->config . " | awk -F= '{ print $2 }'") ?? '');
+      if (!empty($setmaxmem)) {
+        $setmaxmem = trim($setmaxmem);
+        if (is_numeric($setmaxmem)) {
+          $setmembytes = $setmaxmem;
+        } else {
+          $memory = substr($setmaxmem, 0, -1);
+          $unit = strtoupper(substr($setmaxmem, -1));
+          if ($unit === 'G') {
+            $setmembytes = $memory * 1024 * 1024 * 1024;
+          } elseif ($unit === 'M') {
+            $setmembytes = $memory * 1024 * 1024;
+          } elseif ($unit === 'K') {
+            $setmembytes = $memory * 1024;
+          } else {
+            $setmembytes = '';
+          }
+        }
+      }
+    }
+    if (empty($setmembytes)) {
       $setmembytes = trim(shell_exec('awk \'/MemTotal/ { printf "%.0f\n", $2 * 1024 }\' /proc/meminfo'));
     }
     if ($setmembytes >= 1024 * 1024 * 1024 * 1024) {
@@ -139,6 +160,12 @@ class Container {
 
   function startContainer() {
     exec('logger "LXC: Starting container ' . $this->name . '"');
+    exec('lxc-check', $output, $checkval);
+    if ($checkval !== 0) {
+      exec('logger "LXC: failure: Failed to start ' . $this->name . '"');
+      sleep(3);
+      exit(1);
+    }
     exec('lxc-start ' . $this->name . ' 2>&1', $output, $retval);
   if ($retval == 1) {
       exec('logger "LXC: error: Container ' . $this->name . ' failed to start"');
