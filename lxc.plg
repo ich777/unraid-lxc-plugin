@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2025.01.03">
+  <!ENTITY version   "2025.01.09">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "a1e665dccde649fb2234a5276e22b562">
+  <!ENTITY md5       "7af4592640ef87cd79fa1fb4d1c60a8c">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2025.01.09
+- Fix an issue with pattern matching on LXCAddTemplate page which prevented containers from being deployed
 
 ###2025.01.03
 - Fixes for displaying memory incorrect on LXC page when using 'lxc.cgroup2.memory.max' in config
