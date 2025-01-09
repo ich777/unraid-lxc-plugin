@@ -110,7 +110,7 @@ $lxc = simplexml_load_file("/tmp/lxc_container_template.xml");
               <dl>
                 <dt>WebUI:</dt>
                 <dd>
-                  <input type="text" name="contWebUI" value="<? echo $lxc->WebUI; ?>" pattern="^[a-zA-Z0-9\-_:.\/\[\]]*$" placeholder="Full URL to WebGUI or empty for none" class="forbidSpace">
+                  <input type="text" name="contWebUI" value="<? echo $lxc->WebUI; ?>" pattern="^[a-zA-Z0-9\-_:.\/\[\]]?*$" placeholder="Full URL to WebGUI or empty for none" class="forbidSpace">
                 </dd>
               </dl>
             </div>
