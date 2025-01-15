@@ -7,12 +7,6 @@ Tag="wrench"
 <?
 require_once '/usr/local/emhttp/plugins/lxc/include/Settings.php';
 $settings = new Settings();
-
-if (substr($_SERVER['REQUEST_URI'],0,7) != '/LXCSettings') {
-  $lxc = "$docroot/languages/$locale/lxc.txt";
-  if (file_exists($lxc)) $language = array_merge($language,unserialize(file_get_contents($lxc)));
-}
-
 $started = $var['fsState']=='Started';
 $bgcolor = strstr('white,azure',$display['theme']) ? '#f2f2f2' : '#1c1c1c';
 $lxc_version = shell_exec('lxc-info --version');
@@ -30,7 +24,7 @@ body{-webkit-overflow-scrolling:touch}
 <link rel="stylesheet" href="/plugins/lxc/css/lxc.css">
 <script src="/plugins/lxc/js/lxc.js"></script>
 
-<form markdown="1" id="changecfg" method="post" class="<?=$showAdditionalInfo?>">
+<form markdown="1" id="changecfg" method="post">
 _(Enable LXC)_:
 : <select id="SERVICE" name="SERVICE">
   <?= mk_option($settings->status, 'disabled', '_(No)_')?>
