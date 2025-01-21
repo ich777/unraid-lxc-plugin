@@ -227,7 +227,7 @@ restore_lxc_container() {
     echo "Creating ${NEW_NAME} from backup file ${RESTORE_FILE}" | tee >(logger -t "LXC: lxc-autobackup")
     tar -xf ${BACKUP_PATH}/${CONT_NAME}/${RESTORE_FILE} -C ${LXC_PATH}/${NEW_NAME}
   else
-    echo "Creating ${NEW_NAME} from backup file ${FILE_NAME}.tar.xz" | tee >(logger -t "LXC: lxc-autobackup")
+    echo "Creating ${NEW_NAME} from backup file ${FILE_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
     tar -xf ${BACKUP_PATH}/${CONT_NAME}/${FILE_NAME} -C ${LXC_PATH}/${NEW_NAME}
   fi
   if [ "${BDEVTYPE}" == "dir" ]; then
@@ -331,8 +331,8 @@ if [ "${RESTORE}" == "true" ]; then
     echo "Backup path ${BACKUP_PATH}/${CONT_NAME} not found!"
     exit 1
   else
-    if [ -z "$(ls ${BACKUP_PATH}/${CONT_NAME}/*.tar.xz)" ]; then
-      echo "No tar.xz files in ${BACKUP_PATH}/${CONT_NAME}/ found!"
+    if ! ls -1 ${BACKUP_PATH}/${CONT_NAME}/ | grep -qE "^${CONT_NAME}_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_.+\.tar\.xz$" ; then
+      echo "No suitable .tar.xz files in ${BACKUP_PATH}/${CONT_NAME}/ found!"
       exit 1
     fi
   fi
