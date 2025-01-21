@@ -138,7 +138,7 @@ class Container {
 
   private function getBackups() {
     $backups = array();
-    exec("ls -1 " . realpath($this->settings->backup_path) . "/" . $this->name . "/ 2>/dev/null", $backupList);
+    exec("ls -1 " . realpath($this->settings->backup_path) . "/" . $this->name . "/ | grep -E \"^" . $this->name . "_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_.+\.tar\.xz$\" 2>/dev/null", $backupList);
     if (isset($backupList)) {
       foreach ($backupList as $backup){
         $pattern = '/^(.*?)_(\d+\.\d+\.\d+)_(\d{4}-\d{2}-\d{2})(\.tar\.xz)$/';

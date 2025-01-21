@@ -13,10 +13,10 @@ function getVariable($path, $option) {
   }
   $contents = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
   foreach ($contents as $line) {
-   $line = trim($line);
+   $line =  trim(preg_replace('/\s*=\s*/', '=', $line));
    if (strpos($line, $option . '=') === 0) {
      $parts = explode('=', $line, 2);
-     return isset($parts[1]) ? trim($parts[1]) : '';
+     return isset($parts[1]) ? trim(htmlspecialchars(trim($parts[1]), ENT_QUOTES, 'UTF-8')) : '';
    }
  }
  return null;
@@ -46,7 +46,7 @@ function getAvailableInterfaces() {
       return $posA - $posB;
     });
   }
-return $interfaces;
+  return $interfaces;
 }
 
 function getActiveContainers() {
