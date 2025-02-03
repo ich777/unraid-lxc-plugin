@@ -164,15 +164,24 @@ backup_lxc_container() {
     fi
     cd ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}
     rm -f ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}/ts
+    if [ -f "${LXC_PATH}/custom-icons/${CONT_NAME}.png" ]; then
+      cp ${LXC_PATH}/custom-icons/${CONT_NAME}.png ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}/${CONT_NAME}.png
+    fi
     tar -cf - . | xz -${COMPRESSION} --threads=${THREADS} > ${BACKUP_PATH}/${CONT_NAME}/${CONT_NAME}_${DATE}.tar.xz
     echo "Taking backup from temporary snapshot ${TEMP_SNAP} from container ${CONT_NAME} finished" | tee >(logger -t "LXC: lxc-autobackup")
     echo "Deleting temporary snapshot ${TEMP_SNAP} from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    if [ -f "${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}/${CONT_NAME}.png" ]; then
+      rm -f ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}/${CONT_NAME}.png
+    fi
     umount ${LXC_PATH}/${CONT_NAME}/snaps/${TEMP_SNAP}/rootfs 2>/dev/null
     lxc-snapshot -n ${CONT_NAME} -d ${TEMP_SNAP} 2>/dev/null
     echo "Temporary snapshot ${TEMP_SNAP} from container ${CONT_NAME} deleted" | tee >(logger -t "LXC: lxc-autobackup")
   else
     cd ${LXC_PATH}/${CONT_NAME}
     echo "Creating backup from container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
+    if [ -f "${LXC_PATH}/custom-icons/${CONT_NAME}.png" ]; then
+      cp ${LXC_PATH}/custom-icons/${CONT_NAME}.png ${LXC_PATH}/${CONT_NAME}/${CONT_NAME}.png
+    fi
     tar --exclude="snaps" -cf - . | xz -${COMPRESSION} --threads=${THREADS} > ${BACKUP_PATH}/${CONT_NAME}/${CONT_NAME}_${DATE}.tar.xz
     echo "Taking backup from container ${CONT_NAME} finished" | tee >(logger -t "LXC: lxc-autobackup")
     # Start container if it was running before
@@ -180,6 +189,9 @@ backup_lxc_container() {
       echo "Starting container ${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
       lxc-start -n ${CONT_NAME}
       echo "Container ${CONT_NAME} started" | tee >(logger -t "LXC: lxc-autobackup")
+    fi
+    if [ -f "${LXC_PATH}/${CONT_NAME}/${CONT_NAME}.png" ]; then
+      rm -f ${LXC_PATH}/${CONT_NAME}/${CONT_NAME}.png
     fi
   fi
 
@@ -240,6 +252,12 @@ restore_lxc_container() {
   sed -i "/lxc.uts.name =/c\lxc.uts.name = ${NEW_NAME}" ${LXC_PATH}/${NEW_NAME}/config
   if [ -d ${LXC_PATH}/${NEW_NAME}/snaps ]; then
     rm -rf ${LXC_PATH}/${NEW_NAME}/snaps
+  fi
+  if [ -f "${LXC_PATH}/${NEW_NAME}/${CONT_NAME}.png" ]; then
+    if [ ! -d "${LXC_PATH}/custom-icons" ]; then
+      mkdir -p ${LXC_PATH}/custom-icons
+    fi
+    mv ${LXC_PATH}/${NEW_NAME}/${CONT_NAME}.png ${LXC_PATH}/custom-icons/${NEW_NAME}.png
   fi
   if [ -z "${FILE_NAME}" ]; then
     echo "Creating container ${NEW_NAME} from backup file ${RESTORE_FILE} finished" | tee >(logger -t "LXC: lxc-autobackup")
