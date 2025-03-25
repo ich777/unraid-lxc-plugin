@@ -22,7 +22,14 @@ if (!file_exists('/tmp/lxc/containers')) {
 }
 file_put_contents('/tmp/lxc/containers/active', time());
 ?>
+<script>
+  const shadowbox = document.getElementById('shadowbox');
+  function closeShadowbox() {
+    shadowbox.style.display = 'none';
+  }
 
+
+</script>
 <link rel="stylesheet" href="<?autov('/plugins/lxc/css/lxc.css')?>">
 <link type="text/css" rel="stylesheet" href="<?autov('/webGui/styles/jquery.switchbutton.css')?>">
 <script src="<?autov('/webGui/javascript/jquery.switchbutton.js')?>"></script>
@@ -66,7 +73,7 @@ label+.content {
     echo '<span style="font-size:9pt"><i class="fa fa-ban red-text""></i> faulty config</span>';
     echo '</span>';
     echo '</td>';
-    echo '<td>' . $settings->default_path . '/' . ltrim($faulty, './') . '/config<td>';
+    echo '<td><a href="#" class="' . ltrim($faulty, './') . '" id="editconfig"><i class="fa fa-edit text"></i> ' . $settings->default_path . '/' . ltrim($faulty, './') . '/config</a><td>';
   }
   echo '</tr>';
   echo '</tbody>';
@@ -189,7 +196,7 @@ foreach ($allContainers as $container) {
               <li><a href="#" class="killCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-times fa-lg"></i>  Kill</a></li>
             <?php } ?>
             <div class="divider"></div>
-            <li><a href="#" class="<?= $container->name ?>" id="dist"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show Config</a></li>
+            <li><a href="#" class="<?= $container->name ?>" id="editconfig"><i class="fa fa-fw fa-file-text-o fa-lg"></i>  Show/Edit Config</a></li>
             <li><a href="#" class="snapshotCONT" id="<?= $container->name ?>"><i class="fa fa-fw fa-camera fa-lg"></i>  Create Snapshot</a></li>
             <?php if($settings->backup_enabled == "enabled") {
               echo '<li><a href="#" class="backupCONT" id="' . $container->name . '"><i class="fa fa-fw fa-archive fa-lg"></i>  Create Backup</a></li>';
@@ -317,10 +324,10 @@ if (count($differences) > 0) {
     echo ltrim($faulty, './');
     echo '</font>';
     echo '<br>';
-    echo '<span style="font-size:9pt"><i class="fa fa-ban red-text""></i> faulty config</span>';
+    echo '<span style="font-size:9pt"><i class="fa fa-ban red-text"></i> faulty config</span>';
     echo '</span>';
     echo '</td>';
-    echo '<td>' . $settings->default_path . '/' . ltrim($faulty, './') . '/config<td>';
+    echo '<td><a href="#" class="' . ltrim($faulty, './') . '" id="editconfig"><i class="fa fa-edit text"></i> ' . $settings->default_path . '/' . ltrim($faulty, './') . '/config</a><td>';
   }
   echo '</tr>';
   echo '</tbody>';
