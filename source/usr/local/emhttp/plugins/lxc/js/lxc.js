@@ -14,8 +14,39 @@ function postAction(name, id) {
   });
 }
 
-function startConsole(name) {
-  openTerminal('lxc',name);
+function saveConfig(name) {
+  swal({
+    title: "Saving",
+    text: "Saving configuration for LXC container: <span style=\"font-weight:bold\">" + name + "</span>, please wait...",
+    closeOnEsc: false,
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    html: true
+  });
+  let updatedConfig = $('#configEditor').val();
+  $.ajax({
+    type: "POST",
+    url: '/plugins/lxc/include/ajax.php',
+    data: {
+      'lxc': '',
+      'action': 'saveConfig',
+      'container': name,
+      'updatedConfig': updatedConfig
+    },
+    success: function(response) {
+      location.reload();
+    },
+  });
+}
+
+function startConsole(name, navigate) {
+  openTerminal('lxc', name);
+  if (navigate) {
+    setTimeout(function() {
+      top.Shadowbox.close();
+      location.href = '/LXC';
+    }, 1500);
+  }
 }
 
 // Function to wait for an element to be available
@@ -32,30 +63,43 @@ function waitForElement(elementPath, callBack){
 // Function that shows the dialog
 function showDialog(callback, text) {
   swal({
-      title:"Proceed?",
-      text: text,
-      type:'warning',
-      html:true,
-      showCancelButton:true,
-      confirmButtonText: "Proceed",
-      cancelButtonText:"Cancel"},
-    function(confirm){
-      callback(confirm);
-    });
+    title:"Proceed?",
+    text: text,
+    type:'warning',
+    html:true,
+    showCancelButton:true,
+    confirmButtonText: "Proceed",
+    cancelButtonText:"Cancel"
+  },
+  function(confirm){
+    callback(confirm);
+  });
 }
 
 function showPrompt(callback, title, text, placeholder) {
   swal({
-      title: title,
-      text: text,
-      type: "input",
-      showCancelButton: true,
-      closeOnConfirm: true,
-      inputPlaceholder: placeholder}, 
-    function(confirm) {
+    title: title,
+    text: text,
+    type: "input",
+    showCancelButton: true,
+    closeOnConfirm: true,
+    inputPlaceholder: placeholder
+  },
+  function(confirm) {
     callback(confirm);
   });
 }
+
+// Prevent closing shadowbox when editing config
+document.addEventListener('keydown', function(event) {
+  const activeElement = document.activeElement;
+  if (activeElement && activeElement.tagName.toLowerCase() === "textarea") {
+    event.stopPropagation();
+    return;
+  }
+}, true);
+
+
 
 // Function that shows the status dialog
 function showStatus(action, id, title, text) {
@@ -169,7 +213,13 @@ function createContainer(name, description, distribution, release, startcont, au
           dialogContent.append('<p>It is recommended to attach to the corresponding shell by typing in for example:</p>');
           dialogContent.append("<p>lxc-attach " + name + " /bin/bash</p>");
     }
-        dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
+        let HTMLline = '<p class="centered">';
+        if (startcont) {
+            HTMLline += '<button type="button" onclick="startConsole(\'' + name + '\', true);">Open Terminal</button>';
+        }
+        HTMLline += '<button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\';">Done</button>';
+        HTMLline += '</p>';
+        dialogContent.append(HTMLline);
         clearInterval(statusInterval);
       }
     });
@@ -186,9 +236,7 @@ function createContainerCAApp(name, description, repository, webui, icon, startc
     title: "Create Container from Template",
     onClose: function () {
       location.href = '/LXC';
-    },
-    height: Math.min(screen.availHeight, 800),
-    width: Math.min(screen.availWidth, 1200)
+    }
   });
   waitForElement("#dialogContent", function () {
     let dialogContent = $("#dialogContent");
@@ -231,7 +279,13 @@ function createContainerCAApp(name, description, repository, webui, icon, startc
     if (data.toLowerCase().indexOf("error, failed to create container") === -1) {
           dialogContent.append("<p>Check out the README.md from the container if further steps are necessary to configure the container!</p>");
     }
-        dialogContent.append('<br/><p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\'">Done</button></p>');
+        let HTMLline = '<p class="centered">';
+        if (startcont) {
+            HTMLline += '<button type="button" onclick="startConsole(\'' + name + '\', true);">Open Terminal</button>';
+        }
+        HTMLline += '<button class="logLine" type="button" onclick="top.Shadowbox.close(); location.href = \'/LXC\';">Done</button>';
+        HTMLline += '</p>';
+        dialogContent.append(HTMLline);
         clearInterval(statusInterval);
       }
     });
@@ -538,23 +592,25 @@ $(function() {
     postAction($(this).attr("class"), this.id);
   });
 
-  // Listener to show container config
-  document.addEventListener('click', function(e){
-    if(e.target.id=="dist"){
+
+  // Listener to edit container config
+  document.addEventListener('click', function(e) {
+    if (e.target.id === "editconfig") {
       e.stopImmediatePropagation();
-      let statusInterval;
       let container = $(e.target).attr("class");
+
       Shadowbox.open({
         content: '<div id="dialogContent" class="logLine spacing"></div>',
         player: 'html',
-        title: "Configuration",
-        onClose: function () {
+        title: "Show/Edit Configuration",
+        onClose: function() {
           location.reload();
         },
-        height: Math.min(screen.availHeight, 800),
-        width: Math.min(screen.availWidth, 1200)
+        height: Math.min(screen.availHeight, 750),
+        width: Math.min(screen.availWidth, 900)
       });
-      waitForElement("#dialogContent", function () {
+
+      waitForElement("#dialogContent", function() {
         $.ajax({
           type: "POST",
           url: '/plugins/lxc/include/ajax.php',
@@ -563,17 +619,17 @@ $(function() {
             'action': "showConfig",
             'container': container
           },
-          success: function (data) {
-            $("#dialogContent").append(data);
-            $("#dialogContent").append('<p class="centered"><button class="logLine" type="button" onclick="top.Shadowbox.close(); ">Done</button></p>');
-            clearInterval(statusInterval);
+          success: function(data) {
+            let dialogContent = $("#dialogContent");
+            dialogContent.append('<textarea id="configEditor" style="width: 800px; height: 600px; margin: 0 auto; display: block;">' + data + '</textarea>');
+            dialogContent.append('<p class="centered" style="color: red;">WARNING: Saving the configuration will restart a running container!</p>');
+            dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="saveConfig(\'' + container + '\')">Save</button><button class="logLine" type="button" onclick="top.Shadowbox.close();">Done</button></p>');
           }
         });
       });
-    } else if ($(e.target).attr("class")=="btn_dropdown") {
+    } else if ($(e.target).attr("class") === "btn_dropdown") {
       var dropdowns = document.getElementsByClassName("dropdown-menu");
-      var i;
-      for (i = 0; i < dropdowns.length; i++) {
+      for (var i = 0; i < dropdowns.length; i++) {
         var openDropdown = dropdowns[i];
         if (openDropdown.classList.contains('show_lxc')) {
           openDropdown.classList.remove('show_lxc');
