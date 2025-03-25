@@ -621,7 +621,7 @@ $(function() {
           },
           success: function(data) {
             let dialogContent = $("#dialogContent");
-            dialogContent.append('<textarea id="configEditor" style="width: 800px; height: 600px; margin: 0 auto; display: block;">' + data + '</textarea>');
+            dialogContent.append('<textarea id="configEditor" style="width: 800px; height: 600px; margin: 0 auto; display: block; background-color: white; color: black; z-index: 9999; border: 1px solid #ccc; padding: 10px;">' + data + '</textarea>');
             dialogContent.append('<p class="centered" style="color: red;">WARNING: Saving the configuration will restart a running container!</p>');
             dialogContent.append('<p class="centered"><button class="logLine" type="button" onclick="saveConfig(\'' + container + '\')">Save</button><button class="logLine" type="button" onclick="top.Shadowbox.close();">Done</button></p>');
           }
