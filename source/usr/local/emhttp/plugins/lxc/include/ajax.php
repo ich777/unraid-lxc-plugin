@@ -1,5 +1,6 @@
 <?php
 require_once 'functions.php';
+require_once 'Settings.php';
 if (isset($_POST['lxc'])) {
   $settings = new Settings();
   switch ($_POST['action']) {
@@ -100,6 +101,16 @@ if (isset($_POST['lxc'])) {
     case 'showConfig':
       $container = new Container($_POST['container']);
       $container->showConfig();
+      break;
+    case 'saveConfig':
+      $updatedConfig = trim($_POST['updatedConfig']);
+      $container = $_POST['container'];
+      $containerConfig = $settings->default_path . "/" . $container . "/config";
+      file_put_contents($containerConfig, $updatedConfig);
+      $container = new Container($container);
+      if($container->state == "RUNNING") {
+        $container->restartContainer();
+      }
       break;
     case 'fromSnapshot':
       createFromSnapshot($_POST['name'], $_POST['description'], $_POST['container'], $_POST['snapshot'], $_POST['autostart'], $_POST['mac']);

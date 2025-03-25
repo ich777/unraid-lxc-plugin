@@ -60,7 +60,7 @@ function getActiveContainers() {
 }
 
 function getAllContainers() {
-  $containers = shell_exec("lxc-ls");
+  $containers = shell_exec("lxc-ls 2>/dev/null");
   if (!empty($containers)) {
     $containers = preg_replace('!\s+!', ' ', $containers);
     $containers = explode(" ",trim($containers));
