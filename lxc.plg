@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2025.02.03">
+  <!ENTITY version   "2025.03.25">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "4cd305e8cd56cadb7ff783c6d065005a">
+  <!ENTITY md5       "67eede639ad260097556743fd8115f56">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2025.03.25
+- Add Open Terminal button when creating a new container or creating a container from template
+- Change Show Config to Show/Edit Config and make it possible to edit the container configuration directly in the WebUI
 
 ###2025.02.03
 - Include custom container icons in backups
