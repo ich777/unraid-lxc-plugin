@@ -16,7 +16,7 @@
 <CHANGES>
 
 ###2025.03.29
-- Bugfix for commenting memory limits in config not showing up correctly in WebUI - thank you mainfreezer for reporting
+- Bugfix for commenting memory limits in config not showing up correctly in WebUI - thank you mainfrezzer for reporting
 
 ###2025.03.25a
 - Bugfix for themes other than white not showing configuration correctly
