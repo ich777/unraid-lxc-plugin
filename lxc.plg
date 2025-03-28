@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2025.03.25a">
+  <!ENTITY version   "2025.03.29">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "71dbff684e80e19abb376c4cb0660ed1">
+  <!ENTITY md5       "cf328f87a249f8b85ee9c92630cfb17e">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2025.03.29
+- Bugfix for commenting memory limits in config not showing up correctly in WebUI - thank you mainfreezer for reporting
 
 ###2025.03.25a
 - Bugfix for themes other than white not showing configuration correctly
