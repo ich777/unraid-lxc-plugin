@@ -54,9 +54,9 @@ class Container {
       $this->ips = "";
     }
     $this->distribution = trim(exec("grep -oP '(?<=dist )\w+' " . $this->config . " | head -1 | sed 's/\"//g'"));
-    $setmembytes = trim(shell_exec("grep 'lxc.cgroup.memory.limit_in_bytes' " . $this->config . " | awk -F= '{ print $2 }'") ?? '');
+    $setmembytes = trim(shell_exec("grep 'lxc.cgroup.memory.limit_in_bytes' " . $this->config . " | grep -v '^#' | awk -F= '{ print $2 }'") ?? '');
     if (empty($setmembytes)) {
-      $setmaxmem = trim(shell_exec("grep 'lxc.cgroup2.memory.max' " . $this->config . " | awk -F= '{ print $2 }'") ?? '');
+      $setmaxmem = trim(shell_exec("grep 'lxc.cgroup2.memory.max' " . $this->config . " | grep -v '^#' | awk -F= '{ print $2 }'") ?? '');
       if (!empty($setmaxmem)) {
         $setmaxmem = trim($setmaxmem);
         if (is_numeric($setmaxmem)) {
