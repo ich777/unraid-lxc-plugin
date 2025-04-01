@@ -142,9 +142,20 @@ class Container {
     if (isset($backupList)) {
       foreach ($backupList as $backup){
         $pattern = '/^(.*?)_(\d+\.\d+\.\d+)_(\d{4}-\d{2}-\d{2})(\.tar\.xz)$/';
-        preg_match($pattern, $backup, $sorted);
-        $backups[] = new Backup($sorted[1], $sorted[3], $sorted[2]);
+        if (preg_match($pattern, $backup, $sorted)) {
+          $backups[] = array('name' => $sorted[1], 'date' => $sorted[3], 'time' => $sorted[2], 'backupObject' => null);
+        }
       }
+      usort($backups, function($a, $b) {
+        if ($a['date'] == $b['date']) {
+          return strcmp($b['time'], $a['time']);
+        }
+        return strcmp($b['date'], $a['date']);
+      });
+      foreach ($backups as &$backup) {
+        $backup['backupObject'] = new Backup($backup['name'], $backup['date'], $backup['time']);
+      }
+      $backups = array_column($backups, 'backupObject');
     }
     return $backups;
   }
