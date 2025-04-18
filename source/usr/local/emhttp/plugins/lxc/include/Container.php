@@ -20,6 +20,7 @@ class Container {
   public $totalBytes;
   public $pid;
   public $uptime;
+  public $container_order;
   public $settings;
   public $config;
   public $path;
@@ -111,6 +112,12 @@ class Container {
       }
     } else {
       $this->uptime = "";
+    }
+    $order = getVariable($this->config, '#container_order');
+    if (empty($order)) {
+      $this->container_order = null;
+    } else {
+      $this->container_order = $order;
     }
     $this->cpus = $this->getCpus();
     $this->description = getVariable($this->config, '#container_description');
