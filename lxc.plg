@@ -16,7 +16,7 @@
 <CHANGES>
 
 ###2025.04.18a
-- Add the ability to sort containers on the LXC page by adding `#container_order=` followed by the number to the container config
+- Add the ability to sort containers on the LXC page by adding `#container_order=` followed by a number to the container config
 
 ###2025.04.18
 - Fix for to small window when deploying a container from a template
