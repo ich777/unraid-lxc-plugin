@@ -236,7 +236,9 @@ function createContainerCAApp(name, description, repository, webui, icon, startc
     title: "Create Container from Template",
     onClose: function () {
       location.href = '/LXC';
-    }
+    },
+    height: Math.min(screen.availHeight, 800),
+    width: Math.min(screen.availWidth, 1200)
   });
   waitForElement("#dialogContent", function () {
     let dialogContent = $("#dialogContent");
