@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2025.04.18a">
+  <!ENTITY version   "2025.05.19">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "bcd2d1eadbbbf85421ce3ff8108c4b89">
+  <!ENTITY md5       "0c0a72cba6db9f7406509e533c9eafe7">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,10 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2025.05.19
+- Fix bug that shows the LXC page when LXC is disabled
+- Make sure to honor the container order on the Snapshot and Backup pages
 
 ###2025.04.18a
 - Add the ability to sort containers on the LXC page by adding `#container_order=` followed by a number to the container config
