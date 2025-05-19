@@ -4,7 +4,7 @@ Title="LXC Containers"
 Tabs="true"
 Tag="lxc_bw.png"
 Code="f1b2"
-Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/dev/null\")"
+Cond="exec(\"[ -z '$(grep '^CONTAINER_NAME=' config.txt | cut -d'=' -f2)' ] && echo 0 || echo 1\")"
 ---
 <?php
 $started = $var['fsState']=='Started';
@@ -132,6 +132,18 @@ label+.content {
 
   <tbody align="left">
 <?php
+usort($allContainers, function ($a, $b) {
+  if ($a->container_order !== null && $b->container_order !== null) {
+    return $a->container_order <=> $b->container_order;
+  }
+  if ($a->container_order !== null) {
+    return -1;
+  }
+  if ($b->container_order !== null) {
+    return 1;
+  }
+    return strcmp($a->name, $b->name);
+});
 
 foreach ($allContainers as $container) {
   $disableAutoButton = '<input type="submit" class="disableAUTOSTART" value="Disable" id="' . $container->name .'">';

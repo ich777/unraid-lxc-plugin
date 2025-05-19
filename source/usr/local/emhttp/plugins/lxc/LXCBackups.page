@@ -4,9 +4,6 @@ Tag="archive"
 Cond="exec(\"lxc-ls 2>/dev/null\") && parse_ini_file('/boot/config/plugins/lxc/plugin.cfg')['LXC_BACKUP_SERVICE'] == 'enabled'"
 ---
 <?php
-
-$allContainers = getAllContainers();
-
 foreach ($allContainers as $container) { ?>
         <h2><?= $container->name ?></h2>
         <br>

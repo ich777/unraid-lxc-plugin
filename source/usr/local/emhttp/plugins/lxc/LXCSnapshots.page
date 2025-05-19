@@ -11,9 +11,6 @@ require_once('/usr/local/emhttp/plugins/lxc/include/Container.php');
 <script src="/plugins/lxc/js/lxc.js"></script>
 
 <?php
-
-$allContainers = getAllContainers();
-
 foreach ($allContainers as $container) { ?>
         <h2><?= $container->name ?></h2>
         <br>
