@@ -4,7 +4,7 @@ Title="LXC Containers"
 Tabs="true"
 Tag="lxc_bw.png"
 Code="f1b2"
-Cond="exec(\"[ -z '$(grep '^CONTAINER_NAME=' config.txt | cut -d'=' -f2)' ] && echo 0 || echo 1\")"
+Cond="exec(\"grep -o '^SERVICE=enabled' /boot/config/plugins/lxc/plugin.cfg 2>/dev/null\")" 
 ---
 <?php
 $started = $var['fsState']=='Started';
