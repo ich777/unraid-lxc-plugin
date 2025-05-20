@@ -178,12 +178,6 @@ class Container {
 
   function startContainer() {
     exec('logger "LXC: Starting container ' . $this->name . '"');
-    exec('lxc-check', $output, $checkval);
-    if ($checkval !== 0) {
-      exec('logger "LXC: failure: Failed to start ' . $this->name . '"');
-      sleep(3);
-      exit(1);
-    }
     exec('lxc-start ' . $this->name . ' 2>&1', $output, $retval);
   if ($retval == 1) {
       exec('logger "LXC: error: Container ' . $this->name . ' failed to start"');
