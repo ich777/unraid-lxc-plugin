@@ -2,11 +2,11 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "lxc">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2025.05.19">
+  <!ENTITY version   "2025.05.20">
   <!ENTITY launch    "Settings/LXCSettings">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;-plugin/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "0c0a72cba6db9f7406509e533c9eafe7">
+  <!ENTITY md5       "39ee13daeed8c70ca9b1fda2905ab063">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -14,6 +14,11 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.10.0" support="https://forums.unraid.net/topic/123935-plugin-lxc-plugin/">
 
 <CHANGES>
+
+###2025.05.20
+- Minor bugfixes
+- Formatting fixes
+- Code cleanup
 
 ###2025.05.19
 - Fix bug that shows the LXC page when LXC is disabled
@@ -699,9 +704,6 @@ if [ "${LXC_SERVICE}" == "enabled" ]; then
 else 
   chmod 644 &emhttp;/system/LXC
 fi
-
-#Execute lxc startup check
-/usr/bin/lxc-check 2>/dev/null
 
 #Change download URL based on settings file entry
 LXC_CONT_URL=$(cat &plugin;/plugin.cfg | grep "LXC_CONTAINER_URL" | cut -d '=' -f2 | sed 's/\"//g')
