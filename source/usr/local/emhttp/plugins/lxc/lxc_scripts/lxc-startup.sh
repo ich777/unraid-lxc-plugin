@@ -5,6 +5,4 @@ logger "LXC: Waiting ${AUTOSTART_DELAY}s for autostart from container(s) in back
 sleep ${AUTOSTART_DELAY:=10}s 2>/dev/null
 
 logger "LXC: Executing autostart from container(s)"
-if lxc-check 2>/dev/null ; then
-  lxc-autostart
-fi
+lxc-autostart
