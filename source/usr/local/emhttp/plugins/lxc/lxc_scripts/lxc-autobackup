@@ -197,7 +197,7 @@ backup_lxc_container() {
 
 # Delete backups
 # Get backups, sort them by date and time and delete them depending on backups to keep
-BACKUPS_TO_DELETE=$(ls -1 ${BACKUP_PATH}/${CONT_NAME}/ 2>/dev/null | sort -t _ -k3,3 -k2,2 | head -n -${BACKUPS_TO_KEEP})
+BACKUPS_TO_DELETE=$(ls -1 ${BACKUP_PATH}/${CONT_NAME}/ 2>/dev/null | awk -F_ '{print $NF "_" $(NF-1) " " $0}' | sort | awk '{print $2}' | head -n -${BACKUPS_TO_KEEP})
 if [ ! -z "${BACKUPS_TO_DELETE}" ]; then
   echo "Deleting old backups from ${BACKUP_PATH}/${CONT_NAME}" | tee >(logger -t "LXC: lxc-autobackup")
   cd ${BACKUP_PATH}/${CONT_NAME}
